@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Search | House of Viraasat">
+  <title>Search | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --espresso: #2d0f09; --wine: #4b1710; --brown: #6c3022;
+      --cream: #f7f3ed; --ivory: #fcfaf7; --gold: #b58b57; --gold-light: #d0a76e;
+      --text: #211815; --muted: #766b65; --line: #e7ded5;
+      --success: #47704f; --danger: #9a3d32;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); background: var(--ivory); font-family: "DM Sans", sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .announcement { background: var(--espresso); color: #f7e8d7; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 8px 0; }
+    .site-header { background: rgba(252,250,247,.96); border-bottom: 1px solid rgba(45,15,9,.08); backdrop-filter: blur(12px); z-index: 1000; }
+    .navbar { min-height: 88px; padding: 12px 0; }
+    .brand-link { min-width: 285px; }
+    .brand-logo { width: 62px; height: 62px; object-fit: contain; border-radius: 50%; background: var(--ivory); }
+    .brand-fallback { display: none; width: 48px; height: 48px; border: 1px solid var(--brown); border-radius: 50%; color: var(--wine); font-family: "Cormorant Garamond", serif; font-size: 24px; text-align: center; line-height: 46px; }
+    .brand-word { color: var(--espresso); font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 26px; line-height: 1; }
+    .brand-word small { display: block; margin-top: 7px; color: var(--brown); font-family: "DM Sans", sans-serif; font-size: 7.5px; font-weight: 600; letter-spacing: .19em; }
+    .navbar-nav { gap: 10px; }
+    .nav-link { color: #4a3c36 !important; font-size: 12px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; padding: 10px 12px !important; }
+    .header-actions { margin-left: auto; }
+    .icon-btn { border: 0; background: transparent; color: var(--espresso); width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; transition: .25s; }
+    .icon-btn:hover { background: #eee4dc; }
+    .bag-count { position: absolute; top: 2px; right: -1px; width: 17px; height: 17px; border-radius: 50%; background: var(--wine); color: #fff; font-size: 9px; display: grid; place-items: center; }
+    .profile-dropdown .dropdown-menu { min-width: 210px; border: 1px solid var(--line); border-radius: 0; box-shadow: 0 18px 45px rgba(45,15,9,.12); padding: 8px 0; }
+    .profile-dropdown .dropdown-item { font-size: 12px; font-weight: 500; color: #4a3c36; padding: 10px 20px; display: flex; align-items: center; gap: 10px; }
+    .profile-dropdown .dropdown-item i { font-size: 15px; color: var(--brown); width: 18px; }
+    .profile-dropdown .dropdown-item:hover { background: var(--cream); }
+    .profile-dropdown .dropdown-divider { border-color: var(--line); margin: 6px 0; }
+    .profile-dropdown .dropdown-header { font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); padding: 8px 20px 4px; }
+
+    .search-hero { padding: 45px 0 35px; background: linear-gradient(120deg, var(--cream), var(--ivory)); text-align: center; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .2em; font-size: 11px; color: var(--brown); font-weight: 600; }
+    .search-title { font-family: "Cormorant Garamond", serif; font-size: clamp(36px, 4.5vw, 52px); line-height: .95; margin: 12px 0 20px; color: var(--espresso); font-weight: 600; }
+    .search-title em { color: var(--brown); font-weight: 500; }
+
+    .search-bar { max-width: 680px; margin: 0 auto; display: flex; border: 1px solid var(--line); background: #fff; box-shadow: 0 8px 30px rgba(45,15,9,.05); }
+    .search-bar input { flex: 1; border: 0; outline: 0; padding: 15px 20px; font-size: 15px; background: transparent; color: var(--espresso); }
+    .search-bar input::placeholder { color: #aaa19a; }
+    .search-bar button { border: 0; background: var(--espresso); color: #fff; padding: 15px 28px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: .25s; }
+    .search-bar button:hover { background: var(--wine); }
+
+    .quick-tags { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .quick-tag { border: 1px solid var(--line); background: #fff; color: var(--muted); padding: 7px 14px; font-size: 11px; font-weight: 600; letter-spacing: .05em; transition: .25s; cursor: pointer; }
+    .quick-tag:hover { border-color: var(--espresso); color: var(--espresso); }
+
+    .search-section { padding: 40px 0 80px; }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 10px; }
+    .result-header h2 { font-family: "Cormorant Garamond", serif; font-size: 28px; color: var(--espresso); font-weight: 600; margin: 0; }
+    .result-count { color: var(--muted); font-size: 12px; }
+
+    .product-card { background: #fff; border: 1px solid var(--line); transition: .3s; height: 100%; }
+    .product-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 12px 35px rgba(45,15,9,.08); }
+    .product-image-wrap { position: relative; overflow: hidden; background: var(--cream); aspect-ratio: 4/5; }
+    .product-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: .5s; }
+    .product-card:hover .product-image-wrap img { transform: scale(1.05); }
+    .product-badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.96); color: var(--wine); padding: 5px 10px; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .product-info { padding: 16px 18px 18px; }
+    .product-category { color: var(--muted); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 4px; }
+    .product-name { font-family: "Cormorant Garamond", serif; font-size: 21px; font-weight: 600; color: var(--espresso); line-height: 1.1; margin: 0 0 6px; }
+    .product-price { font-size: 14px; font-weight: 700; color: var(--brown); }
+    .btn-view { display: block; text-align: center; border: 1px solid var(--line); background: transparent; color: var(--text); padding: 10px; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: .3s; margin-top: 12px; }
+    .btn-view:hover { border-color: var(--espresso); background: var(--espresso); color: #fff; }
+
+    .no-results { text-align: center; padding: 70px 20px; }
+    .no-results i { font-size: 55px; color: var(--gold); opacity: .4; }
+    .no-results h3 { font-family: "Cormorant Garamond", serif; font-size: 30px; color: var(--espresso); margin: 15px 0 8px; }
+    .no-results p { color: var(--muted); max-width: 400px; margin: 0 auto 20px; }
+
+    .footer { background: var(--espresso); color: #eaded2; padding: 78px 0 28px; }
+    .footer-brand { font-family: "Cormorant Garamond", serif; font-size: 36px; color: #fff; font-weight: 600; }
+    .footer-copy { color: #b9aaa0; font-size: 13px; max-width: 360px; }
+    .socials { display: flex; gap: 8px; margin-top: 20px; }
+    .socials a { width: 36px; height: 36px; border: 1px solid #63443a; border-radius: 50%; display: grid; place-items: center; }
+    .socials a:hover { background: var(--gold); color: var(--espresso); border-color: var(--gold); }
+    .footer h6 { color: #fff; font-size: 10px; text-transform: uppercase; letter-spacing: .18em; margin-bottom: 18px; }
+    .footer .col-6 a, .footer-mail { display: block; color: #b9aaa0; font-size: 12px; margin: 0 0 9px; }
+    .footer .col-6 a:hover, .footer-mail:hover { color: #fff; }
+    .footer-bottom { border-top: 1px solid #4c3027; margin-top: 55px; padding-top: 20px; display: flex; justify-content: space-between; color: #88766c; font-size: 10px; letter-spacing: .05em; }
+
+    @media (max-width: 991.98px) {
+      .navbar { min-height: 76px; }
+      .brand-link { min-width: auto; }
+      .brand-logo { width: 52px; height: 52px; }
+      .brand-word { font-size: 22px; }
+      .header-actions { margin-left: 0; }
+      .navbar-collapse { order: 4; padding-top: 12px; }
+      .navbar-nav { gap: 0; border-top: 1px solid var(--line); padding-top: 8px; }
+      .nav-link { padding: 11px 0 !important; }
+    }
+    @media (max-width: 575.98px) {
+      .announcement { font-size: 8px; }
+      .brand-word { font-size: 20px; }
+      .brand-logo { width: 48px; height: 48px; }
+      .header-actions .icon-btn { width: 35px; height: 35px; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+      .search-bar { flex-direction: column; }
+      .search-bar button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">
+    <div class="container text-center">
+      <span>Complimentary shipping on orders above ₹2,999</span>
+      <span class="d-none d-md-inline mx-2">•</span>
+      <span>Crafted for celebrations</span>
+    </div>
+  </div>
+
+  <header class="site-header sticky-top">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="logo.png" class="brand-logo" alt="House of Viraasat Logo" />
+          <span class="brand-fallback">hoV</span>
+          <span class="brand-word d-none d-sm-block">House of Viraasat
+            <small>KURTA · SHERWANI · ETHNIC WEAR</small>
+          </span>
+        </a>
+        <div class="header-actions order-3 d-flex align-items-center gap-1">
+          <a href="search.html" class="icon-btn" aria-label="Search"><i class="bi bi-search"></i></a>
+          <div class="dropdown profile-dropdown">
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            </ul>
+          </div>
+          <a href="wishlist.html" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
+          <a href="cart.html" class="icon-btn position-relative" aria-label="Shopping bag">
+            <i class="bi bi-bag"></i>
+            <span class="bag-count" id="bagCount">0</span>
+          </a>
+        </div>
+        <div class="collapse navbar-collapse order-2" id="mainNav">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="search-hero">
+      <div class="container">
+        <div class="eyebrow">Search the Collection</div>
+        <h1 class="search-title">Find your <em>perfect piece.</em></h1>
+        <form class="search-bar" id="searchForm">
+          <input type="text" id="searchInput" placeholder="Search kurtas, sherwanis, colours...">
+          <button type="submit"><i class="bi bi-search me-2"></i>Search</button>
+        </form>
+        <div class="quick-tags">
+          <span class="quick-tag">Kurta</span>
+          <span class="quick-tag">Sherwani</span>
+          <span class="quick-tag">Nehru Jacket</span>
+          <span class="quick-tag">Ivory</span>
+          <span class="quick-tag">Maroon</span>
+          <span class="quick-tag">Wedding</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="search-section">
+      <div class="container">
+        <div class="result-header" id="resultHeader" style="display:none;">
+          <h2 id="resultTitle">Results</h2>
+          <span class="result-count" id="resultCount">0 products</span>
+        </div>
+        <div class="row g-4" id="resultsGrid"></div>
+        <div class="no-results d-none" id="noResults">
+          <i class="bi bi-search"></i>
+          <h3>No results found</h3>
+          <p>We couldn't find anything matching your search. Try different keywords.</p>
+          <a href="index.html#featured" class="btn-view" style="display:inline-block;padding:12px 28px;">Browse Collections</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <a href="index.html" class="footer-brand">House of Viraasat</a>
+          <p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p>
+          <div class="socials">
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-pinterest"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6>Shop</h6>
+          <a href="index.html#featured">Kurtas</a>
+          <a href="index.html#featured">Sherwanis</a>
+          <a href="index.html#new-arrivals">New Arrivals</a>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6>Company</h6>
+          <a href="index.html#story">Our Story</a>
+          <a href="contact.html">Contact</a>
+          <a href="faq.html">FAQ</a>
+          <a href="shipping-policy.html">Shipping</a>
+        </div>
+        <div class="col-lg-4">
+          <h6>Visit House of Viraasat</h6>
+          <a href="mailto:hello@houseofviraasat.com" class="footer-mail">hello@houseofviraasat.com</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 House of Viraasat. All rights reserved.</span>
+        <span>Made with heritage &amp; intention.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  $(function () {
+    function formatPrice(price) { return "₹" + Number(price).toLocaleString("en-IN"); }
+
+    const allProducts = [
+      { id: 1, name: "Ivory Handwork Kurta", category: "Kurta", price: 2899, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85", badge: "Bestseller" },
+      { id: 2, name: "Midnight Velvet Sherwani", category: "Sherwani", price: 8999, image: "https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85", badge: "Signature" },
+      { id: 3, name: "Sage Embroidered Kurta", category: "Kurta", price: 3499, image: "https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85", badge: "New" },
+      { id: 4, name: "Regal Bandhgala Set", category: "Sherwani", price: 7499, image: "https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85", badge: "Limited" },
+      { id: 5, name: "Maroon Silk Kurta", category: "Kurta", price: 3299, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85", badge: "Just In" },
+      { id: 6, name: "Sandstone Textured Kurta", category: "Kurta", price: 2999, image: "https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85", badge: "Just In" },
+      { id: 7, name: "Black Royal Sherwani", category: "Sherwani", price: 9499, image: "https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85", badge: "Premium" },
+      { id: 8, name: "Olive Festive Sherwani", category: "Sherwani", price: 8299, image: "https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85", badge: "New" },
+      { id: 9, name: "Sandstone Nehru Jacket", category: "Nehru Jacket", price: 7490, image: "https://images.unsplash.com/photo-1627225924765-552d49cf47ad?auto=format&fit=crop&w=900&q=85", badge: "Popular" },
+      { id: 10, name: "Maharaja Green Sherwani", category: "Sherwani", price: 11000, image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&w=900&q=85", badge: "Royal" },
+      { id: 11, name: "Antique Gold Jacket", category: "Nehru Jacket", price: 8990, image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=900&q=85", badge: "Limited" },
+      { id: 12, name: "Regal Ivory Kurta", category: "Kurta", price: 5490, image: "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=85", badge: "Elegant" }
+    ];
+
+    function performSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        $("#resultHeader").hide();
+        $("#resultsGrid").html("");
+        $("#noResults").addClass("d-none");
+        return;
+      }
+
+      const results = allProducts.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        (p.badge && p.badge.toLowerCase().includes(q))
+      );
+
+      $("#resultHeader").show();
+      $("#resultTitle").html(`Results for "<em style="color:var(--brown);">${query}</em>"`);
+      $("#resultCount").text(results.length + " product" + (results.length !== 1 ? "s" : ""));
+
+      if (results.length === 0) {
+        $("#resultsGrid").html("");
+        $("#noResults").removeClass("d-none");
+        return;
+      }
+      $("#noResults").addClass("d-none");
+
+      const html = results.map(p => `
+        <div class="col-6 col-lg-3">
+          <article class="product-card">
+            <div class="product-image-wrap">
+              <img src="${p.image}" alt="${p.name}">
+              <span class="product-badge">${p.badge}</span>
+            </div>
+            <div class="product-info">
+              <div class="product-category">${p.category}</div>
+              <h3 class="product-name">${p.name}</h3>
+              <div class="product-price">${formatPrice(p.price)}</div>
+              <a href="product.html?id=${p.id}" class="btn-view">View Details</a>
+            </div>
+          </article>
+        </div>
+      `).join("");
+      $("#resultsGrid").html(html);
+    }
+
+    $("#searchForm").on("submit", function (e) {
+      e.preventDefault();
+      performSearch($("#searchInput").val());
+    });
+
+    $(".quick-tag").on("click", function () {
+      const tag = $(this).text().trim();
+      $("#searchInput").val(tag);
+      performSearch(tag);
+    });
+
+    // Load from URL ?q=
+    const params = new URLSearchParams(window.location.search);
+    const initialQ = params.get("q");
+    if (initialQ) {
+      $("#searchInput").val(initialQ);
+      performSearch(initialQ);
+    }
+
+    // Bag count
+    const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+    $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
+
+    // Mobile menu close
+    $(".navbar-nav .nav-link").on("click", function () {
+      const nav = document.getElementById("mainNav");
+      if (window.innerWidth < 992 && nav.classList.contains("show")) {
+        bootstrap.Collapse.getOrCreateInstance(nav).hide();
+      }
+    });
+  });
+  </script>
+</body>
+</html>

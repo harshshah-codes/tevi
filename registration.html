@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | House of Viraasat</title>
+    <link rel="icon" type="image/png" href="fav.png">
+  
+  <!-- Google Fonts + Bootstrap -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for eye icons (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ----- root & reset ----- */
+    :root {
+      --ink: #241d18;
+      --wine: #5a160b;
+      --wine2: #84291d;
+      --cream: #fbfaf7;
+      --sand: #f1ece5;
+      --muted: #766d66;
+      --line: rgba(36,29,24,.12);
+      --ease: cubic-bezier(.2,.75,.25,1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      background: radial-gradient(circle at 12% 10%, rgba(132,41,29,.08), transparent 26%), var(--cream);
+    }
+
+    /* ----- LEFT side (brand) ----- */
+    .left {
+      width: 48%;
+      padding: 42px 8%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      background: #f4f0e9;
+    }
+    .left:after {
+      content: '';
+      position: absolute;
+      right: -25%;
+      top: 12%;
+      width: 560px;
+      height: 560px;
+      border: 1px solid rgba(132,41,29,.18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 80px rgba(90,22,11,.025);
+    }
+
+    /* ---- LOGO : refined size & position (image file kept as is) ---- */
+    .logo {
+      position: relative;
+      z-index: 2;
+      width: 220px;          
+      max-height: 130px;     
+      object-fit: contain;
+      object-position: left center;
+      margin-bottom: 10px;   
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.02));
+      display: block;
+    }
+
+    .eyebrow {
+      font-size: .68rem;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--wine2);
+    }
+    .copy {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 20px 0 30px 0;
+    }
+    h1, h2 {
+      font-family: 'Cormorant Garamond', serif;
+    }
+    h1 {
+      font-size: clamp(3.8rem, 6vw, 6.8rem);
+      line-height: .82;
+      letter-spacing: -.06em;
+      margin: 18px 0;
+    }
+    h1 em {
+      color: var(--wine2);
+      font-weight: 500;
+    }
+    .copy p {
+      max-width: 48ch;
+      color: #655d57;
+      line-height: 1.9;
+    }
+    .quote {
+      position: relative;
+      z-index: 2;
+      border-left: 1px solid var(--wine2);
+      padding-left: 20px;
+      color: #6f645d;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+    }
+
+    /* ----- RIGHT side (form) ----- */
+    .right {
+      width: 52%;
+      min-height: 100vh;
+      padding: 70px 8%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+    .formwrap {
+      width: min(100%, 540px);
+      animation: rise .8s var(--ease) both;
+    }
+    .formtop h2 {
+      font-size: 3.7rem;
+      line-height: .9;
+      margin: 10px 0;
+    }
+    .formtop p {
+      color: var(--muted);
+    }
+    .label {
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #655c56;
+      margin-bottom: 8px;
+    }
+    .form-control {
+      height: 54px;
+      border-radius: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+    .form-control:focus {
+      background: #fff;
+      color: var(--ink);
+      border-color: var(--wine2);
+      box-shadow: 0 0 0 .18rem rgba(132,41,29,.10);
+    }
+    .form-control::placeholder {
+      color: #aaa19a;
+    }
+    .pass {
+      position: relative;
+    }
+    .pass button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 54px;
+      width: 52px;
+      border: 0;
+      background: transparent;
+      color: #7d726b;
+      font-size: 1rem;   
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color .2s;
+    }
+    .pass button:hover {
+      color: var(--wine2);
+    }
+    .check {
+      font-size: .78rem;
+      color: #756b64;
+    }
+    .check a, .signin a {
+      color: var(--wine2);
+      border-bottom: 1px solid rgba(132,41,29,.35);
+      text-decoration: none;
+    }
+    .btn-register {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--wine2);
+      background: linear-gradient(135deg, #5a160b, #84291d);
+      color: #fff;
+      border-radius: 0;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      transition: .3s;
+    }
+    .btn-register:hover {
+      transform: translateY(-2px);
+      background: #96382a;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 26px 0;
+      color: #8a817b;
+      font-size: .66rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .divider:before, .divider:after {
+      content: '';
+      height: 1px;
+      flex: 1;
+      background: var(--line);
+    }
+    .social {
+      height: 50px;
+      border-radius: 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      transition: .3s;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .social i {
+      font-size: 1.1rem;
+    }
+    .social:hover {
+      border-color: var(--wine2);
+      transform: translateY(-2px);
+    }
+    .signin {
+      margin-top: 26px;
+      text-align: center;
+      color: #756b64;
+      font-size: .82rem;
+    }
+    .success {
+      display: none;
+      margin-top: 15px;
+      padding: 12px 15px;
+      background: rgba(132,41,29,.07);
+      border-left: 2px solid var(--wine2);
+      color: #5a160b;
+      font-size: .82rem;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ----- responsive fine-tune ----- */
+    @media (max-width: 991px) {
+      .page { display: block; }
+      .left, .right { width: 100%; min-height: auto; }
+      .left { padding: 35px 8% 50px; }
+      .right { padding: 60px 8%; }
+      .quote { display: none; }
+    }
+    @media (max-width: 575px) {
+      .left, .right { padding-left: 28px; padding-right: 28px; }
+      h1 { font-size: 3.8rem; }
+      .formtop h2 { font-size: 3.1rem; }
+      .logo { width: 180px; max-height: 110px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <!-- LEFT section -->
+  <section class="left">
+    <!-- LOGO: image file kept as "logo.png", only position / size refined via CSS -->
+    <img src="logo.png" alt="House of Viraasat" class="logo">
+
+    <div class="copy">
+      <span class="eyebrow">Welcome to the House</span>
+      <h1>Become part of our <em>viraasat.</em></h1>
+      <p>Create your account to discover exclusive collections, save your favourites and enjoy a more personal House of Viraasat experience.</p>
+    </div>
+    <div class="quote">“Where heritage is remembered, and every story is worn forward.”</div>
+  </section>
+
+  <!-- RIGHT section (form) -->
+  <section class="right">
+    <div class="formwrap">
+      <div class="formtop">
+        <span class="eyebrow">Create your account</span>
+        <h2>Join the family.</h2>
+        <p>A few details and you’re part of the House of Viraasat world.</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="label">First Name</label>
+            <input class="form-control" required placeholder="Your first name">
+          </div>
+          <div class="col-md-6">
+            <label class="label">Last Name</label>
+            <input class="form-control" required placeholder="Your last name">
+          </div>
+          <div class="col-12">
+            <label class="label">Email Address</label>
+            <input type="email" class="form-control" required placeholder="you@example.com">
+          </div>
+          <div class="col-12">
+            <label class="label">Phone Number</label>
+            <input type="tel" class="form-control" required placeholder="+91 00000 00000">
+          </div>
+          <div class="col-md-6">
+            <label class="label">Password</label>
+            <div class="pass">
+              <input type="password" id="p1" class="form-control" required minlength="6" placeholder="Create password">
+              <button type="button" data-id="p1" aria-label="Toggle password visibility">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="label">Confirm Password</label>
+            <div class="pass">
+              <input type="password" id="p2" class="form-control" required minlength="6" placeholder="Confirm password">
+              <button type="button" data-id="p2" aria-label="Toggle password visibility">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-check check">
+              <input class="form-check-input" type="checkbox" required id="terms">
+              <label class="form-check-label ms-1" for="terms">I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>.</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <button class="btn-register">Create My Account</button>
+            <div id="success" class="success">Your registration is complete. Welcome to the House of Viraasat.</div>
+          </div>
+        </div>
+      </form>
+
+      <div class="divider">or continue with</div>
+      <!-- only Google login kept, Facebook removed as per request -->
+      <div class="row g-2">
+        <div class="col-12">
+          <button class="social w-100" type="button">
+            <i class="fab fa-google"></i> Sign in with Google
+          </button>
+        </div>
+      </div>
+      <div class="signin">Already have an account? <a href="login.html"><b>Sign in</b></a></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // toggle password visibility with eye icon
+  document.querySelectorAll('.pass button').forEach(btn => {
+    btn.onclick = () => {
+      const input = document.getElementById(btn.dataset.id);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      // toggle eye icon
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.className = isPassword ? 'far fa-eye-slash' : 'far fa-eye';
+      }
+    };
+  });
+
+  // registration form validation + success
+  document.getElementById('registerForm').onsubmit = (e) => {
+    e.preventDefault();
+    const p1 = document.getElementById('p1');
+    const p2 = document.getElementById('p2');
+
+    if (p1.value !== p2.value) {
+      p2.setCustomValidity('Passwords do not match');
+      p2.reportValidity();
+      return;
+    }
+    p2.setCustomValidity('');
+
+    // show success message
+    const successBox = document.getElementById('success');
+    if (successBox) successBox.style.display = 'block';
+
+    // update button text
+    const btn = e.target.querySelector('.btn-register');
+    if (btn) btn.textContent = 'Account Created ✓';
+  };
+</script>
+</body>
+</html>

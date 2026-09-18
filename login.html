@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <meta name="description" content="Sign in to your House of Viraasat account.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for eye icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root{
+      --ink:#241d18;--wine:#5a160b;--wine2:#84291d;--cream:#fbfaf7;
+      --sand:#f4f0e9;--muted:#766d66;--line:rgba(36,29,24,.12);
+      --ease:cubic-bezier(.2,.75,.25,1)
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;background:var(--cream);color:var(--ink);
+      font-family:"DM Sans",sans-serif;overflow-x:hidden
+    }
+    a{text-decoration:none;color:inherit}
+    .page{
+      min-height:100vh;display:flex;
+      background:
+        radial-gradient(circle at 12% 10%,rgba(132,41,29,.08),transparent 27%),
+        var(--cream)
+    }
+    .brand-side{
+      width:48%;min-height:100vh;padding:42px 8%;
+      display:flex;flex-direction:column;justify-content:space-between;
+      position:relative;overflow:hidden;background:#f4f0e9
+    }
+    .brand-side:before{
+      content:"";position:absolute;right:-22%;top:10%;
+      width:580px;height:580px;border-radius:50%;
+      border:1px solid rgba(132,41,29,.17);
+      box-shadow:0 0 0 78px rgba(90,22,11,.025),0 0 0 156px rgba(90,22,11,.015)
+    }
+    .brand-side:after{
+      content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+      background:linear-gradient(0deg,rgba(90,22,11,.045),transparent);
+      pointer-events:none
+    }
+    .logo-wrap{position:relative;z-index:2}
+
+    .logo {
+      width: 220px;
+      max-height: 130px;
+      object-fit: contain;
+      object-position: left center;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.02));
+    }
+
+    .brand-name{
+      display:inline-flex;flex-direction:column;line-height:.78;color:var(--wine);
+      font-family:"Cormorant Garamond",serif;font-weight:700
+    }
+    .brand-name strong{font-size:clamp(3rem,5vw,5rem);letter-spacing:-.07em}
+    .brand-name span{
+      margin-top:18px;font-size:clamp(1.35rem,2vw,2rem);
+      letter-spacing:.11em;font-weight:500
+    }
+    .brand-copy{position:relative;z-index:2;max-width:610px;margin:55px 0}
+    .eyebrow{
+      color:var(--wine2);font-size:.68rem;font-weight:700;
+      letter-spacing:.24em;text-transform:uppercase
+    }
+    h1,h2{font-family:"Cormorant Garamond",serif}
+    .brand-copy h1{
+      margin:18px 0;font-size:clamp(3.8rem,6vw,6.8rem);
+      line-height:.82;letter-spacing:-.06em
+    }
+    .brand-copy h1 em{font-weight:500;color:var(--wine2)}
+    .brand-copy p{max-width:48ch;color:#655d57;line-height:1.9;margin:0}
+    .quote{
+      position:relative;z-index:2;border-left:1px solid var(--wine2);
+      padding-left:20px;color:#6f645d;font-family:"Cormorant Garamond",serif;
+      font-size:1.3rem;line-height:1.35
+    }
+    .form-side{
+      width:52%;min-height:100vh;padding:70px 8%;
+      display:flex;align-items:center;justify-content:center;background:#fff
+    }
+    .form-wrap{width:min(100%,500px);animation:rise .8s var(--ease) both}
+    .form-top h2{
+      font-size:clamp(3rem,4.5vw,4rem);line-height:.9;margin:10px 0 12px;
+      letter-spacing:-.045em
+    }
+    .form-top p{color:var(--muted);margin-bottom:34px}
+    .label{
+      display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+      font-weight:700;color:#655c56;margin-bottom:8px
+    }
+    .form-control{
+      height:55px;border-radius:0;border:1px solid var(--line);
+      background:#fff;color:var(--ink);padding-left:15px
+    }
+    .form-control:focus{
+      background:#fff;color:var(--ink);border-color:var(--wine2);
+      box-shadow:0 0 0 .18rem rgba(132,41,29,.10)
+    }
+    .form-control::placeholder{color:#aaa19a}
+    .password-box{position:relative}
+    .password-box .toggle-pass{
+      position:absolute;right:0;top:0;height:55px;width:56px;border:0;
+      background:transparent;color:#7d726b;font-size:1.1rem;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:color .2s;
+    }
+    .password-box .toggle-pass:hover{color:var(--wine2);}
+    .options{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin:17px 0 24px;font-size:.78rem
+    }
+    .form-check-label{color:#756b64}
+    .form-check-input{border-radius:0;border-color:rgba(36,29,24,.28)}
+    .form-check-input:checked{background-color:var(--wine2);border-color:var(--wine2)}
+    .forgot{color:var(--wine2);font-weight:600}
+    .btn-login{
+      width:100%;padding:16px;border:1px solid var(--wine2);
+      background:linear-gradient(135deg,#5a160b,#84291d);color:#fff;border-radius:0;
+      font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      transition:.3s var(--ease)
+    }
+    .btn-login:hover{transform:translateY(-2px);background:#96382a;color:#fff}
+    .divider{
+      display:flex;align-items:center;gap:14px;margin:27px 0;color:#8a817b;
+      font-size:.66rem;letter-spacing:.14em;text-transform:uppercase
+    }
+    .divider:before,.divider:after{content:"";height:1px;flex:1;background:var(--line)}
+    .social{
+      height:50px;border-radius:0;background:#fff;border:1px solid var(--line);
+      color:var(--ink);font-size:.78rem;font-weight:600;transition:.3s var(--ease);
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .social:hover{border-color:var(--wine2);transform:translateY(-2px);color:var(--wine)}
+    .social i{font-size:1rem;}
+    .signup{
+      margin-top:27px;text-align:center;color:#756b64;font-size:.82rem
+    }
+    .signup a{color:var(--wine2);font-weight:700;border-bottom:1px solid rgba(132,41,29,.35)}
+    .alert-login{
+      display:none;margin-top:15px;padding:12px 15px;background:rgba(132,41,29,.07);
+      border-left:2px solid var(--wine2);color:#5a160b;font-size:.82rem
+    }
+    @keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    @media(max-width:991px){
+      .page{display:block}.brand-side,.form-side{width:100%;min-height:auto}
+      .brand-side{padding:34px 8%;height:430px}.brand-copy{margin:30px 0}
+      .brand-copy h1{font-size:4rem}.quote{display:none}
+      .form-side{padding:60px 8%}
+    }
+    @media(max-width:575px){
+      .brand-side{height:370px;padding:28px 7%}.brand-copy h1{font-size:3.35rem}
+      .brand-copy p{font-size:.88rem}.brand-name strong{font-size:3.2rem}
+      .form-side{padding:50px 7%}.options{align-items:flex-start;flex-direction:column}
+      .logo { width: 180px; max-height: 110px; }
+    }
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <aside class="brand-side">
+    <div class="logo-wrap">
+      <a href="#" class="brand-name" aria-label="House of Viraasat Home">
+        <img src="logo.png" alt="House of Viraasat" class="logo">
+      </a>
+    </div>
+
+    <div class="brand-copy">
+      <div class="eyebrow">Welcome back</div>
+      <h1>Tradition,<br><em>always with you.</em></h1>
+      <p>Sign in to discover your favourite pieces, revisit your wishlist and continue your journey with House of Viraasat.</p>
+    </div>
+
+    <div class="quote">“Where heritage finds a place in your everyday story.”</div>
+  </aside>
+
+  <main class="form-side">
+    <div class="form-wrap">
+      <div class="form-top">
+        <div class="eyebrow">Your Viraasat account</div>
+        <h2>Welcome back.</h2>
+        <p>Enter your details to continue to House of Viraasat.</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="mb-3">
+          <label class="label" for="email">Email address</label>
+          <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="mb-0">
+          <label class="label" for="password">Password</label>
+          <div class="password-box">
+            <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+            <button type="button" class="toggle-pass" id="togglePass" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="options">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember">
+            <label class="form-check-label" for="remember">Remember me</label>
+          </div>
+          <a href="#" class="forgot">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-login">Sign In to Your Account</button>
+        <div class="alert-login" id="loginAlert">Welcome back to House of Viraasat ✦</div>
+      </form>
+
+      <div class="divider">or continue with</div>
+
+      <!-- Only Google login button remains -->
+      <div class="row g-2">
+        <div class="col-12">
+          <button class="social w-100" type="button">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+        </div>
+        <!-- Facebook button removed -->
+      </div>
+
+      <div class="signup">New to House of Viraasat? <a href="registration.html">Create an account</a></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(function(){
+  // Toggle password visibility with eye icon
+  $("#togglePass").on("click", function(){
+    const input = $("#password");
+    const isPassword = input.attr("type") === "password";
+    input.attr("type", isPassword ? "text" : "password");
+    // Toggle eye icon (open/closed)
+    $(this).find("i").toggleClass("fa-eye fa-eye-slash");
+  });
+
+  // Login form submit handler
+  $("#loginForm").on("submit", function(e){
+    e.preventDefault();
+    const button = $(this).find("button[type='submit']");
+    button.text("Signing You In...");
+    setTimeout(function(){
+      button.text("Sign In to Your Account");
+      $("#loginAlert").stop(true,true).fadeIn(250);
+    }, 700);
+  });
+});
+</script>
+</body>
+</html>

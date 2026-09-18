@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Bag | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--espresso:#2d0f09;--wine:#4b1710;--brown:#6c3022;--cream:#f7f3ed;--ivory:#fcfaf7;--gold:#b58b57;--gold-light:#d0a76e;--text:#211815;--muted:#766b65;--line:#e7ded5;--success:#47704f;--danger:#9a3d32}
+    *{box-sizing:border-box}body{margin:0;color:var(--text);background:var(--ivory);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.7}
+    a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
+    .announcement{background:var(--espresso);color:#f7e8d7;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 0}
+    .site-header{background:rgba(252,250,247,.96);border-bottom:1px solid rgba(45,15,9,.08);backdrop-filter:blur(12px);z-index:1000}
+    .navbar{min-height:88px;padding:12px 0}.brand-link{min-width:285px}
+    .brand-logo{width:62px;height:62px;object-fit:contain;border-radius:50%;background:var(--ivory)}
+    .brand-word{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-weight:700;font-size:26px;line-height:1}
+    .brand-word small{display:block;margin-top:7px;color:var(--brown);font-size:7.5px;font-weight:600;letter-spacing:.19em}
+    .nav-link{color:#4a3c36 !important;font-size:12px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;padding:10px 12px !important}
+    .header-actions{margin-left:auto}.icon-btn{border:0;background:transparent;color:var(--espresso);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:18px}
+    .icon-btn:hover{background:#eee4dc}.icon-btn.search-static{cursor:default}.icon-btn.search-static:hover{background:transparent}
+    .bag-count{position:absolute;top:2px;right:-1px;width:17px;height:17px;border-radius:50%;background:var(--wine);color:#fff;font-size:9px;display:grid;place-items:center}
+    .profile-dropdown .dropdown-menu{min-width:210px;border:1px solid var(--line);border-radius:0;box-shadow:0 18px 45px rgba(45,15,9,.12);padding:8px 0;margin-top:10px !important}
+    .profile-dropdown .dropdown-item{font-size:12px;font-weight:500;color:#4a3c36;padding:10px 20px;display:flex;align-items:center;gap:10px}
+    .profile-dropdown .dropdown-item i{font-size:15px;color:var(--brown);width:18px}
+    .profile-dropdown .dropdown-item:hover{background:var(--cream)}
+    .profile-dropdown .dropdown-divider{border-color:var(--line);margin:6px 0}
+    .profile-dropdown .dropdown-header{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:8px 20px 4px}
+    .cart-hero{padding:55px 0 30px;background:linear-gradient(120deg,var(--cream),var(--ivory));text-align:center;position:relative;overflow:hidden}
+    .cart-hero:before{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(181,139,87,.15);border-radius:50%;right:-80px;bottom:-50px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.2em;font-size:11px;color:var(--brown);font-weight:600}
+    .cart-title{font-family:"Cormorant Garamond",serif;font-size:clamp(44px,6vw,68px);line-height:.92;margin:12px 0 8px;color:var(--espresso);font-weight:600}
+    .cart-title em{color:var(--brown);font-weight:500}
+    .cart-subtitle{color:var(--muted);max-width:500px;margin:auto}
+    .cart-section{padding:50px 0 80px}
+    .cart-items-wrap{background:#fff;border:1px solid var(--line);padding:25px 30px}
+    .cart-item{display:flex;gap:20px;padding:25px 0;border-bottom:1px solid var(--line);align-items:center}
+    .cart-item:first-child{padding-top:0}.cart-item:last-child{border-bottom:none;padding-bottom:0}
+    .cart-item-image{width:110px;height:140px;flex-shrink:0;background:var(--cream);overflow:hidden}
+    .cart-item-image img{width:100%;height:100%;object-fit:cover}
+    .cart-item-details{flex:1}
+    .cart-item-category{text-transform:uppercase;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:4px}
+    .cart-item-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:var(--espresso);margin:0 0 6px;line-height:1.1}
+    .cart-item-meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+    .cart-item-meta span{margin-right:15px}
+    .cart-item-price{font-size:16px;font-weight:700;color:var(--brown);margin-bottom:10px}
+    .cart-qty-control{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff;margin-bottom:10px}
+    .cart-qty-control button{width:34px;height:36px;border:0;background:transparent;color:var(--espresso);font-size:16px;cursor:pointer}
+    .cart-qty-control button:hover{background:var(--cream)}
+    .cart-qty-control input{width:40px;height:36px;border:0;outline:0;text-align:center;background:transparent;font-size:13px;font-weight:600}
+    .cart-remove-btn{border:0;background:transparent;color:var(--muted);font-size:12px;padding:6px 0;transition:.25s;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+    .cart-remove-btn:hover{color:var(--danger)}
+    .cart-summary{background:#fff;border:1px solid var(--line);padding:30px;position:sticky;top:120px}
+    .cart-summary-title{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:600;color:var(--espresso);margin-bottom:20px}
+    .cart-summary-title em{color:var(--brown);font-weight:500}
+    .summary-row{display:flex;justify-content:space-between;padding:10px 0;font-size:13px}
+    .summary-row .label{color:var(--muted)}
+    .summary-row.total{border-top:2px solid var(--brown);margin-top:12px;padding-top:18px;font-size:17px;font-weight:700;color:var(--espresso)}
+    .coupon-input{display:flex;border:1px solid var(--line);margin:18px 0}
+    .coupon-input input{flex:1;border:0;outline:0;padding:10px 14px;font-size:12px;background:transparent}
+    .coupon-input button{border:0;background:var(--espresso);color:#fff;padding:10px 18px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+    .coupon-input button:hover{background:var(--wine)}
+    .btn-checkout{width:100%;padding:14px;border:1px solid var(--gold);background:var(--gold);color:#24150d;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transition:.3s;margin-bottom:10px;display:block;text-align:center}
+    .btn-checkout:hover{background:var(--gold-light);border-color:var(--gold-light);transform:translateY(-2px);color:#24150d}
+    .btn-continue-shopping{display:block;text-align:center;color:var(--brown);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:12px;transition:.25s}
+    .btn-continue-shopping:hover{background:var(--cream);border-color:var(--brown);color:var(--espresso)}
+    .empty-cart{padding:80px 20px;text-align:center}
+    .empty-cart i{font-size:60px;color:var(--gold);opacity:.4}
+    .empty-cart h3{font-family:"Cormorant Garamond",serif;font-size:34px;color:var(--espresso);margin:18px 0 10px}
+    .empty-cart p{color:var(--muted);max-width:380px;margin:0 auto 22px}
+    .footer{background:var(--espresso);color:#eaded2;padding:78px 0 28px}
+    .footer-brand{font-family:"Cormorant Garamond",serif;font-size:36px;color:#fff;font-weight:600}
+    .footer-copy{color:#b9aaa0;font-size:13px;max-width:360px}
+    .socials{display:flex;gap:8px;margin-top:20px}
+    .socials a{width:36px;height:36px;border:1px solid #63443a;border-radius:50%;display:grid;place-items:center}
+    .socials a:hover{background:var(--gold);color:var(--espresso);border-color:var(--gold)}
+    .footer h6{color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:18px}
+    .footer .col-6 a,.footer-mail{display:block;color:#b9aaa0;font-size:12px;margin:0 0 9px}
+    .footer .col-6 a:hover,.footer-mail:hover{color:#fff}
+    .footer-bottom{border-top:1px solid #4c3027;margin-top:55px;padding-top:20px;display:flex;justify-content:space-between;color:#88766c;font-size:10px;letter-spacing:.05em}
+    .toast{background:var(--espresso);color:#fff;border-radius:0}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:0}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.cart-summary{position:relative;top:auto;margin-top:30px}.cart-items-wrap{padding:20px}}
+    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.footer-bottom{flex-direction:column;gap:8px}.cart-title{font-size:38px}.cart-item{flex-direction:column;align-items:flex-start}.cart-item-image{width:100%;height:220px}.cart-item-name{font-size:19px}.cart-summary{padding:20px}}
+  </style>
+</head>
+<body>
+  <div class="announcement"><div class="container text-center"><span>Complimentary shipping on orders above ₹2,999</span><span class="d-none d-md-inline mx-2">•</span><span>Crafted for celebrations</span></div></div>
+
+  <header class="site-header sticky-top">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="logo.png" class="brand-logo" alt="Logo">
+          <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
+        </a>
+        <div class="header-actions order-3 d-flex align-items-center gap-1">
+          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <div class="dropdown profile-dropdown">
+            <button class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            </ul>
+          </div>
+          <a href="wishlist.html" class="icon-btn"><i class="bi bi-heart"></i></a>
+          <a href="cart.html" class="icon-btn position-relative"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
+        </div>
+        <div class="collapse navbar-collapse order-2" id="mainNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="cart-hero">
+      <div class="container">
+        <div class="eyebrow">House of Viraasat</div>
+        <h1 class="cart-title">Your <em>Shopping Bag</em></h1>
+        <p class="cart-subtitle">Review your selection before checkout.</p>
+      </div>
+    </section>
+
+    <section class="cart-section">
+      <div class="container">
+        <div class="row" id="cartWrap">
+          <div class="col-lg-8">
+            <div class="cart-items-wrap" id="cartItemsWrap"></div>
+            <div id="emptyCart" class="empty-cart d-none" style="background:#fff;border:1px solid var(--line);">
+              <i class="bi bi-bag"></i>
+              <h3>Your bag is empty</h3>
+              <p>Add something beautiful to your bag and complete your look.</p>
+              <a href="index.html#featured" class="btn-continue-shopping" style="display:inline-block;padding:12px 28px;">Continue Shopping →</a>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="cart-summary" id="cartSummary">
+              <h3 class="cart-summary-title">Order <em>Summary</em></h3>
+              <div class="summary-row"><span class="label">Subtotal</span><span id="subtotal">₹0</span></div>
+              <div class="summary-row"><span class="label">Shipping</span><span id="shipping">FREE</span></div>
+              <div class="summary-row"><span class="label">Discount</span><span id="discount">-₹0</span></div>
+              <div class="summary-row total"><span class="label">Total</span><span id="total">₹0</span></div>
+              <div class="coupon-input">
+                <input type="text" id="couponCode" placeholder="Promo code (try HOV10)">
+                <button id="applyCoupon">Apply</button>
+              </div>
+              <a href="checkout.html" class="btn-checkout">Proceed to Checkout <i class="bi bi-arrow-right ms-2"></i></a>
+              <a href="index.html#featured" class="btn-continue-shopping">← Continue Shopping</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4"><a href="index.html" class="footer-brand">House of Viraasat</a><p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p><div class="socials"><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-pinterest"></i></a></div></div>
+        <div class="col-6 col-lg-2"><h6>Shop</h6><a href="index.html#featured">Kurtas</a><a href="index.html#featured">Sherwanis</a><a href="index.html#new-arrivals">New Arrivals</a></div>
+        <div class="col-6 col-lg-2"><h6>Company</h6><a href="index.html#story">Our Story</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a><a href="shipping-policy.html">Shipping</a></div>
+        <div class="col-lg-4"><h6>Visit House of Viraasat</h6><a href="mailto:hello@houseofviraasat.com" class="footer-mail">hello@houseofviraasat.com</a></div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 House of Viraasat. All rights reserved.</span><span>Made with heritage &amp; intention.</span></div>
+    </div>
+  </footer>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="siteToast" class="toast border-0"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div></div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  $(function () {
+    let cart = JSON.parse(localStorage.getItem("hovBag") || "[]");
+    let couponApplied = false;
+
+    function formatPrice(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
+    function saveCart() { localStorage.setItem("hovBag", JSON.stringify(cart)); }
+    function showToast(m) { $("#toastMessage").text(m); bootstrap.Toast.getOrCreateInstance(document.getElementById("siteToast"),{delay:2200}).show(); }
+
+    function updateBagCount() {
+      const count = cart.reduce((a, b) => a + (b.qty || 1), 0);
+      $("#bagCount").text(count);
+    }
+
+    function renderCart() {
+      if (cart.length === 0) {
+        $("#cartItemsWrap").addClass("d-none");
+        $("#cartSummary").addClass("d-none");
+        $("#emptyCart").removeClass("d-none");
+        updateBagCount();
+        return;
+      }
+      $("#cartItemsWrap").removeClass("d-none");
+      $("#cartSummary").removeClass("d-none");
+      $("#emptyCart").addClass("d-none");
+
+      const html = cart.map((item, index) => `
+        <div class="cart-item" data-index="${index}">
+          <div class="cart-item-image">
+            <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.name}">
+          </div>
+          <div class="cart-item-details">
+            <div class="cart-item-category">${item.category || "Apparel"}</div>
+            <h3 class="cart-item-name">${item.name}</h3>
+            <div class="cart-item-meta">
+              <span>Size: ${item.size || "M"}</span>
+              ${item.color ? `<span>Color: ${item.color}</span>` : ""}
+            </div>
+            <div class="cart-item-price">${formatPrice(item.price)}</div>
+            <div class="cart-qty-control">
+              <button class="qty-minus">−</button>
+              <input type="text" value="${item.qty || 1}" readonly>
+              <button class="qty-plus">+</button>
+            </div>
+            <br>
+            <button class="cart-remove-btn remove-item"><i class="bi bi-trash3"></i> Remove</button>
+          </div>
+        </div>`).join("");
+      $("#cartItemsWrap").html(html);
+      calculateTotals();
+      updateBagCount();
+    }
+
+    function calculateTotals() {
+      let subtotal = 0;
+      cart.forEach(i => { subtotal += i.price * (i.qty || 1); });
+      const shipping = subtotal >= 2999 || subtotal === 0 ? 0 : 199;
+      const discount = couponApplied ? Math.round(subtotal * 0.10) : 0;
+      const total = subtotal + shipping - discount;
+      $("#subtotal").text(formatPrice(subtotal));
+      $("#shipping").text(shipping === 0 ? "FREE" : formatPrice(shipping));
+      $("#discount").text("-" + formatPrice(discount));
+      $("#total").text(formatPrice(total));
+    }
+
+    $(document).on("click", ".qty-plus", function () {
+      const idx = parseInt($(this).closest(".cart-item").data("index"));
+      if (cart[idx].qty < 10) {
+        cart[idx].qty = (cart[idx].qty || 1) + 1;
+        $(this).siblings("input").val(cart[idx].qty);
+        saveCart(); calculateTotals(); updateBagCount();
+      }
+    });
+
+    $(document).on("click", ".qty-minus", function () {
+      const idx = parseInt($(this).closest(".cart-item").data("index"));
+      if (cart[idx].qty > 1) {
+        cart[idx].qty -= 1;
+        $(this).siblings("input").val(cart[idx].qty);
+        saveCart(); calculateTotals(); updateBagCount();
+      } else {
+        const name = cart[idx].name;
+        const $el = $(this).closest(".cart-item");
+        $el.fadeOut(250, () => { cart.splice(idx, 1); saveCart(); renderCart(); });
+        showToast(name + " removed from bag.");
+      }
+    });
+
+    $(document).on("click", ".remove-item", function () {
+      const idx = parseInt($(this).closest(".cart-item").data("index"));
+      const name = cart[idx].name;
+      const $el = $(this).closest(".cart-item");
+      $el.fadeOut(250, () => { cart.splice(idx, 1); saveCart(); renderCart(); });
+      showToast(name + " removed from bag.");
+    });
+
+    $("#applyCoupon").click(function () {
+      const code = $("#couponCode").val().trim().toUpperCase();
+      if (code === "HOV10" && !couponApplied) {
+        couponApplied = true;
+        $("#couponCode").val("");
+        calculateTotals();
+        showToast("Coupon HOV10 applied — 10% off.");
+      } else if (couponApplied) {
+        showToast("Coupon already applied.");
+      } else {
+        showToast("Invalid coupon. Try HOV10.");
+      }
+    });
+
+    $(".navbar-nav .nav-link").on("click", function () {
+      const nav = document.getElementById("mainNav");
+      if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
+    });
+
+    renderCart();
+  });
+  </script>
+</body>
+</html>

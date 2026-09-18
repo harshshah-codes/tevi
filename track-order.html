@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track Order | House of Viraasat">
+  <title>Track Order | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --espresso: #2d0f09; --wine: #4b1710; --brown: #6c3022;
+      --cream: #f7f3ed; --ivory: #fcfaf7; --gold: #b58b57;
+      --text: #211815; --muted: #766b65; --line: #e7ded5;
+      --success: #47704f; --danger: #9a3d32;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); background: var(--ivory); font-family: "DM Sans", sans-serif; font-size: 15px; line-height: 1.7; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .announcement { background: var(--espresso); color: #f7e8d7; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 8px 0; }
+    .site-header { background: rgba(252,250,247,.96); border-bottom: 1px solid rgba(45,15,9,.08); backdrop-filter: blur(12px); z-index: 1000; }
+    .navbar { min-height: 88px; padding: 12px 0; }
+    .brand-link { min-width: 285px; }
+    .brand-logo { width: 62px; height: 62px; object-fit: contain; border-radius: 50%; background: var(--ivory); }
+    .brand-fallback { display: none; width: 48px; height: 48px; border: 1px solid var(--brown); border-radius: 50%; color: var(--wine); font-family: "Cormorant Garamond", serif; font-size: 24px; text-align: center; line-height: 46px; }
+    .brand-word { color: var(--espresso); font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: .01em; }
+    .brand-word small { display: block; margin-top: 7px; color: var(--brown); font-family: "DM Sans", sans-serif; font-size: 7.5px; font-weight: 600; letter-spacing: .19em; }
+    .navbar-nav { gap: 10px; }
+    .nav-link { color: #4a3c36 !important; font-size: 12px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; padding: 10px 12px !important; position: relative; }
+    .nav-link::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 1px; background: var(--wine); transform: scaleX(0); transition: .25s; }
+    .nav-link:hover::after { transform: scaleX(1); }
+    .header-actions { margin-left: auto; }
+    .icon-btn { border: 0; background: transparent; color: var(--espresso); width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; transition: .25s; }
+    .icon-btn:hover { background: #eee4dc; }
+    .icon-btn.search-static { cursor: default; }
+    .icon-btn.search-static:hover { background: transparent; }
+    .bag-count { position: absolute; top: 2px; right: -1px; width: 17px; height: 17px; border-radius: 50%; background: var(--wine); color: #fff; font-size: 9px; display: grid; place-items: center; }
+    .profile-dropdown .dropdown-menu { min-width: 210px; border: 1px solid var(--line); border-radius: 0; box-shadow: 0 18px 45px rgba(45,15,9,.12); padding: 8px 0; margin-top: 10px !important; }
+    .profile-dropdown .dropdown-item { font-size: 12px; font-weight: 500; color: #4a3c36; padding: 10px 20px; display: flex; align-items: center; gap: 10px; }
+    .profile-dropdown .dropdown-item i { font-size: 15px; color: var(--brown); width: 18px; }
+    .profile-dropdown .dropdown-item:hover { background: var(--cream); color: var(--espresso); }
+    .profile-dropdown .dropdown-divider { border-color: var(--line); margin: 6px 0; }
+    .profile-dropdown .dropdown-header { font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); padding: 8px 20px 4px; }
+
+    .track-hero { padding: 55px 0 30px; background: linear-gradient(120deg, var(--cream), var(--ivory)); text-align: center; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .2em; font-size: 11px; color: var(--brown); font-weight: 600; }
+    .track-title { font-family: "Cormorant Garamond", serif; font-size: clamp(40px, 5vw, 60px); line-height: .92; margin: 12px 0 8px; color: var(--espresso); font-weight: 600; }
+    .track-title em { color: var(--brown); font-weight: 500; }
+    .track-subtitle { color: var(--muted); max-width: 500px; margin: auto; }
+    .track-section { padding: 40px 0 80px; }
+
+    .track-search {
+      max-width: 560px; margin: 0 auto 40px;
+      display: flex; border: 1px solid var(--line); background: #fff;
+    }
+    .track-search input {
+      flex: 1; border: 0; outline: 0; padding: 14px 18px; font-size: 14px; background: transparent;
+    }
+    .track-search button {
+      border: 0; background: var(--espresso); color: #fff; padding: 14px 28px;
+      font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: .25s;
+    }
+    .track-search button:hover { background: var(--wine); }
+
+    .track-card {
+      max-width: 820px; margin: 0 auto; background: #fff;
+      border: 1px solid var(--line); padding: 40px;
+    }
+    .track-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 30px; flex-wrap: wrap; gap: 10px;
+    }
+    .track-order-id { font-family: "Cormorant Garamond", serif; font-size: 28px; font-weight: 700; color: var(--espresso); }
+    .track-order-date { font-size: 12px; color: var(--muted); }
+    .track-status-badge {
+      background: #f7f0e6; color: #b58b57; padding: 6px 16px;
+      font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    }
+
+    .progress-track {
+      display: flex; justify-content: space-between; position: relative; margin-bottom: 40px;
+    }
+    .progress-track:before {
+      content: ""; position: absolute; top: 20px; left: 8%; right: 8%;
+      height: 2px; background: var(--line); z-index: 0;
+    }
+    .progress-step { position: relative; z-index: 1; text-align: center; flex: 1; }
+    .progress-dot {
+      width: 42px; height: 42px; border-radius: 50%; background: #fff;
+      border: 2px solid var(--line); margin: 0 auto 12px;
+      display: grid; place-items: center; color: var(--muted); font-size: 16px;
+      transition: .3s;
+    }
+    .progress-step.active .progress-dot {
+      background: var(--success); border-color: var(--success); color: #fff;
+      box-shadow: 0 0 0 6px rgba(71,112,79,.12);
+    }
+    .progress-step.completed .progress-dot { background: var(--success); border-color: var(--success); color: #fff; }
+    .progress-step span {
+      font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700;
+    }
+    .progress-step.active span, .progress-step.completed span { color: var(--espresso); }
+
+    .track-detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 25px;
+      border-top: 1px solid var(--line); padding-top: 25px;
+    }
+    .track-detail-block h6 {
+      font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted); font-weight: 700; margin-bottom: 8px;
+    }
+    .track-detail-block p { margin: 0; font-size: 13px; line-height: 1.7; }
+
+    .track-items { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 25px; }
+    .track-items h6 { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 16px; }
+    .track-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center; }
+    .track-item:last-child { border-bottom: 0; }
+    .track-item img { width: 55px; height: 70px; object-fit: cover; background: var(--cream); }
+    .track-item-name { font-size: 14px; font-weight: 600; color: var(--espresso); }
+    .track-item-meta { font-size: 11px; color: var(--muted); }
+
+    .track-empty { text-align: center; padding: 70px 30px; max-width: 820px; margin: 0 auto; background: #fff; border: 1px solid var(--line); }
+    .track-empty i { font-size: 55px; color: var(--gold); opacity: .4; }
+    .track-empty h3 { font-family: "Cormorant Garamond", serif; font-size: 30px; color: var(--espresso); margin: 15px 0 8px; }
+
+    .footer { background: var(--espresso); color: #eaded2; padding: 78px 0 28px; }
+    .footer-brand { font-family: "Cormorant Garamond", serif; font-size: 36px; color: #fff; font-weight: 600; }
+    .footer-copy { color: #b9aaa0; font-size: 13px; max-width: 360px; }
+    .socials { display: flex; gap: 8px; margin-top: 20px; }
+    .socials a { width: 36px; height: 36px; border: 1px solid #63443a; border-radius: 50%; display: grid; place-items: center; }
+    .socials a:hover { background: var(--gold); color: var(--espresso); border-color: var(--gold); }
+    .footer h6 { color: #fff; font-size: 10px; text-transform: uppercase; letter-spacing: .18em; margin-bottom: 18px; }
+    .footer .col-6 a, .footer-mail { display: block; color: #b9aaa0; font-size: 12px; margin: 0 0 9px; }
+    .footer .col-6 a:hover, .footer-mail:hover { color: #fff; }
+    .footer-bottom { border-top: 1px solid #4c3027; margin-top: 55px; padding-top: 20px; display: flex; justify-content: space-between; color: #88766c; font-size: 10px; letter-spacing: .05em; }
+
+    @media (max-width: 991.98px) {
+      .navbar { min-height: 76px; }
+      .brand-link { min-width: auto; }
+      .brand-logo { width: 52px; height: 52px; }
+      .brand-word { font-size: 22px; }
+      .header-actions { margin-left: 0; }
+      .navbar-collapse { order: 4; padding-top: 12px; }
+      .navbar-nav { gap: 0; border-top: 1px solid var(--line); padding-top: 8px; }
+      .nav-link { padding: 11px 0 !important; }
+      .track-card { padding: 25px; }
+    }
+    @media (max-width: 575.98px) {
+      .announcement { font-size: 8px; }
+      .brand-word { font-size: 20px; }
+      .brand-logo { width: 48px; height: 48px; }
+      .footer-bottom { flex-direction: column; gap: 8px; }
+      .progress-track { flex-direction: column; gap: 18px; }
+      .progress-track:before { display: none; }
+      .progress-step { display: flex; align-items: center; gap: 14px; text-align: left; }
+      .progress-dot { margin: 0; }
+      .track-detail-grid { grid-template-columns: 1fr; }
+      .track-search { flex-direction: column; }
+      .track-search button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">
+    <div class="container text-center">
+      <span>Complimentary shipping on orders above ₹2,999</span>
+      <span class="d-none d-md-inline mx-2">•</span>
+      <span>Crafted for celebrations</span>
+    </div>
+  </div>
+
+  <header class="site-header sticky-top">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="logo.png" class="brand-logo" alt="House of Viraasat Logo" />
+          <span class="brand-fallback">hoV</span>
+          <span class="brand-word d-none d-sm-block">House of Viraasat
+            <small>KURTA · SHERWANI · ETHNIC WEAR</small>
+          </span>
+        </a>
+        <div class="header-actions order-3 d-flex align-items-center gap-1">
+          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <div class="dropdown profile-dropdown">
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            </ul>
+          </div>
+          <a href="wishlist.html" class="icon-btn"><i class="bi bi-heart"></i></a>
+          <a href="cart.html" class="icon-btn position-relative">
+            <i class="bi bi-bag"></i>
+            <span class="bag-count" id="bagCount">0</span>
+          </a>
+        </div>
+        <div class="collapse navbar-collapse order-2" id="mainNav">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="track-hero">
+      <div class="container">
+        <div class="eyebrow">House of Viraasat</div>
+        <h1 class="track-title">Track Your <em>Order</em></h1>
+        <p class="track-subtitle">Enter your order ID to see real-time updates.</p>
+      </div>
+    </section>
+
+    <section class="track-section">
+      <div class="container">
+        <div class="track-search">
+          <input type="text" id="trackInput" placeholder="Enter Order ID (e.g. HOV-12345678)">
+          <button id="trackBtn">Track</button>
+        </div>
+
+        <div id="trackResult"></div>
+
+        <div id="trackEmpty" class="track-empty d-none">
+          <i class="bi bi-search"></i>
+          <h3>Order not found</h3>
+          <p>We couldn't find an order with that ID. Please check and try again.</p>
+          <a href="myaccount.html" class="btn btn-dark" style="border-radius:0;padding:10px 24px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;">View My Orders</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <a href="index.html" class="footer-brand">House of Viraasat</a>
+          <p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p>
+          <div class="socials">
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-pinterest"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6>Shop</h6>
+          <a href="index.html#featured">Kurtas</a>
+          <a href="index.html#featured">Sherwanis</a>
+          <a href="index.html#new-arrivals">New Arrivals</a>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6>Company</h6>
+          <a href="index.html#story">Our Story</a>
+          <a href="contact.html">Contact</a>
+          <a href="shipping-policy.html">Shipping</a>
+        </div>
+        <div class="col-lg-4">
+          <h6>Visit House of Viraasat</h6>
+          <a href="mailto:hello@houseofviraasat.com" class="footer-mail">hello@houseofviraasat.com</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 House of Viraasat. All rights reserved.</span>
+        <span>Made with heritage &amp; intention.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  $(function () {
+    function formatPrice(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
+    const params = new URLSearchParams(window.location.search);
+    const presetId = params.get("id");
+    if (presetId) $("#trackInput").val(presetId);
+
+    function renderOrder(order) {
+      if (!order) {
+        $("#trackResult").html("");
+        $("#trackEmpty").removeClass("d-none");
+        return;
+      }
+      $("#trackEmpty").addClass("d-none");
+
+      const orderDate = order.date ? new Date(order.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "—";
+      const itemsHtml = (order.items || []).map(item => `
+        <div class="track-item">
+          <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.name}">
+          <div>
+            <div class="track-item-name">${item.name}</div>
+            <div class="track-item-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1}</div>
+          </div>
+        </div>
+      `).join("");
+
+      // Determine current step: first 2 are done since order is placed
+      // Simulate: Confirmed -> active, Processing/Shipped/Delivered = pending
+      const html = `
+        <div class="track-card">
+          <div class="track-header">
+            <div>
+              <div class="track-order-id">#${order.orderId}</div>
+              <div class="track-order-date">Placed on ${orderDate}</div>
+            </div>
+            <span class="track-status-badge">Processing</span>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-step completed">
+              <div class="progress-dot"><i class="bi bi-check2"></i></div>
+              <span>Confirmed</span>
+            </div>
+            <div class="progress-step active">
+              <div class="progress-dot"><i class="bi bi-box"></i></div>
+              <span>Processing</span>
+            </div>
+            <div class="progress-step">
+              <div class="progress-dot"><i class="bi bi-truck"></i></div>
+              <span>Shipped</span>
+            </div>
+            <div class="progress-step">
+              <div class="progress-dot"><i class="bi bi-house-check"></i></div>
+              <span>Delivered</span>
+            </div>
+          </div>
+
+          <div class="track-detail-grid">
+            <div class="track-detail-block">
+              <h6>Delivery Address</h6>
+              <p>
+                <strong>${order.firstName} ${order.lastName}</strong><br>
+                ${order.address}<br>
+                ${order.city}, ${order.state} - ${order.pincode}<br>
+                Phone: ${order.phone}
+              </p>
+            </div>
+            <div class="track-detail-block">
+              <h6>Estimated Delivery</h6>
+              <p>${new Date(Date.now() + 4*24*60*60*1000).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+              <h6 style="margin-top:14px;">Payment</h6>
+              <p>${order.payment === "cod" ? "Cash on Delivery" : "Paid Online"}</p>
+            </div>
+          </div>
+
+          <div class="track-items">
+            <h6>Items in this order</h6>
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
+      $("#trackResult").html(html);
+    }
+
+    function findOrder(id) {
+      const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
+      return orders.find(o => o.orderId === id || o.orderId === id.replace(/^#/, ""));
+    }
+
+    $("#trackBtn").click(function () {
+      const id = $("#trackInput").val().trim();
+      if (!id) return;
+      renderOrder(findOrder(id));
+    });
+
+    $("#trackInput").on("keypress", function (e) {
+      if (e.which === 13) $("#trackBtn").click();
+    });
+
+    // Auto-load if order ID in URL
+    if (presetId) {
+      renderOrder(findOrder(presetId));
+    }
+
+    // Bag count
+    const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+    const count = bag.reduce((a, b) => a + (b.qty || 1), 0);
+    $("#bagCount").text(count);
+  });
+  </script>
+</body>
+</html>

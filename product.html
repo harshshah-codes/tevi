@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--espresso:#2d0f09;--wine:#4b1710;--brown:#6c3022;--cream:#f7f3ed;--ivory:#fcfaf7;--gold:#b58b57;--gold-light:#d0a76e;--text:#211815;--muted:#766b65;--line:#e7ded5;--success:#47704f;--danger:#9a3d32}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:var(--ivory);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.7}
+    a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
+    .announcement{background:var(--espresso);color:#f7e8d7;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 0}
+    .site-header{background:rgba(252,250,247,.96);border-bottom:1px solid rgba(45,15,9,.08);backdrop-filter:blur(12px);z-index:1000}
+    .navbar{min-height:88px;padding:12px 0}.brand-link{min-width:285px}
+    .brand-logo{width:62px;height:62px;object-fit:contain;border-radius:50%;background:var(--ivory)}
+    .brand-word{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-weight:700;font-size:26px;line-height:1}
+    .brand-word small{display:block;margin-top:7px;color:var(--brown);font-size:7.5px;font-weight:600;letter-spacing:.19em}
+    .nav-link{color:#4a3c36 !important;font-size:12px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;padding:10px 12px !important}
+    .header-actions{margin-left:auto}.icon-btn{border:0;background:transparent;color:var(--espresso);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:18px}
+    .icon-btn:hover{background:#eee4dc}.icon-btn.search-static{cursor:default}.icon-btn.search-static:hover{background:transparent}
+    .bag-count{position:absolute;top:2px;right:-1px;width:17px;height:17px;border-radius:50%;background:var(--wine);color:#fff;font-size:9px;display:grid;place-items:center}
+    .profile-dropdown .dropdown-menu{min-width:210px;border:1px solid var(--line);border-radius:0;box-shadow:0 18px 45px rgba(45,15,9,.12);padding:8px 0;margin-top:10px !important}
+    .profile-dropdown .dropdown-item{font-size:12px;font-weight:500;color:#4a3c36;padding:10px 20px;display:flex;align-items:center;gap:10px}
+    .profile-dropdown .dropdown-item i{font-size:15px;color:var(--brown);width:18px}
+    .profile-dropdown .dropdown-item:hover{background:var(--cream)}
+    .profile-dropdown .dropdown-divider{border-color:var(--line);margin:6px 0}
+    .profile-dropdown .dropdown-header{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:8px 20px 4px}
+    .breadcrumb-area{padding:20px 0;border-bottom:1px solid var(--line)}
+    .breadcrumb{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+    .breadcrumb-item a{color:var(--muted)}.breadcrumb-item a:hover{color:var(--brown)}
+    .breadcrumb-item.active{color:var(--brown);font-weight:600}
+    .breadcrumb-item + .breadcrumb-item::before{content:"·";color:var(--muted)}
+    .product-section{padding:45px 0 80px}
+    .product-gallery{position:sticky;top:120px}
+    .gallery-layout{display:grid;grid-template-columns:85px 1fr;gap:15px}
+    .thumbnail-list{display:flex;flex-direction:column;gap:10px}
+    .thumbnail{width:85px;height:105px;border:1px solid var(--line);background:#f0ebe5;padding:0;overflow:hidden;cursor:pointer;transition:.25s ease}
+    .thumbnail img{width:100%;height:100%;object-fit:cover}
+    .thumbnail.active{border-color:var(--espresso);box-shadow:0 0 0 1px var(--espresso)}
+    .main-image-wrapper{position:relative;overflow:hidden;background:#eee8e0;aspect-ratio:4/5}
+    .main-product-image{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+    .main-image-wrapper:hover .main-product-image{transform:scale(1.08)}
+    .zoom-label{position:absolute;right:15px;bottom:15px;background:rgba(255,255,255,.94);color:var(--espresso);padding:9px 13px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;pointer-events:none}
+    .image-counter{position:absolute;left:15px;bottom:15px;background:rgba(45,15,9,.78);color:#fff;padding:6px 10px;font-size:9px;letter-spacing:.1em}
+    .product-info{padding-left:20px}
+    .product-eyebrow{color:var(--brown);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+    .product-title{font-family:"Cormorant Garamond",serif;color:var(--espresso);font-size:clamp(36px,4vw,52px);line-height:.95;font-weight:600;letter-spacing:-.02em;margin:0 0 15px}
+    .product-rating{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .rating-stars{color:var(--gold);letter-spacing:3px;font-size:13px}
+    .rating-text{color:var(--muted);font-size:11px}
+    .product-price{color:var(--brown);font-size:26px;font-weight:700;margin-bottom:4px}
+    .tax-note{color:var(--muted);font-size:10px;margin-bottom:20px}
+    .product-description{color:#665c56;max-width:600px;font-size:14px;line-height:1.85;margin-bottom:25px}
+    .product-divider{height:1px;background:var(--line);margin:22px 0}
+    .option-label{display:flex;justify-content:space-between;align-items:center;color:var(--espresso);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+    .selected-value{color:var(--brown);font-weight:600}
+    .color-options{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+    .color-option{width:34px;height:34px;border-radius:50%;border:2px solid #fff;outline:1px solid #d9d0c7;cursor:pointer;transition:.2s}
+    .color-option:hover,.color-option.active{outline:2px solid var(--espresso);outline-offset:2px}
+    .color-ivory{background:#eee5d7}.color-black{background:#1e1c1b}.color-maroon{background:#651d1b}.color-sage{background:#9aa28c}
+    .size-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .size-guide{color:var(--wine);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--wine);padding-bottom:2px;cursor:pointer}
+    .size-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .size-option{min-width:48px;height:42px;border:1px solid #dcd4cb;background:#fff;color:#655c56;font-size:10px;font-weight:700;cursor:pointer;transition:.2s}
+    .size-option:hover,.size-option.active{border-color:var(--espresso);background:var(--espresso);color:#fff}
+    .stock-row{display:flex;align-items:center;gap:8px;margin:18px 0;font-size:11px}
+    .stock-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(71,112,79,.1)}
+    .stock-text{color:var(--success);font-weight:700}
+    .stock-count{color:var(--muted)}
+    .purchase-row{display:flex;gap:10px;margin-top:20px}
+    .quantity-control{display:flex;width:120px;height:52px;border:1px solid var(--line);background:#fff}
+    .quantity-control button{width:38px;border:0;background:transparent;color:var(--espresso);font-size:16px;cursor:pointer}
+    .quantity-control button:hover{background:var(--cream)}
+    .quantity-control input{width:44px;border:0;outline:0;text-align:center;background:transparent;font-size:12px;font-weight:700}
+    .btn-add-cart{flex:1;height:52px;border:1px solid var(--gold);background:var(--gold);color:#24150d;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transition:.3s;cursor:pointer}
+    .btn-add-cart:hover{background:var(--gold-light);border-color:var(--gold-light);transform:translateY(-2px)}
+    .wishlist-product{width:52px;height:52px;border:1px solid var(--line);background:#fff;color:var(--espresso);font-size:19px;cursor:pointer;transition:.25s}
+    .wishlist-product:hover,.wishlist-product.active{color:var(--danger);border-color:#c8aaa5;background:#fff9f8}
+    .btn-buy-now{width:100%;height:50px;margin-top:10px;border:1px solid var(--espresso);background:var(--espresso);color:#fff;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transition:.3s;cursor:pointer}
+    .btn-buy-now:hover{background:var(--wine);border-color:var(--wine)}
+    .service-box{margin-top:25px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .service-item{display:flex;align-items:center;gap:15px;padding:16px 0;border-bottom:1px solid var(--line)}
+    .service-item:last-child{border-bottom:0}
+    .service-icon{width:38px;height:38px;border-radius:50%;background:#f1e9df;color:var(--brown);display:grid;place-items:center;font-size:16px;flex-shrink:0}
+    .service-content strong{display:block;color:var(--espresso);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .service-content span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+    .delivery-check{margin-top:22px;background:#f7f2eb;padding:18px}
+    .delivery-check label{display:block;color:var(--espresso);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+    .pincode-form{display:flex;border-bottom:1px solid #a98e79}
+    .pincode-form input{flex:1;border:0;outline:0;background:transparent;padding:8px 0;font-size:12px}
+    .pincode-form button{border:0;background:transparent;color:var(--wine);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+    #deliveryResult{display:none;margin-top:10px;color:var(--success);font-size:10px}
+    .details-section{background:#fff;border-top:1px solid var(--line);padding:70px 0}
+    .details-heading{text-align:center;margin-bottom:40px}
+    .details-heading .eyebrow{color:var(--brown);font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-bottom:10px}
+    .details-heading h2{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-size:48px;line-height:.95;font-weight:600;margin:0}
+    .details-heading h2 em{color:var(--brown);font-weight:500}
+    .detail-card{height:100%;padding:28px;border:1px solid var(--line);background:#fff;transition:.3s ease}
+    .detail-card:hover{transform:translateY(-4px);box-shadow:0 15px 40px rgba(45,15,9,.07)}
+    .detail-icon{width:46px;height:46px;border-radius:50%;background:#f3ece3;color:var(--brown);display:grid;place-items:center;margin-bottom:15px;font-size:18px}
+    .detail-card h3{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:600;margin-bottom:15px}
+    .spec-table{width:100%}
+    .spec-row{display:flex;justify-content:space-between;gap:20px;padding:8px 0;border-bottom:1px solid #eee8e1;font-size:11px}
+    .spec-row:last-child{border-bottom:0}
+    .spec-row span:first-child{color:var(--muted)}
+    .spec-row span:last-child{color:var(--espresso);font-weight:600;text-align:right}
+    .detail-list{list-style:none;padding:0;margin:0}
+    .detail-list li{position:relative;padding-left:22px;margin-bottom:10px;color:#625953;font-size:12px}
+    .detail-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--gold);font-weight:700}
+    .reviews-section{background:var(--cream);padding:70px 0}
+    .reviews-heading{text-align:center;margin-bottom:40px}
+    .reviews-heading h2{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-size:48px;line-height:.95;font-weight:600;margin:0}
+    .reviews-heading h2 em{color:var(--brown);font-weight:500}
+    .review-card{background:#fff;border:1px solid var(--line);padding:25px;margin-bottom:15px;transition:.3s}
+    .review-card:hover{border-color:var(--gold)}
+    .review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .review-author{font-weight:700;color:var(--espresso);font-size:14px}
+    .review-date{color:var(--muted);font-size:11px}
+    .review-stars{color:var(--gold);letter-spacing:2px;font-size:13px;margin-bottom:8px}
+    .review-text{color:#665c56;font-size:13px;line-height:1.75;margin:0}
+    .related-section{padding:70px 0;background:#fff}
+    .related-heading{text-align:center;margin-bottom:40px}
+    .related-heading h2{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-size:48px;line-height:.95;font-weight:600;margin:0}
+    .related-heading h2 em{color:var(--brown);font-weight:500}
+    .related-card{background:#fff;border:1px solid var(--line);transition:.3s;cursor:pointer;overflow:hidden;display:block}
+    .related-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 35px rgba(45,15,9,.08)}
+    .related-image{aspect-ratio:4/5;overflow:hidden;background:var(--cream)}
+    .related-image img{width:100%;height:100%;object-fit:cover;transition:.5s}
+    .related-card:hover .related-image img{transform:scale(1.05)}
+    .related-info{padding:15px}
+    .related-category{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
+    .related-name{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;color:var(--espresso);margin:4px 0 6px;line-height:1.1}
+    .related-price{font-size:14px;font-weight:700;color:var(--brown)}
+    .footer{background:var(--espresso);color:#eaded2;padding:78px 0 28px}
+    .footer-brand{font-family:"Cormorant Garamond",serif;font-size:36px;color:#fff;font-weight:600}
+    .footer-copy{color:#b9aaa0;font-size:13px;max-width:360px}
+    .socials{display:flex;gap:8px;margin-top:20px}
+    .socials a{width:36px;height:36px;border:1px solid #63443a;border-radius:50%;display:grid;place-items:center}
+    .socials a:hover{background:var(--gold);color:var(--espresso);border-color:var(--gold)}
+    .footer h6{color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:18px}
+    .footer .col-6 a,.footer-mail{display:block;color:#b9aaa0;font-size:12px;margin:0 0 9px}
+    .footer .col-6 a:hover,.footer-mail:hover{color:#fff}
+    .footer-bottom{border-top:1px solid #4c3027;margin-top:55px;padding-top:20px;display:flex;justify-content:space-between;color:#88766c;font-size:10px;letter-spacing:.05em}
+    .toast{background:var(--espresso);color:#fff;border-radius:0}
+    .size-modal .modal-content{border:0;border-radius:0}
+    .size-modal .modal-header{border-bottom:1px solid var(--line)}
+    .size-modal .modal-title{font-family:"Cormorant Garamond",serif;font-size:28px;color:var(--espresso)}
+    .size-modal table{font-size:13px}
+    .size-modal th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:2px solid var(--line)}
+    .size-modal td{border-bottom:1px solid var(--line)}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:0}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.product-gallery{position:relative;top:auto;margin-bottom:40px}.product-info{padding-left:0}.details-section,.reviews-section,.related-section{padding:55px 0}}
+    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.footer-bottom{flex-direction:column;gap:8px}.product-section{padding:25px 0 60px}.gallery-layout{grid-template-columns:70px 1fr;gap:10px}.thumbnail{width:70px;height:88px}.product-title{font-size:32px}.product-price{font-size:22px}.purchase-row{flex-wrap:wrap}.quantity-control{width:100px}.details-heading h2,.reviews-heading h2,.related-heading h2{font-size:36px}}
+  </style>
+</head>
+<body>
+  <div class="announcement"><div class="container text-center"><span>Complimentary shipping on orders above ₹2,999</span><span class="d-none d-md-inline mx-2">•</span><span>Crafted for celebrations</span></div></div>
+
+  <header class="site-header sticky-top">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="logo.png" class="brand-logo" alt="Logo">
+          <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
+        </a>
+        <div class="header-actions order-3 d-flex align-items-center gap-1">
+          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <div class="dropdown profile-dropdown">
+            <button class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            </ul>
+          </div>
+          <a href="wishlist.html" class="icon-btn"><i class="bi bi-heart"></i></a>
+          <a href="cart.html" class="icon-btn position-relative"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
+        </div>
+        <div class="collapse navbar-collapse order-2" id="mainNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="breadcrumb-area">
+      <div class="container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item"><a href="index.html#featured">Kurtas</a></li>
+            <li class="breadcrumb-item active">Ivory Handwork Kurta</li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <section class="product-section">
+      <div class="container">
+        <div class="row g-lg-5">
+          <div class="col-lg-7">
+            <div class="product-gallery">
+              <div class="gallery-layout">
+                <div class="thumbnail-list">
+                  <button class="thumbnail active" data-image="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=90"><img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85" alt="Front"></button>
+                  <button class="thumbnail" data-image="https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=1200&q=90"><img src="https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=300&q=85" alt="Detail"></button>
+                  <button class="thumbnail" data-image="https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=1200&q=90"><img src="https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=300&q=85" alt="Back"></button>
+                  <button class="thumbnail" data-image="https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=1200&q=90"><img src="https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=300&q=85" alt="Styling"></button>
+                </div>
+                <div class="main-image-wrapper">
+                  <img id="mainProductImage" class="main-product-image" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=90" alt="Ivory Handwork Kurta">
+                  <span class="zoom-label"><i class="bi bi-zoom-in me-1"></i>Zoom</span>
+                  <span class="image-counter" id="imageCounter">01 / 04</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="product-info">
+              <div class="product-eyebrow">Premium Kurta · Festive Edit</div>
+              <h1 class="product-title">Ivory Handwork Kurta</h1>
+              <div class="product-rating"><span class="rating-stars">★★★★★</span><span class="rating-text">4.8 · 126 Reviews</span></div>
+              <div class="product-price">₹2,899</div>
+              <div class="tax-note">Inclusive of all applicable taxes</div>
+              <p class="product-description">A refined ivory kurta crafted for celebrations. Designed with subtle handwork, a clean silhouette and premium fabric for effortless festive dressing.</p>
+              <div class="product-divider"></div>
+
+              <div class="option-label"><span>Colour</span><span class="selected-value" id="selectedColor">Ivory</span></div>
+              <div class="color-options">
+                <button class="color-option color-ivory active" data-color="Ivory"></button>
+                <button class="color-option color-black" data-color="Black"></button>
+                <button class="color-option color-maroon" data-color="Maroon"></button>
+                <button class="color-option color-sage" data-color="Sage"></button>
+              </div>
+
+              <div class="size-header">
+                <div class="option-label mb-0">Size</div>
+                <span class="size-guide" data-bs-toggle="modal" data-bs-target="#sizeModal">Size Guide</span>
+              </div>
+              <div class="size-options">
+                <button class="size-option">S</button>
+                <button class="size-option active">M</button>
+                <button class="size-option">L</button>
+                <button class="size-option">XL</button>
+                <button class="size-option">XXL</button>
+              </div>
+
+              <div class="stock-row"><span class="stock-dot"></span><span class="stock-text">In Stock</span><span class="stock-count">· Only 6 left</span></div>
+
+              <div class="purchase-row">
+                <div class="quantity-control">
+                  <button type="button" id="qtyMinus">−</button>
+                  <input type="text" id="quantity" value="1" readonly>
+                  <button type="button" id="qtyPlus">+</button>
+                </div>
+                <button class="btn-add-cart" id="addToCart">Add to Bag <i class="bi bi-bag-plus ms-2"></i></button>
+                <button class="wishlist-product" id="productWishlist"><i class="bi bi-heart"></i></button>
+              </div>
+              <button class="btn-buy-now" id="buyNow">Buy It Now</button>
+
+              <div class="service-box">
+                <div class="service-item"><div class="service-icon"><i class="bi bi-truck"></i></div><div class="service-content"><strong>Estimated Delivery</strong><span>12–15 September 2026</span></div></div>
+                <div class="service-item"><div class="service-icon"><i class="bi bi-arrow-repeat"></i></div><div class="service-content"><strong>Easy Returns</strong><span>7-day return &amp; exchange available</span></div></div>
+                <div class="service-item"><div class="service-icon"><i class="bi bi-shield-check"></i></div><div class="service-content"><strong>Secure Shopping</strong><span>Your payment and details are protected</span></div></div>
+              </div>
+
+              <div class="delivery-check">
+                <label>Check Delivery Availability</label>
+                <form class="pincode-form" id="pincodeForm">
+                  <input type="text" id="pincode" maxlength="6" placeholder="Enter 6-digit pincode">
+                  <button type="submit">Check</button>
+                </form>
+                <div id="deliveryResult">✓ Delivery available to your location.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="details-section">
+      <div class="container">
+        <div class="details-heading"><div class="eyebrow">PRODUCT INFORMATION</div><h2>Details That <em>Matter.</em></h2></div>
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="detail-card">
+              <div class="detail-icon"><i class="bi bi-list-check"></i></div>
+              <h3>Product Specifications</h3>
+              <div class="spec-table">
+                <div class="spec-row"><span>Product Type</span><span>Kurta</span></div>
+                <div class="spec-row"><span>Fit</span><span>Regular Fit</span></div>
+                <div class="spec-row"><span>Pattern</span><span>Handwork</span></div>
+                <div class="spec-row"><span>Occasion</span><span>Festive / Wedding</span></div>
+                <div class="spec-row"><span>SKU</span><span>HOV-KRT-2026-001</span></div>
+                <div class="spec-row"><span>Country of Origin</span><span>India</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="detail-card">
+              <div class="detail-icon"><i class="bi bi-stars"></i></div>
+              <h3>Fabric Details</h3>
+              <ul class="detail-list">
+                <li>Premium blended cotton fabric</li>
+                <li>Soft and breathable texture</li>
+                <li>Lightweight festive construction</li>
+                <li>Subtle handwork detailing</li>
+                <li>Comfortable for long celebrations</li>
+                <li>Designed for an elegant drape</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="detail-card">
+              <div class="detail-icon"><i class="bi bi-droplet-half"></i></div>
+              <h3>Care Instructions</h3>
+              <ul class="detail-list">
+                <li>Dry clean recommended</li>
+                <li>Do not bleach</li>
+                <li>Use a cool iron</li>
+                <li>Avoid direct high heat</li>
+                <li>Store in a breathable garment bag</li>
+                <li>Keep away from excessive moisture</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews-section">
+      <div class="container">
+        <div class="reviews-heading"><h2>Customer <em>Reviews</em></h2></div>
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="review-card"><div class="review-header"><span class="review-author">Vivaan Patel</span><span class="review-date">10 Aug 2026</span></div><div class="review-stars">★★★★★</div><p class="review-text">Elegant, comfortable and beautifully finished. The handwork detailing is subtle but adds a premium touch.</p></div>
+            <div class="review-card"><div class="review-header"><span class="review-author">Aarav Shah</span><span class="review-date">3 Aug 2026</span></div><div class="review-stars">★★★★★</div><p class="review-text">The craftsmanship is absolutely beautiful. Every outfit feels premium and perfectly designed.</p></div>
+            <div class="review-card"><div class="review-header"><span class="review-author">Rohan Mehta</span><span class="review-date">25 Jul 2026</span></div><div class="review-stars">★★★★☆</div><p class="review-text">Amazing collection, excellent fitting and a truly premium shopping experience.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="related-section">
+      <div class="container">
+        <div class="related-heading"><h2>You May Also <em>Like</em></h2></div>
+        <div class="row g-4">
+          <div class="col-6 col-lg-3"><a href="product.html?id=2" class="related-card"><div class="related-image"><img src="https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=600&q=85" alt="Midnight Velvet Sherwani"></div><div class="related-info"><div class="related-category">Sherwani</div><div class="related-name">Midnight Velvet Sherwani</div><div class="related-price">₹8,999</div></div></a></div>
+          <div class="col-6 col-lg-3"><a href="product.html?id=3" class="related-card"><div class="related-image"><img src="https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=600&q=85" alt="Sage Embroidered Kurta"></div><div class="related-info"><div class="related-category">Kurta</div><div class="related-name">Sage Embroidered Kurta</div><div class="related-price">₹3,499</div></div></a></div>
+          <div class="col-6 col-lg-3"><a href="product.html?id=4" class="related-card"><div class="related-image"><img src="https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=600&q=85" alt="Regal Bandhgala Set"></div><div class="related-info"><div class="related-category">Sherwani</div><div class="related-name">Regal Bandhgala Set</div><div class="related-price">₹7,499</div></div></a></div>
+          <div class="col-6 col-lg-3"><a href="product.html?id=5" class="related-card"><div class="related-image"><img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=85" alt="Maroon Silk Kurta"></div><div class="related-info"><div class="related-category">Kurta</div><div class="related-name">Maroon Silk Kurta</div><div class="related-price">₹3,299</div></div></a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4"><a href="index.html" class="footer-brand">House of Viraasat</a><p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p><div class="socials"><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-pinterest"></i></a></div></div>
+        <div class="col-6 col-lg-2"><h6>Shop</h6><a href="index.html#featured">Kurtas</a><a href="index.html#featured">Sherwanis</a><a href="index.html#new-arrivals">New Arrivals</a></div>
+        <div class="col-6 col-lg-2"><h6>Company</h6><a href="index.html#story">Our Story</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a><a href="shipping-policy.html">Shipping</a></div>
+        <div class="col-lg-4"><h6>Visit House of Viraasat</h6><a href="mailto:hello@houseofviraasat.com" class="footer-mail">hello@houseofviraasat.com</a></div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 House of Viraasat. All rights reserved.</span><span>Made with heritage &amp; intention.</span></div>
+    </div>
+  </footer>
+
+  <div class="modal fade size-modal" id="sizeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Kurta Size Guide</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Size</th><th>Chest</th><th>Shoulder</th><th>Length</th></tr></thead>
+            <tbody>
+              <tr><td>S</td><td>38"</td><td>17"</td><td>40"</td></tr>
+              <tr><td>M</td><td>40"</td><td>18"</td><td>41"</td></tr>
+              <tr><td>L</td><td>42"</td><td>19"</td><td>42"</td></tr>
+              <tr><td>XL</td><td>44"</td><td>20"</td><td>43"</td></tr>
+              <tr><td>XXL</td><td>46"</td><td>21"</td><td>44"</td></tr>
+            </tbody>
+          </table>
+          <p class="text-muted small mb-0">Measurements are approximate. For the best fit, compare these measurements with a garment that fits you well.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="siteToast" class="toast border-0"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div></div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  $(function () {
+    const product = {
+      id: 1,
+      name: "Ivory Handwork Kurta",
+      price: 2899,
+      category: "Kurta",
+      image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=90"
+    };
+
+    let quantity = 1;
+    let selectedSize = "M";
+    let selectedColor = "Ivory";
+
+    function showToast(m) { $("#toastMessage").text(m); bootstrap.Toast.getOrCreateInstance(document.getElementById("siteToast"),{delay:2200}).show(); }
+
+    function updateBagCount() {
+      const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+      $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
+    }
+
+    $(".thumbnail").on("click", function () {
+      const image = $(this).data("image");
+      $(".thumbnail").removeClass("active");
+      $(this).addClass("active");
+      $("#mainProductImage").stop(true).fadeOut(150, function () { $(this).attr("src", image).fadeIn(250); });
+      $("#imageCounter").text(String($(".thumbnail").index(this) + 1).padStart(2, "0") + " / 04");
+    });
+
+    $(".color-option").on("click", function () {
+      $(".color-option").removeClass("active");
+      $(this).addClass("active");
+      selectedColor = $(this).data("color");
+      $("#selectedColor").text(selectedColor);
+    });
+
+    $(".size-option").on("click", function () {
+      $(".size-option").removeClass("active");
+      $(this).addClass("active");
+      selectedSize = $(this).text().trim();
+    });
+
+    $("#qtyPlus").on("click", function () { if (quantity < 10) { quantity++; $("#quantity").val(quantity); } });
+    $("#qtyMinus").on("click", function () { if (quantity > 1) { quantity--; $("#quantity").val(quantity); } });
+
+    $("#addToCart").on("click", function () {
+      let bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+      const existing = bag.find(i => i.name === product.name && i.size === selectedSize);
+      if (existing) existing.qty += quantity;
+      else bag.push({id:Date.now(),name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
+      localStorage.setItem("hovBag", JSON.stringify(bag));
+      updateBagCount();
+      showToast(product.name + " added to your bag.");
+    });
+
+    $("#buyNow").on("click", function () {
+      let bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+      const existing = bag.find(i => i.name === product.name && i.size === selectedSize);
+      if (existing) existing.qty += quantity;
+      else bag.push({id:Date.now(),name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
+      localStorage.setItem("hovBag", JSON.stringify(bag));
+      window.location.href = "checkout.html";
+    });
+
+    // Sync wishlist state on load
+    let wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+    if (wishlist.find(w => w.name === product.name)) {
+      $("#productWishlist").addClass("active");
+      $("#productWishlist i").removeClass("bi-heart").addClass("bi-heart-fill");
+    }
+
+    $("#productWishlist").on("click", function () {
+      $(this).toggleClass("active");
+      const icon = $(this).find("i");
+      let wl = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      if ($(this).hasClass("active")) {
+        icon.removeClass("bi-heart").addClass("bi-heart-fill");
+        if (!wl.find(w => w.name === product.name)) {
+          wl.push({name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor});
+        }
+        showToast("Added to wishlist.");
+      } else {
+        icon.removeClass("bi-heart-fill").addClass("bi-heart");
+        wl = wl.filter(w => w.name !== product.name);
+        showToast("Removed from wishlist.");
+      }
+      localStorage.setItem("hovWishlist", JSON.stringify(wl));
+    });
+
+    $("#pincodeForm").on("submit", function (e) {
+      e.preventDefault();
+      const pincode = $("#pincode").val().trim();
+      if (!/^[0-9]{6}$/.test(pincode)) {
+        $("#deliveryResult").css("color", "#9a3d32").text("Please enter a valid 6-digit pincode.").fadeIn();
+        return;
+      }
+      $("#deliveryResult").css("color", "#47704f").text("✓ Delivery available. Estimated delivery: 12–15 September 2026.").fadeIn();
+    });
+
+    $(".navbar-nav .nav-link").on("click", function () {
+      const nav = document.getElementById("mainNav");
+      if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
+    });
+
+    updateBagCount();
+  });
+  </script>
+</body>
+</html>

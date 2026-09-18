@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account | House of Viraasat</title>
+  <link rel="icon" type="image/png" href="fav.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--espresso:#2d0f09;--wine:#4b1710;--brown:#6c3022;--cream:#f7f3ed;--ivory:#fcfaf7;--gold:#b58b57;--text:#211815;--muted:#766b65;--line:#e7ded5;--success:#47704f;--danger:#9a3d32}
+    *{box-sizing:border-box}body{margin:0;color:var(--text);background:var(--ivory);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.7}
+    a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
+    .announcement{background:var(--espresso);color:#f7e8d7;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 0}
+    .site-header{background:rgba(252,250,247,.96);border-bottom:1px solid rgba(45,15,9,.08);backdrop-filter:blur(12px);z-index:1000}
+    .navbar{min-height:88px;padding:12px 0}.brand-link{min-width:285px}
+    .brand-logo{width:62px;height:62px;object-fit:contain;border-radius:50%;background:var(--ivory)}
+    .brand-word{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-weight:700;font-size:26px;line-height:1}
+    .brand-word small{display:block;margin-top:7px;color:var(--brown);font-size:7.5px;font-weight:600;letter-spacing:.19em}
+    .nav-link{color:#4a3c36 !important;font-size:12px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;padding:10px 12px !important}
+    .header-actions{margin-left:auto}.icon-btn{border:0;background:transparent;color:var(--espresso);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:18px}
+    .icon-btn:hover{background:#eee4dc}.icon-btn.search-static{cursor:default}.icon-btn.search-static:hover{background:transparent}
+    .bag-count{position:absolute;top:2px;right:-1px;width:17px;height:17px;border-radius:50%;background:var(--wine);color:#fff;font-size:9px;display:grid;place-items:center}
+    .profile-dropdown .dropdown-menu{min-width:210px;border:1px solid var(--line);border-radius:0;box-shadow:0 18px 45px rgba(45,15,9,.12);padding:8px 0;margin-top:10px !important}
+    .profile-dropdown .dropdown-item{font-size:12px;font-weight:500;color:#4a3c36;padding:10px 20px;display:flex;align-items:center;gap:10px}
+    .profile-dropdown .dropdown-item i{font-size:15px;color:var(--brown);width:18px}
+    .profile-dropdown .dropdown-item:hover{background:var(--cream)}
+    .profile-dropdown .dropdown-divider{border-color:var(--line);margin:6px 0}
+    .profile-dropdown .dropdown-header{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:8px 20px 4px}
+    .account-hero{padding:55px 0 30px;background:linear-gradient(120deg,var(--cream),var(--ivory));text-align:center;position:relative;overflow:hidden}
+    .account-hero:before{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(181,139,87,.15);border-radius:50%;left:-80px;bottom:-50px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.2em;font-size:11px;color:var(--brown);font-weight:600}
+    .account-title{font-family:"Cormorant Garamond",serif;font-size:clamp(44px,6vw,68px);line-height:.92;margin:12px 0 8px;color:var(--espresso);font-weight:600}
+    .account-title em{color:var(--brown);font-weight:500}
+    .account-section{padding:40px 0 80px}
+    .profile-sidebar{background:#fff;border:1px solid var(--line);padding:30px 25px;position:sticky;top:120px}
+    .profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--cream);display:grid;place-items:center;font-size:34px;color:var(--brown);margin:0 auto 12px;border:2px solid var(--gold)}
+    .profile-name{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:600;color:var(--espresso);text-align:center}
+    .profile-email{text-align:center;color:var(--muted);font-size:12px;margin-bottom:20px}
+    .sidebar-nav{list-style:none;padding:0;margin:0}
+    .sidebar-nav li{padding:10px 0;border-bottom:1px solid var(--line)}
+    .sidebar-nav li:last-child{border-bottom:0}
+    .sidebar-nav a{display:flex;align-items:center;gap:12px;color:var(--text);font-size:13px;font-weight:500;transition:.25s;cursor:pointer}
+    .sidebar-nav a:hover,.sidebar-nav a.active{color:var(--brown)}
+    .sidebar-nav a i{width:20px;font-size:16px;color:var(--muted)}
+    .sidebar-nav a.active{color:var(--wine);font-weight:600}
+    .sidebar-nav a.active i{color:var(--wine)}
+    .profile-content{background:#fff;border:1px solid var(--line);padding:30px 35px}
+    .profile-content-title{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600;color:var(--espresso);margin-bottom:20px}
+    .profile-content-title em{color:var(--brown);font-weight:500}
+    .form-group{margin-bottom:18px}
+    .form-group label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;margin-bottom:4px;display:block}
+    .form-group .form-control{border:1px solid var(--line);border-radius:0;padding:10px 14px;font-size:14px;background:var(--ivory)}
+    .form-group .form-control:focus{border-color:var(--brown);box-shadow:none}
+    .form-group .form-control[readonly]{background:#f5f1ec}
+    .btn-save{border:1px solid var(--espresso);background:var(--espresso);color:#fff;padding:11px 28px;font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;transition:.3s;border-radius:0;cursor:pointer}
+    .btn-save:hover{background:var(--wine);border-color:var(--wine);color:#fff}
+    .btn-edit{border:1px solid var(--line);background:transparent;color:var(--text);padding:11px 28px;font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;transition:.3s;border-radius:0;cursor:pointer;display:inline-block}
+    .btn-edit:hover{background:var(--cream);border-color:var(--brown)}
+    .order-card{border:1px solid var(--line);padding:18px 22px;margin-bottom:15px;transition:.25s}
+    .order-card:hover{border-color:var(--gold)}
+    .order-number{font-weight:700;color:var(--espresso);font-size:14px}
+    .order-date{color:var(--muted);font-size:12px}
+    .order-status{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;display:inline-block}
+    .status-delivered{color:#47704f;background:#e8f3e9}
+    .status-shipped{color:#b58b57;background:#f7f0e6}
+    .status-processing{color:#8a7a63;background:#f0ebe5}
+    .status-cancelled{color:#9a3d32;background:#f7e8e6}
+    .order-total{font-weight:700;color:var(--brown)}
+    .order-view-btn{border:0;background:transparent;color:var(--brown);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:0;cursor:pointer}
+    .order-view-btn:hover{color:var(--espresso)}
+    .wishlist-item{display:flex;gap:15px;padding:15px 0;border-bottom:1px solid var(--line);align-items:center}
+    .wishlist-item:last-child{border-bottom:0}
+    .wishlist-item img{width:70px;height:90px;object-fit:cover;background:var(--cream)}
+    .wishlist-item-name{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;color:var(--espresso)}
+    .wishlist-item-price{font-weight:600;color:var(--brown)}
+    .wishlist-item-remove{border:0;background:transparent;color:var(--muted);cursor:pointer}
+    .wishlist-item-remove:hover{color:var(--danger)}
+    .address-card{border:1px solid var(--line);padding:20px;background:var(--ivory);height:100%}
+    .address-card h6{font-weight:700;color:var(--espresso);font-size:13px;margin-bottom:8px}
+    .address-card p{font-size:13px;margin-bottom:4px;color:var(--text)}
+    .address-card .phone{font-size:12px;color:var(--muted)}
+    .address-card .btn-edit-address{border:1px solid var(--line);background:transparent;color:var(--text);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:5px 14px;margin-top:10px;border-radius:0;transition:.25s;cursor:pointer}
+    .address-card .btn-edit-address:hover{background:var(--espresso);color:#fff;border-color:var(--espresso)}
+    .add-address-btn{border:1px dashed var(--line);background:transparent;color:var(--muted);padding:15px;width:100%;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:.25s;cursor:pointer}
+    .add-address-btn:hover{border-color:var(--brown);color:var(--brown)}
+    .footer{background:var(--espresso);color:#eaded2;padding:78px 0 28px}
+    .footer-brand{font-family:"Cormorant Garamond",serif;font-size:36px;color:#fff;font-weight:600}
+    .footer-copy{color:#b9aaa0;font-size:13px;max-width:360px}
+    .socials{display:flex;gap:8px;margin-top:20px}
+    .socials a{width:36px;height:36px;border:1px solid #63443a;border-radius:50%;display:grid;place-items:center}
+    .socials a:hover{background:var(--gold);color:var(--espresso);border-color:var(--gold)}
+    .footer h6{color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:18px}
+    .footer .col-6 a,.footer-mail{display:block;color:#b9aaa0;font-size:12px;margin:0 0 9px}
+    .footer .col-6 a:hover,.footer-mail:hover{color:#fff}
+    .footer-bottom{border-top:1px solid #4c3027;margin-top:55px;padding-top:20px;display:flex;justify-content:space-between;color:#88766c;font-size:10px;letter-spacing:.05em}
+    .toast{background:var(--espresso);color:#fff;border-radius:0}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:0}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.account-hero{padding:45px 0 25px}.profile-sidebar{position:relative;top:auto;margin-bottom:25px}.profile-content{padding:25px}}
+    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.footer-bottom{flex-direction:column;gap:8px}.account-title{font-size:38px}.profile-content-title{font-size:26px}.profile-content{padding:18px}.order-card{padding:14px 16px}}
+  </style>
+</head>
+<body>
+  <div class="announcement"><div class="container text-center"><span>Complimentary shipping on orders above ₹2,999</span><span class="d-none d-md-inline mx-2">•</span><span>Crafted for celebrations</span></div></div>
+
+  <header class="site-header sticky-top">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="logo.png" class="brand-logo" alt="Logo">
+          <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
+        </a>
+        <div class="header-actions order-3 d-flex align-items-center gap-1">
+          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <div class="dropdown profile-dropdown">
+            <button class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Account</h6></li>
+              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            </ul>
+          </div>
+          <a href="wishlist.html" class="icon-btn"><i class="bi bi-heart"></i></a>
+          <a href="cart.html" class="icon-btn position-relative"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
+        </div>
+        <div class="collapse navbar-collapse order-2" id="mainNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="account-hero">
+      <div class="container">
+        <div class="eyebrow">House of Viraasat</div>
+        <h1 class="account-title">My <em>Account</em></h1>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-3">
+            <div class="profile-sidebar">
+              <div class="profile-avatar"><i class="bi bi-person"></i></div>
+              <div class="profile-name">Arjun Mehta</div>
+              <div class="profile-email">arjun@example.com</div>
+              <ul class="sidebar-nav">
+                <li><a class="active" data-tab="profile"><i class="bi bi-person"></i> Profile</a></li>
+                <li><a data-tab="orders"><i class="bi bi-box"></i> Orders</a></li>
+                <li><a data-tab="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
+                <li><a data-tab="addresses"><i class="bi bi-geo-alt"></i> Addresses</a></li>
+                <li><a href="index.html"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-9">
+            <div class="profile-content">
+              <div id="tab-profile" class="tab-content">
+                <h2 class="profile-content-title">Profile <em>Details</em></h2>
+                <form id="profileForm">
+                  <div class="row">
+                    <div class="col-md-6"><div class="form-group"><label>First Name</label><input type="text" class="form-control" value="Arjun" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Last Name</label><input type="text" class="form-control" value="Mehta" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Email Address</label><input type="email" class="form-control" value="arjun@example.com" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" value="+91 98765 43210" readonly></div></div>
+                    <div class="col-12"><div class="form-group"><label>Default Shipping Address</label><input type="text" class="form-control" value="42, Heritage Apartments, Juhu, Mumbai - 400049" readonly></div></div>
+                  </div>
+                  <div class="mt-3">
+                    <button type="button" class="btn-edit" id="editProfileBtn"><i class="bi bi-pencil me-2"></i>Edit Profile</button>
+                    <button type="button" class="btn-save ms-2 d-none" id="saveProfileBtn"><i class="bi bi-check2 me-2"></i>Save Changes</button>
+                  </div>
+                </form>
+              </div>
+
+              <div id="tab-orders" class="tab-content d-none">
+                <h2 class="profile-content-title">Order <em>History</em></h2>
+                <div id="accountOrdersList"></div>
+                <div class="text-center mt-4">
+                  <a href="myorder.html" class="btn-edit">View All Orders <i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+              </div>
+
+              <div id="tab-wishlist" class="tab-content d-none">
+                <h2 class="profile-content-title">My <em>Wishlist</em></h2>
+                <div id="accountWishlist"></div>
+              </div>
+
+              <div id="tab-addresses" class="tab-content d-none">
+                <h2 class="profile-content-title">Saved <em>Addresses</em></h2>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="address-card">
+                      <h6>Default Address</h6>
+                      <p>Arjun Mehta</p><p>42, Heritage Apartments,</p><p>Juhu, Mumbai - 400049</p>
+                      <p class="phone">Phone: +91 98765 43210</p>
+                      <button class="btn-edit-address">Edit</button>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="address-card">
+                      <h6>Work Address</h6>
+                      <p>Arjun Mehta</p><p>7th Floor, BKC Tower,</p><p>Bandra East, Mumbai - 400051</p>
+                      <p class="phone">Phone: +91 98765 43211</p>
+                      <button class="btn-edit-address">Edit</button>
+                    </div>
+                  </div>
+                  <div class="col-12"><button class="add-address-btn"><i class="bi bi-plus me-2"></i>Add New Address</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4"><a href="index.html" class="footer-brand">House of Viraasat</a><p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p><div class="socials"><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-pinterest"></i></a></div></div>
+        <div class="col-6 col-lg-2"><h6>Shop</h6><a href="index.html#featured">Kurtas</a><a href="index.html#featured">Sherwanis</a><a href="index.html#new-arrivals">New Arrivals</a></div>
+        <div class="col-6 col-lg-2"><h6>Company</h6><a href="index.html#story">Our Story</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a><a href="shipping-policy.html">Shipping</a></div>
+        <div class="col-lg-4"><h6>Visit House of Viraasat</h6><a href="mailto:hello@houseofviraasat.com" class="footer-mail">hello@houseofviraasat.com</a></div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 House of Viraasat. All rights reserved.</span><span>Made with heritage &amp; intention.</span></div>
+    </div>
+  </footer>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="siteToast" class="toast border-0"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div></div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  $(function () {
+    function showToast(m) { $("#toastMessage").text(m); bootstrap.Toast.getOrCreateInstance(document.getElementById("siteToast"),{delay:2200}).show(); }
+    function formatPrice(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
+
+    const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+    $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
+
+    $(".sidebar-nav a[data-tab]").click(function (e) {
+      e.preventDefault();
+      const tab = $(this).data("tab");
+      $(".sidebar-nav a").removeClass("active");
+      $(this).addClass("active");
+      $(".tab-content").addClass("d-none");
+      $("#tab-" + tab).removeClass("d-none");
+      if (tab === "orders") loadAccountOrders();
+      if (tab === "wishlist") loadAccountWishlist();
+    });
+
+    let isEditing = false;
+    $("#editProfileBtn").click(function () {
+      isEditing = !isEditing;
+      const inputs = $("#profileForm .form-control");
+      inputs.prop("readonly", !isEditing);
+      if (isEditing) {
+        inputs.css("background", "#fff");
+        $(this).html('<i class="bi bi-x me-2"></i>Cancel');
+        $("#saveProfileBtn").removeClass("d-none");
+      } else {
+        inputs.css("background", "#f5f1ec");
+        $(this).html('<i class="bi bi-pencil me-2"></i>Edit Profile');
+        $("#saveProfileBtn").addClass("d-none");
+      }
+    });
+
+    $("#saveProfileBtn").click(function () {
+      showToast("Profile updated successfully!");
+      $("#editProfileBtn").click();
+    });
+
+    function loadAccountOrders() {
+      const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
+      const $list = $("#accountOrdersList");
+      if (orders.length === 0) {
+        $list.html('<p style="color:var(--muted);font-size:13px;">No orders yet. Start shopping to see your orders here.</p>');
+        return;
+      }
+      const html = orders.slice(0, 3).map(o => {
+        const d = o.date ? new Date(o.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+        return `
+          <div class="order-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+              <div>
+                <div class="order-number">#${o.orderId}</div>
+                <div class="order-date">Ordered on ${d}</div>
+              </div>
+              <div><span class="order-status status-processing">Processing</span></div>
+              <div><span class="order-total">${formatPrice(o.total)}</span></div>
+              <div><a href="order-detail.html?id=${o.orderId}" class="order-view-btn">View Details <i class="bi bi-arrow-right"></i></a></div>
+            </div>
+          </div>`;
+      }).join("");
+      $list.html(html);
+    }
+
+    function loadAccountWishlist() {
+      const wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      const $list = $("#accountWishlist");
+      if (wishlist.length === 0) {
+        $list.html('<p style="color:var(--muted);font-size:13px;">Your wishlist is empty.</p>');
+        return;
+      }
+      const html = wishlist.map((w, i) => `
+        <div class="wishlist-item" data-index="${i}">
+          <img src="${w.image}" alt="${w.name}">
+          <div class="flex-grow-1">
+            <div class="wishlist-item-name">${w.name}</div>
+            <div class="wishlist-item-price">${formatPrice(w.price)}</div>
+          </div>
+          <button class="wishlist-item-remove"><i class="bi bi-x-lg"></i></button>
+        </div>`).join("");
+      $list.html(html);
+    }
+
+    $(document).on("click", ".wishlist-item-remove", function () {
+      const idx = parseInt($(this).closest(".wishlist-item").data("index"));
+      let wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      wishlist.splice(idx, 1);
+      localStorage.setItem("hovWishlist", JSON.stringify(wishlist));
+      loadAccountWishlist();
+      showToast("Removed from wishlist.");
+    });
+
+    $(".add-address-btn").click(function () { showToast("Add address form coming soon."); });
+    $(".btn-edit-address").click(function () { showToast("Edit address form coming soon."); });
+
+    $(".navbar-nav .nav-link").on("click", function () {
+      const nav = document.getElementById("mainNav");
+      if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
+    });
+
+    loadAccountOrders();
+  });
+  </script>
+</body>
+</html>
