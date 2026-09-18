@@ -716,10 +716,10 @@
 
       // Simulate sending
       const $btn = $(this).find(".btn-send");
-      $btn.prop("disabled", true)('<span class="spinner-border spinner-border-sm me-2"></span>Sending...');
+      $btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2"></span>Sending...');
 
       setTimeout(function () {
-        $btn.prop("disabled", false)('<i class="bi bi-send me-2"></i>Send Message');
+        $btn.prop("disabled", false).html('<i class="bi bi-send me-2"></i>Send Message');
         showToast("Thank you — we'll be in touch soon.");
         $("#contactForm")[0].reset();
       }, 1200);

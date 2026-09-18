@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+require __DIR__ . '/../app/Core/Autoload.php';
+\App\Core\Autoload::register();
+
 // Normalise the request URI to a path, stripping the app's base directory
 // (e.g. "/house of virasat/public") so the app works in any folder or at root.
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);

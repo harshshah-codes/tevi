@@ -230,7 +230,7 @@
             <button class="cart-remove-btn remove-item"><i class="bi bi-trash3"></i> Remove</button>
           </div>
         </div>`).join("");
-      $("#cartItemsWrap")(html);
+      $("#cartItemsWrap").html(html);
       calculateTotals();
       updateBagCount();
     }

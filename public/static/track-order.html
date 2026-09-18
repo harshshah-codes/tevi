@@ -294,7 +294,7 @@
 
     function renderOrder(order) {
       if (!order) {
-        $("#trackResult")("");
+        $("#trackResult").html("");
         $("#trackEmpty").removeClass("d-none");
         return;
       }
@@ -366,7 +366,7 @@
           </div>
         </div>
       `;
-      $("#trackResult")(html);
+      $("#trackResult").html(html);
     }
 
     function findOrder(id) {

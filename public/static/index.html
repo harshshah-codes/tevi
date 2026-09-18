@@ -213,48 +213,7 @@
   <main>
     <section id="home" class="hero-section">
       <div id="heroSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5500">
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="0" class="active"></button>
-          <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="1"></button>
-          <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="2"></button>
-        </div>
-        <div class="carousel-inner">
-          <div class="carousel-item active hero-slide hero-slide-1">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content">
-              <div class="hero-copy">
-                <span class="eyebrow">THE FESTIVE EDIT · 2026</span>
-                <h1>Tradition,<br><em>Tailored</em> Beautifully.</h1>
-                <p>Timeless Indian silhouettes, refined fabrics and details made for your most memorable occasions.</p>
-                <a href="#featured" class="btn btn-viraasat">Explore Collection <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item hero-slide hero-slide-2">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content">
-              <div class="hero-copy">
-                <span class="eyebrow">ROYAL SHERWANIS</span>
-                <h1>Make an<br><em>Entrance</em> to Remember.</h1>
-                <p>Statement sherwanis crafted with a modern eye and a deep respect for heritage.</p>
-                <a href="#featured" class="btn btn-viraasat">Shop Sherwanis <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item hero-slide hero-slide-3">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content">
-              <div class="hero-copy">
-                <span class="eyebrow">EVERYDAY ETHNIC</span>
-                <h1>Quiet Luxury,<br><em>Indian Soul.</em></h1>
-                <p>Elevated kurtas designed to move effortlessly from intimate gatherings to grand celebrations.</p>
-                <a href="#new-arrivals" class="btn btn-viraasat">Discover New Arrivals <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+        <!--HERO_CAROUSEL-->
       </div>
     </section>
 
@@ -469,8 +428,8 @@
         </div>`;
     }
 
-    $("#featuredProducts")(featuredProducts.map(productCard).join(""));
-    $("#newProducts")(newProducts.map(productCard).join(""));
+    $("#featuredProducts").html(featuredProducts.map(productCard).join(""));
+    $("#newProducts").html(newProducts.map(productCard).join(""));
 
     $(document).on("click", ".quick-add", function () {
       const p = $(this).data("product");

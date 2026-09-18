@@ -266,7 +266,7 @@
       const q = query.toLowerCase().trim();
       if (!q) {
         $("#resultHeader").hide();
-        $("#resultsGrid")("");
+        $("#resultsGrid").html("");
         $("#noResults").addClass("d-none");
         return;
       }
@@ -278,11 +278,11 @@
       );
 
       $("#resultHeader").show();
-      $("#resultTitle")(`Results for "<em style="color:var(--brown);">${query}</em>"`);
+      $("#resultTitle").html(`Results for "<em style="color:var(--brown);">${query}</em>"`);
       $("#resultCount").text(results.length + " product" + (results.length !== 1 ? "s" : ""));
 
       if (results.length === 0) {
-        $("#resultsGrid")("");
+        $("#resultsGrid").html("");
         $("#noResults").removeClass("d-none");
         return;
       }
@@ -304,7 +304,7 @@
           </article>
         </div>
       `).join("");
-      $("#resultsGrid")(html);
+      $("#resultsGrid").html(html);
     }
 
     $("#searchForm").on("submit", function (e) {

@@ -203,10 +203,10 @@
     if (!order) {
       $("#orderId").text("#HOV-00000000");
       $("#customerName").text("there");
-      $("#addressBlock")("No order information available.<br>Please return to the <a href='index' style='color:var(--brown);'>homepage</a>.");
+      $("#addressBlock").html("No order information available.<br>Please return to the <a href='index' style='color:var(--brown);'>homepage</a>.");
       $("#paymentBlock").text("—");
       $("#deliveryBlock").text("—");
-      $("#confirmItems")("<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
+      $("#confirmItems").html("<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
       return;
     }
 
@@ -214,7 +214,7 @@
     $("#orderId").text("#" + (order.orderId || "HOV-00000000"));
     $("#trackOrderBtn").attr("href", "track-order?id=" + order.orderId);
 
-    $("#addressBlock")(
+    $("#addressBlock").html(
       `<strong>${order.firstName} ${order.lastName}</strong><br>` +
       `${order.address}<br>` +
       `${order.city}, ${order.state} - ${order.pincode}<br>` +
@@ -237,7 +237,7 @@
         </div>
         <div class="confirm-item-price">${formatPrice((item.price || 0) * (item.qty || 1))}</div>
       </div>`).join("");
-    $("#confirmItems")(itemsHtml || "<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
+    $("#confirmItems").html(itemsHtml || "<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
 
     $("#subtotal").text(formatPrice(order.subtotal || 0));
     $("#shipping").text((order.shipping || 0) === 0 ? "FREE" : formatPrice(order.shipping));

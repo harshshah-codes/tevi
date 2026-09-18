@@ -929,7 +929,7 @@
         `;
       }).join("");
 
-      $("#orderItems")(itemsHtml);
+      $("#orderItems").html(itemsHtml);
 
       const shipping = subtotal >= 2999 ? 0 : 199;
       const tax = Math.round(subtotal * 0.05); // 5% GST
@@ -986,7 +986,7 @@
 
       // Show processing state
       const btn = $("#placeOrderBtn");
-      btn.prop("disabled", true)('<span class="spinner-border spinner-border-sm me-2"></span>Processing Order...');
+      btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2"></span>Processing Order...');
 
       // Save order details to localStorage
       const orderData = {

@@ -69,37 +69,18 @@ $routes = [
 
 // Check if the route exists in our map
 if (array_key_exists($uri, $routes)) {
+    // Home is rendered by the Hero Carousel backend controller
+    if ($uri === '/' || $uri === '/index') {
+        $app = require __DIR__ . '/bootstrap.php';
+        $app['heroCarousel']->show();
+        exit;
+    }
+
     $file = __DIR__ . '/../public/static/' . $routes[$uri];
 
     if (file_exists($file)) {
-        // Absolute base URL of the app (works at domain root or in a sub-folder)
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $baseUrl = $scheme . '://' . $host . $basePath;
-
-        // Inject a <base> tag so every relative link resolves to the app root,
-        // and rewrite absolute-root links so they point at the app root.
-        $html = str_replace(
-            [
-                '<head>',
-                'href="/"',
-                'src="/images/',
-                'href="fav.png"',
-                'src="image.png"',
-            ],
-            [
-                '<head>' . "\n" . '    <base href="' . $baseUrl . '/">',
-                'href="' . $baseUrl . '/"',
-                'src="' . $baseUrl . '/images/',
-                'href="' . $baseUrl . '/images/fav.png"',
-                'src="' . $baseUrl . '/images/image.png"',
-            ],
-            file_get_contents($file)
-        );
-
-        // Serve the HTML file
         header('Content-Type: text/html; charset=UTF-8');
-        echo $html;
+        echo \App\Core\StaticPage::render($file);
         exit;
     }
 }
