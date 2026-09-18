@@ -128,39 +128,39 @@
         <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a href="index.html" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
-          <img src="logo.png" class="brand-logo" alt="House of Viraasat Logo" />
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo" />
           <span class="brand-fallback">hoV</span>
           <span class="brand-word d-none d-sm-block">House of Viraasat
             <small>KURTA · SHERWANI · ETHNIC WEAR</small>
           </span>
         </a>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <a href="search.html" class="icon-btn" aria-label="Search"><i class="bi bi-search"></i></a>
+          <a href="search" class="icon-btn" aria-label="Search"><i class="bi bi-search"></i></a>
           <div class="dropdown profile-dropdown">
             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><h6 class="dropdown-header">Account</h6></li>
-              <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-              <li><a class="dropdown-item" href="registration.html"><i class="bi bi-person-plus"></i> Registration</a></li>
+              <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+              <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="myaccount.html"><i class="bi bi-person-circle"></i> My Account</a></li>
-              <li><a class="dropdown-item" href="myorder.html"><i class="bi bi-bag-check"></i> My Orders</a></li>
+              <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
-          <a href="wishlist.html" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
-          <a href="cart.html" class="icon-btn position-relative" aria-label="Shopping bag">
+          <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
+          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag">
             <i class="bi bi-bag"></i>
             <span class="bag-count" id="bagCount">0</span>
           </a>
         </div>
         <div class="collapse navbar-collapse order-2" id="mainNav">
           <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.html#featured">Collections</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.html#new-arrivals">New Arrivals</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.html#story">Our Story</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.html#testimonials">Testimonials</a></li>
+            <li class="nav-item"><a class="nav-link" href="./">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="index#featured">Collections</a></li>
+            <li class="nav-item"><a class="nav-link" href="index#new-arrivals">New Arrivals</a></li>
+            <li class="nav-item"><a class="nav-link" href="index#story">Our Story</a></li>
+            <li class="nav-item"><a class="nav-link" href="index#testimonials">Testimonials</a></li>
           </ul>
         </div>
       </div>
@@ -198,7 +198,7 @@
           <i class="bi bi-search"></i>
           <h3>No results found</h3>
           <p>We couldn't find anything matching your search. Try different keywords.</p>
-          <a href="index.html#featured" class="btn-view" style="display:inline-block;padding:12px 28px;">Browse Collections</a>
+          <a href="index#featured" class="btn-view" style="display:inline-block;padding:12px 28px;">Browse Collections</a>
         </div>
       </div>
     </section>
@@ -208,7 +208,7 @@
     <div class="container">
       <div class="row g-5">
         <div class="col-lg-4">
-          <a href="index.html" class="footer-brand">House of Viraasat</a>
+          <a href="./" class="footer-brand">House of Viraasat</a>
           <p class="footer-copy">Contemporary Indian occasionwear, inspired by the richness of our heritage.</p>
           <div class="socials">
             <a href="#"><i class="bi bi-instagram"></i></a>
@@ -218,16 +218,16 @@
         </div>
         <div class="col-6 col-lg-2">
           <h6>Shop</h6>
-          <a href="index.html#featured">Kurtas</a>
-          <a href="index.html#featured">Sherwanis</a>
-          <a href="index.html#new-arrivals">New Arrivals</a>
+          <a href="index#featured">Kurtas</a>
+          <a href="index#featured">Sherwanis</a>
+          <a href="index#new-arrivals">New Arrivals</a>
         </div>
         <div class="col-6 col-lg-2">
           <h6>Company</h6>
-          <a href="index.html#story">Our Story</a>
-          <a href="contact.html">Contact</a>
-          <a href="faq.html">FAQ</a>
-          <a href="shipping-policy.html">Shipping</a>
+          <a href="index#story">Our Story</a>
+          <a href="contact">Contact</a>
+          <a href="faq">FAQ</a>
+          <a href="shipping-policy">Shipping</a>
         </div>
         <div class="col-lg-4">
           <h6>Visit House of Viraasat</h6>
@@ -266,7 +266,7 @@
       const q = query.toLowerCase().trim();
       if (!q) {
         $("#resultHeader").hide();
-        $("#resultsGrid").html("");
+        $("#resultsGrid")("");
         $("#noResults").addClass("d-none");
         return;
       }
@@ -278,11 +278,11 @@
       );
 
       $("#resultHeader").show();
-      $("#resultTitle").html(`Results for "<em style="color:var(--brown);">${query}</em>"`);
+      $("#resultTitle")(`Results for "<em style="color:var(--brown);">${query}</em>"`);
       $("#resultCount").text(results.length + " product" + (results.length !== 1 ? "s" : ""));
 
       if (results.length === 0) {
-        $("#resultsGrid").html("");
+        $("#resultsGrid")("");
         $("#noResults").removeClass("d-none");
         return;
       }
@@ -299,12 +299,12 @@
               <div class="product-category">${p.category}</div>
               <h3 class="product-name">${p.name}</h3>
               <div class="product-price">${formatPrice(p.price)}</div>
-              <a href="product.html?id=${p.id}" class="btn-view">View Details</a>
+              <a href="product?id=${p.id}" class="btn-view">View Details</a>
             </div>
           </article>
         </div>
       `).join("");
-      $("#resultsGrid").html(html);
+      $("#resultsGrid")(html);
     }
 
     $("#searchForm").on("submit", function (e) {
