@@ -9,14 +9,12 @@ use App\Domain\Models\HeroSlide;
 
 final class HeroCarouselController
 {
-    private const HOME_TEMPLATE = '/public/static/index.html';
-
     public function __construct(
         private readonly HeroCarouselService $carousel,
     ) {
     }
 
-    public function show(): void
+    public function renderCarousel(): string
     {
         try {
             $slides = $this->carousel->getHomeSlides();
@@ -38,7 +36,7 @@ final class HeroCarouselController
             $items .= $this->renderSlide($slide, $active) . "\n";
         }
 
-        $hero = '<div class="carousel-indicators">' . "\n"
+        return '<div class="carousel-indicators">' . "\n"
             . $indicators
             . '</div>' . "\n"
             . '<div class="carousel-inner">' . "\n"
@@ -46,11 +44,14 @@ final class HeroCarouselController
             . '</div>' . "\n"
             . '<button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>' . "\n"
             . '<button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>';
+    }
 
+    public function show(): void
+    {
         $html = str_replace(
             '<!--HERO_CAROUSEL-->',
-            $hero,
-            StaticPage::render(dirname(__DIR__, 4) . self::HOME_TEMPLATE)
+            $this->renderCarousel(),
+            StaticPage::render(dirname(__DIR__, 4) . '/public/static/index.html')
         );
 
         header('Content-Type: text/html; charset=UTF-8');

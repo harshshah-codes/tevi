@@ -69,10 +69,17 @@ $routes = [
 
 // Check if the route exists in our map
 if (array_key_exists($uri, $routes)) {
-    // Home is rendered by the Hero Carousel backend controller
+    // Home is rendered by the Home controller (live hero + catalog from the DB backend)
     if ($uri === '/' || $uri === '/index') {
         $app = require __DIR__ . '/bootstrap.php';
-        $app['heroCarousel']->show();
+        $app['home']->show();
+        exit;
+    }
+
+    // Product details are rendered by the Product controller (live data from the DB backend)
+    if ($uri === '/product') {
+        $app = require __DIR__ . '/bootstrap.php';
+        $app['product']->show();
         exit;
     }
 

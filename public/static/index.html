@@ -97,14 +97,16 @@
     .catalog-heading-centered h2{margin:0;color:#2d211b;font-family:"Cormorant Garamond",serif;font-size:52px;line-height:1;font-weight:600}
     .catalog-heading-centered h2 em{color:#76501e;font-style:italic}
     .catalog-top{position:relative;min-height:52px;display:flex;justify-content:center;align-items:center;margin-bottom:32px}
-    .catalog-tabs{display:flex;gap:22px;justify-content:center}
-    .catalog-tab{min-width:205px;height:52px;padding:0 25px;border:1px solid #dedbd7;background:#fff;color:#97918d;font-size:11px;font-weight:600;letter-spacing:.06em;transition:.25s}
+    .catalog-tabs{display:flex;flex-wrap:wrap;gap:14px 22px;justify-content:center;max-width:100%}
+    .catalog-tab{min-width:clamp(120px,15vw,205px);height:52px;padding:0 22px;border:1px solid #dedbd7;background:#fff;color:#97918d;font-size:11px;font-weight:600;letter-spacing:.06em;transition:.25s}
     .catalog-tab:hover,.catalog-tab.active{border-color:#6c6a67;color:#2e2b28}
     .catalog-view-all{position:absolute;right:0;bottom:0;color:#684a18;font-size:10px;font-weight:600;letter-spacing:.08em}
     .catalog-track-wrap{position:relative}
     .catalog-row{flex-wrap:wrap !important;overflow-x:visible !important;gap:12px 0}
     .catalog-row > .product-item{flex:0 0 calc(25% - 12px) !important;max-width:calc(25% - 12px) !important;margin:0 6px}
-    .catalog-card{position:relative;min-width:0;background:#fff}
+    .catalog-card{position:relative;min-width:0;background:#fff;cursor:pointer}
+    .catalog-image-link{display:block;height:100%}
+    .catalog-product-name a{color:inherit}
     .catalog-image-wrap{position:relative;overflow:hidden;background:#f2eee9;aspect-ratio:1/1.22}
     .catalog-image-wrap img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .55s ease}
     .catalog-card:hover .catalog-image-wrap img{transform:scale(1.035)}
@@ -165,8 +167,8 @@
     .active-dot{background:#b08d57;transform:scale(1.25)}
     #testimonialCarousel,#testimonialCarousel .carousel-inner,#testimonialCarousel .carousel-item{height:auto !important;min-height:0 !important}
     @media (min-width:992px){.site-header .navbar > .container{display:flex;align-items:center}.site-header .navbar-collapse{order:2 !important}.site-header .header-actions{order:3 !important;margin-left:auto !important}.site-header .brand-link{order:1 !important}}
-    @media (max-width:991.98px){.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.hero-section,.hero-section .carousel,.hero-slide{height:650px;min-height:560px}.newsletter-box{flex-direction:column;align-items:flex-start}.newsletter-form{min-width:100%;width:100%}.catalog-row > .product-item{flex-basis:50%;max-width:50%}.about-viraasat{grid-template-columns:1fr}.about-image{min-height:520px;order:-1}.about-copy{padding:70px 7%}.category-slider-wrapper{padding:0 45px}.category-item{flex:0 0 calc((100% - 22px)/2);min-width:180px}}
-    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-word small{font-size:6px;letter-spacing:.11em}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.hero-section,.hero-section .carousel,.hero-slide{height:620px;min-height:620px}.hero-copy h1{font-size:56px}.hero-copy p{font-size:13px;max-width:340px}.collection-banner{min-height:560px}.collection-content{margin-left:6vw;padding-right:20px}.newsletter-section{padding-bottom:70px}.newsletter-box{padding:35px 24px}.newsletter-box h3{font-size:32px}.footer-bottom{flex-direction:column;gap:8px}.catalog-row > .product-item{flex-basis:88%;max-width:88%}.catalog-heading-centered h2{font-size:43px}.about-copy{padding:55px 7%}.about-copy h2{font-size:37px}.about-image{min-height:420px}.looking-for-section{padding:58px 0 48px}.looking-heading h2{font-size:35px;padding:0 15px}.category-slider-wrapper{padding:0 18px}.category-slider{gap:16px;padding-bottom:12px}.category-item{flex:0 0 72%;min-width:0}.category-arrow{display:none}.viraasat-testimonials{padding:52px 0 48px}.testimonial-card{padding:8px 48px 10px}.testimonial-card blockquote{font-size:22px}.testimonial-arrow{width:34px;height:34px;font-size:15px}}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.hero-section,.hero-section .carousel,.hero-slide{height:650px;min-height:560px}.newsletter-box{flex-direction:column;align-items:flex-start}.newsletter-form{min-width:100%;width:100%}.catalog-row > .product-item{flex-basis:50%;max-width:50%}.about-viraasat{grid-template-columns:1fr}.about-image{min-height:520px;order:-1}.about-copy{padding:70px 7%}.category-slider-wrapper{padding:0 45px}.category-item{flex:0 0 calc((100% - 22px)/2);min-width:180px}.catalog-top{flex-direction:column;gap:14px;min-height:0}.catalog-tabs{width:100%}.catalog-tab{min-width:clamp(110px,20vw,180px);height:46px;padding:0 16px;font-size:10px}.catalog-view-all{position:static;align-self:center}}
+    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-word small{font-size:6px;letter-spacing:.11em}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.hero-section,.hero-section .carousel,.hero-slide{height:620px;min-height:620px}.hero-copy h1{font-size:56px}.hero-copy p{font-size:13px;max-width:340px}.collection-banner{min-height:560px}.collection-content{margin-left:6vw;padding-right:20px}.newsletter-section{padding-bottom:70px}.newsletter-box{padding:35px 24px}.newsletter-box h3{font-size:32px}.footer-bottom{flex-direction:column;gap:8px}.catalog-row > .product-item{flex-basis:88%;max-width:88%}.catalog-heading-centered h2{font-size:43px}.about-copy{padding:55px 7%}.about-copy h2{font-size:37px}.about-image{min-height:420px}.looking-for-section{padding:58px 0 48px}.looking-heading h2{font-size:35px;padding:0 15px}.category-slider-wrapper{padding:0 18px}.category-slider{gap:16px;padding-bottom:12px}.category-item{flex:0 0 72%;min-width:0}.category-arrow{display:none}.viraasat-testimonials{padding:52px 0 48px}.testimonial-card{padding:8px 48px 10px}.testimonial-card blockquote{font-size:22px}.testimonial-arrow{width:34px;height:34px;font-size:15px}.catalog-tabs{gap:8px}.catalog-tab{min-width:0;flex:1 1 calc(50% - 8px);height:42px;padding:0 10px;font-size:9px;letter-spacing:.04em}}
   </style>
 </head>
 <body>
@@ -226,11 +228,7 @@
         <div class="category-slider-wrapper">
           <button class="category-arrow category-prev-btn" id="categoryPrev"><i class="bi bi-chevron-left"></i></button>
           <div class="category-slider" id="categorySlider">
-            <a href="#featured" class="category-item"><div class="category-image"><img src="https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=700&q=90" alt="Kurtas"></div><h3>KURTAS</h3><span>Timeless Everyday Style</span></a>
-            <a href="#featured" class="category-item"><div class="category-image"><img src="https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=700&q=90" alt="Sherwanis"></div><h3>SHERWANIS</h3><span>Made For Grand Celebrations</span></a>
-            <a href="#featured" class="category-item"><div class="category-image"><img src="https://images.unsplash.com/photo-1627225924765-552d49cf47ad?auto=format&fit=crop&w=700&q=90" alt="Nehru Jackets"></div><h3>NEHRU JACKETS</h3><span>Refined Traditional Style</span></a>
-            <a href="#featured" class="category-item"><div class="category-image"><img src="https://images.unsplash.com/photo-1608234807905-4466023792f5?auto=format&fit=crop&w=700&q=90" alt="Indo Western"></div><h3>INDO-WESTERN</h3><span>Tradition Meets Modern</span></a>
-            <a href="#featured" class="category-item"><div class="category-image"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=90" alt="Wedding Wear"></div><h3>WEDDING WEAR</h3><span>Crafted For Your Big Day</span></a>
+            <!--CATEGORY_SLIDER-->
           </div>
           <button class="category-arrow category-next-btn" id="categoryNext"><i class="bi bi-chevron-right"></i></button>
         </div>
@@ -244,13 +242,9 @@
           <h2>Featured <em>Products</em></h2>
         </div>
         <div class="catalog-top">
-          <div class="catalog-tabs">
-            <button class="catalog-tab active" data-catalog-filter="best">BEST SELLER</button>
-            <button class="catalog-tab" data-catalog-filter="kurta">KURTAS</button>
-          </div>
           <a href="#" class="catalog-view-all">VIEW ALL <i class="bi bi-arrow-up-right"></i></a>
         </div>
-        <div class="catalog-track-wrap"><div class="row catalog-row" id="featuredProducts"></div></div>
+        <div class="catalog-track-wrap"><div class="row catalog-row" id="featuredProducts"><!--FEATURED_PRODUCTS--></div></div>
       </div>
     </section>
 
@@ -272,12 +266,11 @@
         </div>
         <div class="catalog-top">
           <div class="catalog-tabs">
-            <button class="catalog-tab active" data-filter="all">ALL NEW</button>
-            <button class="catalog-tab" data-filter="kurta">KURTAS</button>
+            <!--NEW_ARRIVAL_FILTERS-->
           </div>
           <a href="#" class="catalog-view-all">VIEW ALL <i class="bi bi-arrow-up-right"></i></a>
         </div>
-        <div class="catalog-track-wrap"><div class="row catalog-row" id="newProducts"></div></div>
+        <div class="catalog-track-wrap"><div class="row catalog-row" id="newProducts"><!--NEW_ARRIVALS--></div></div>
       </div>
     </section>
 
@@ -298,38 +291,7 @@
           <p class="section-tag">THE VIRAASAT EXPERIENCE</p>
           <h2>Loved by our <em>community.</em></h2>
         </div>
-        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <div class="testimonial-card text-center">
-                <div class="stars">★★★★★</div>
-                <blockquote>"Elegant, comfortable and beautifully finished. House of Viraasat has become my go-to for celebrations."</blockquote>
-                <div class="testimonial-author"><strong>— Vivaan Patel</strong> <span>· Occasionwear</span></div>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="testimonial-card text-center">
-                <div class="stars">★★★★★</div>
-                <blockquote>"The craftsmanship is absolutely beautiful. Every outfit feels premium and perfectly designed."</blockquote>
-                <div class="testimonial-author"><strong>— Aarav Shah</strong> <span>· Wedding Collection</span></div>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="testimonial-card text-center">
-                <div class="stars">★★★★★</div>
-                <blockquote>"Amazing collection, excellent fitting and a truly premium shopping experience every time."</blockquote>
-                <div class="testimonial-author"><strong>— Rohan Mehta</strong> <span>· Ethnicwear</span></div>
-              </div>
-            </div>
-          </div>
-          <a class="carousel-control-prev" href="#testimonialCarousel" role="button" data-bs-slide="prev"><span class="testimonial-arrow">←</span></a>
-          <a class="carousel-control-next" href="#testimonialCarousel" role="button" data-bs-slide="next"><span class="testimonial-arrow">→</span></a>
-        </div>
-        <div class="testimonial-dots text-center mt-4">
-          <button type="button" class="dot active-dot" data-bs-target="#testimonialCarousel" data-bs-slide-to="0"></button>
-          <button type="button" class="dot" data-bs-target="#testimonialCarousel" data-bs-slide-to="1"></button>
-          <button type="button" class="dot" data-bs-target="#testimonialCarousel" data-bs-slide-to="2"></button>
-        </div>
+        <!--HOME_REVIEWS-->
       </div>
     </section>
 
@@ -384,22 +346,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
   $(function () {
-    const sizes = ["S","M","L","XL","2XL"];
-
-    const featuredProducts = [
-      {name:"Ivory Handwork Kurta",category:"Kurta",price:2899,image:"https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85",badge:"Bestseller"},
-      {name:"Midnight Velvet Sherwani",category:"Sherwani",price:8999,image:"https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85",badge:"Signature"},
-      {name:"Sage Embroidered Kurta",category:"Kurta",price:3499,image:"https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85",badge:"New"},
-      {name:"Regal Bandhgala Set",category:"Sherwani",price:7499,image:"https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85",badge:"Limited"}
-    ];
-
-    const newProducts = [
-      {name:"Maroon Silk Kurta",category:"Kurta",price:3299,image:"https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85",badge:"Just In"},
-      {name:"Sandstone Textured Kurta",category:"Kurta",price:2999,image:"https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85",badge:"Just In"},
-      {name:"Black Royal Sherwani",category:"Sherwani",price:9499,image:"https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85",badge:"Premium"},
-      {name:"Olive Festive Sherwani",category:"Sherwani",price:8299,image:"https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85",badge:"New"}
-    ];
-
     function formatPrice(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
     function showToast(m) { $("#toastMessage").text(m); bootstrap.Toast.getOrCreateInstance(document.getElementById("siteToast"),{delay:2200}).show(); }
 
@@ -409,27 +355,11 @@
       $("#bagCount").text(count);
     }
 
-    function productCard(p) {
-      return `
-        <div class="col-6 col-lg-3 product-item" data-category="${p.category.toLowerCase()}" data-best="true">
-          <article class="catalog-card">
-            <div class="catalog-image-wrap">
-              <img src="${p.image}" alt="${p.name}" loading="lazy">
-              <span class="catalog-badge">${p.badge}</span>
-              <button class="catalog-heart wishlist-btn" data-product='${JSON.stringify(p)}' aria-label="Wishlist"><i class="bi bi-heart"></i></button>
-              <button class="catalog-bag quick-add" aria-label="Add to bag" data-product='${JSON.stringify(p)}'><i class="bi bi-bag-plus"></i></button>
-            </div>
-            <div class="catalog-info">
-              <div class="catalog-product-name">${p.name}</div>
-              <div class="catalog-price">${formatPrice(p.price)}</div>
-              <div class="size-list">${sizes.map(s => `<button type="button" class="size-btn">${s}</button>`).join("")}</div>
-            </div>
-          </article>
-        </div>`;
-    }
-
-    $("#featuredProducts").html(featuredProducts.map(productCard).join(""));
-    $("#newProducts").html(newProducts.map(productCard).join(""));
+    $(document).on("click", ".catalog-card", function (e) {
+      if ($(e.target).closest("a, button").length) return;
+      const url = $(this).data("product-url");
+      if (url) window.location.href = url;
+    });
 
     $(document).on("click", ".quick-add", function () {
       const p = $(this).data("product");
@@ -467,17 +397,20 @@
 
     $(document).on("click", ".catalog-tab", function () {
       const $btn = $(this);
-      const filter = $btn.data("filter") || $btn.data("catalog-filter");
+      const filter = String($btn.data("filter") || $btn.data("catalog-filter") || "");
       const $section = $btn.closest(".catalog-section");
       $section.find(".catalog-tab").removeClass("active");
       $btn.addClass("active");
       const $items = $section.find(".product-item");
       $items.each(function () {
         const category = String($(this).data("category"));
+        const badge = String($(this).data("badge") || "");
         const isBest = String($(this).data("best")) === "true";
         let show = true;
-        if (filter === "kurta" || filter === "sherwani") show = category === filter;
-        if (filter === "best") show = isBest;
+        if (filter === "all") show = true;
+        else if (filter === "best") show = isBest;
+        else if (filter === "kurta" || filter === "sherwani") show = category === filter;
+        else if (filter) show = badge === filter;
         $(this).toggle(show);
       });
     });
@@ -498,6 +431,11 @@
     $(".navbar-nav .nav-link").on("click", function () {
       const nav = document.getElementById("mainNav");
       if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
+    });
+
+    $(".catalog-section").each(function () {
+      const $active = $(this).find(".catalog-tab.active").first();
+      if ($active.length) $active.trigger("click");
     });
 
     updateBagFromLocalStorage();
