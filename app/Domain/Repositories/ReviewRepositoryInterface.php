@@ -25,4 +25,19 @@ interface ReviewRepositoryInterface
      * @return array{avg: float, count: int}
      */
     public function summaryByProductId(int $productId): array;
+
+    /**
+     * @return Review[]
+     */
+    public function findAll(): array;
+
+    public function findById(int $id): ?Review;
+
+    public function create(Review $review): int;
+
+    public function update(Review $review): bool;
+
+    public function delete(int $id): bool;
+
+    public function setVisibility(int $id, bool $visible): bool;
 }

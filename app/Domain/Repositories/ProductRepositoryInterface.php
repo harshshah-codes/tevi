@@ -28,4 +28,19 @@ interface ProductRepositoryInterface
      * @return Product[]
      */
     public function findRelated(array $categoryIds, int $excludeProductId, int $limit = 4): array;
+
+    /**
+     * @return Product[]
+     */
+    public function findAll(): array;
+
+    public function create(Product $product): int;
+
+    public function update(Product $product): bool;
+
+    public function delete(int $id): bool;
+
+    public function attachCategories(int $productId, array $categoryIds): bool;
+
+    public function detachCategories(int $productId): bool;
 }

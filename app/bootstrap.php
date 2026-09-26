@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Application\Services\CatalogService;
 use App\Application\Services\HeroCarouselService;
 use App\Core\Database;
+use App\Core\MigrationRunner;
 use App\Infrastructure\Http\Controllers\CatalogController;
 use App\Infrastructure\Http\Controllers\HeroCarouselController;
 use App\Infrastructure\Http\Controllers\HomeController;
@@ -16,6 +17,8 @@ use App\Infrastructure\Persistence\MySqlReviewRepository;
 $config = require __DIR__ . '/Config/config.php';
 
 $pdo = Database::connect($config['db']);
+
+(new MigrationRunner($pdo))->run();
 
 $heroRepository = new MySqlHeroSlideRepository($pdo);
 $heroService = new HeroCarouselService($heroRepository);

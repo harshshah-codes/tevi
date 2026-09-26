@@ -87,6 +87,120 @@ final class MySqlProductRepository implements ProductRepositoryInterface
     }
 
     /**
+     * @return Product[]
+     */
+    public function findAll(): array
+    {
+        $rows = $this->pdo
+            ->query('SELECT ' . self::COLUMNS . ' FROM products ORDER BY id DESC')
+            ->fetchAll();
+
+        return $this->hydrate($rows);
+    }
+
+    public function create(Product $product): int
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO products (name, slug, description, price, image, badge, sizes, colors, is_featured)
+                 VALUES (:name, :slug, :description, :price, :image, :badge, :sizes, :colors, :is_featured)'
+            );
+            $stmt->execute([
+                ':name'        => $product->name(),
+                ':slug'        => $product->slug(),
+                ':description' => $product->description(),
+                ':price'       => $product->price(),
+                ':image'       => $product->image(),
+                ':badge'       => $product->badge()?->value ?? '',
+                ':sizes'       => json_encode($product->sizes()),
+                ':colors'      => json_encode($product->colors()),
+                ':is_featured' => $product->isFeatured() ? 1 : 0,
+            ]);
+
+            $productId = (int) $this->pdo->lastInsertId();
+
+            if ($product->categories() !== []) {
+                $this->attachCategories($productId, array_map(fn (Category $c) => $c->id(), $product->categories()));
+            }
+
+            $this->pdo->commit();
+            return $productId;
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
+    }
+
+    public function update(Product $product): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE products SET name = :name, slug = :slug, description = :description, price = :price,
+             image = :image, badge = :badge, sizes = :sizes, colors = :colors, is_featured = :is_featured
+             WHERE id = :id'
+        );
+        $result = $stmt->execute([
+            ':id'          => $product->id(),
+            ':name'        => $product->name(),
+            ':slug'        => $product->slug(),
+            ':description' => $product->description(),
+            ':price'       => $product->price(),
+            ':image'       => $product->image(),
+            ':badge'       => $product->badge()?->value ?? '',
+            ':sizes'       => json_encode($product->sizes()),
+            ':colors'      => json_encode($product->colors()),
+            ':is_featured' => $product->isFeatured() ? 1 : 0,
+        ]);
+
+        if ($result) {
+            $this->detachCategories($product->id());
+            if ($product->categories() !== []) {
+                $this->attachCategories($product->id(), array_map(fn (Category $c) => $c->id(), $product->categories()));
+            }
+        }
+
+        return $result && $stmt->rowCount() > 0;
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM products WHERE id = :id');
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function attachCategories(int $productId, array $categoryIds): bool
+    {
+        if ($categoryIds === []) {
+            return true;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'INSERT IGNORE INTO product_category (product_id, category_id) VALUES (:product_id, :category_id)'
+        );
+
+        foreach ($categoryIds as $categoryId) {
+            $stmt->execute([
+                ':product_id'  => $productId,
+                ':category_id' => $categoryId,
+            ]);
+        }
+
+        return true;
+    }
+
+    public function detachCategories(int $productId): bool
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM product_category WHERE product_id = :product_id');
+        $stmt->bindValue(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return true;
+    }
+
+    /**
      * @param array<int, array<string, mixed>> $rows
      * @return Product[]
      */

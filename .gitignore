@@ -1,3 +1,41 @@
+# Configuration
 config.php
 **/config.php
 app/Config/config.php
+
+# Dependencies
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+storage/logs/
+
+# Cache
+bootstrap/cache/
+var/cache/
+
+# Environment
+.env
+.env.*
+
+# Database
+*.sqlite
+*.db
+
+# Uploads
+public/uploads/
+public/admin/uploads/
+
+# Temporary files
+*.tmp
+*.temp
