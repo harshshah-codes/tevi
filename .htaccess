@@ -1,0 +1,20 @@
+RewriteEngine On
+RewriteBase /
+
+# Block sensitive files from web access
+RewriteRule (^\.env.*$|^app/|^vendor/|^migrate\.php$) - [F,L,NC]
+
+# Serve existing files (catches rewrites from previous pass — prevents loops)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Admin panel → dedicated entry point
+RewriteCond %{REQUEST_URI} ^/admin
+RewriteRule ^(.*)$ public/admin/index.php [L,QSA]
+
+# Static files inside public/
+RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+RewriteRule ^(.+)$ public/$1 [L]
+
+# Everything else → main entry point
+RewriteRule ^(.*)$ public/index.php [L,QSA]

@@ -1,5 +1,9 @@
 RewriteEngine On
 
+# Admin panel → dedicated entry point
+RewriteCond %{REQUEST_URI} ^/admin
+RewriteRule ^ admin/index.php [L,QSA]
+
 # Serve existing files directly (css, js, images, .html)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

@@ -100,6 +100,7 @@ final class AdminCategoryController extends AdminController
         $content = $this->render('categories/form.php', [
             'TITLE'             => 'Edit Category',
             'ACTION'            => 'categories/edit?id=' . $id,
+            'CATEGORY'          => true,
             'CATEGORY_NAME'     => htmlspecialchars($category->name(), ENT_QUOTES),
             'CATEGORY_SLUG'     => htmlspecialchars($category->slug(), ENT_QUOTES),
             'CATEGORY_IMAGE'    => htmlspecialchars($category->image(), ENT_QUOTES),

@@ -13,6 +13,11 @@ final class StaticPage
         $basePath = $scriptDir === '/' || $scriptDir === '.' ? '' : rtrim($scriptDir, '/');
         $baseUrl = $scheme . '://' . $host . $basePath;
 
+        $content = file_get_contents($file);
+        if ($content === false) {
+            return '';
+        }
+
         return str_replace(
             [
                 '<head>',
@@ -28,7 +33,7 @@ final class StaticPage
                 'href="' . $baseUrl . '/images/fav.png"',
                 'src="' . $baseUrl . '/images/image.png"',
             ],
-            file_get_contents($file)
+            $content
         );
     }
 }

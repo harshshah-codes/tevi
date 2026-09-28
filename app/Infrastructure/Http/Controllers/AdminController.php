@@ -3,18 +3,31 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Controllers;
 
-use App\Core\StaticPage;
-
 abstract class AdminController
 {
     protected function render(string $template, array $placeholders = []): string
     {
         $path = dirname(__DIR__, 4) . '/public/admin/' . $template;
-        $html = StaticPage::render($path);
+        $html = file_get_contents($path);
+        if ($html === false) {
+            return '';
+        }
+
+        $html = preg_replace_callback(
+            '/<!--IF:([A-Z0-9_]+)-->(.*?)<!--ENDIF:\1-->/s',
+            function (array $m) use ($placeholders): string {
+                $key = $m[1];
+                $val = $placeholders[$key] ?? '';
+                return $val ? $m[2] : '';
+            },
+            $html
+        );
 
         foreach ($placeholders as $key => $value) {
-            $html = str_replace('<!--' . $key . '-->', $value, $html);
+            $html = str_replace('<!--' . $key . '-->', (string) $value, $html);
         }
+
+        $html = preg_replace('/<!--END[A-Z]+-->/', '', $html);
 
         return $html;
     }

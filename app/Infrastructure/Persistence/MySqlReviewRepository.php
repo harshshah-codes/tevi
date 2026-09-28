@@ -38,6 +38,7 @@ final class MySqlReviewRepository implements ReviewRepositoryInterface
                 $row['review_text'] ?? '',
                 $row['created_at'],
                 $row['context'] ?? '',
+                (bool) $row['is_visible'],
             );
         }
 
@@ -94,6 +95,7 @@ final class MySqlReviewRepository implements ReviewRepositoryInterface
                 $row['review_text'] ?? '',
                 $row['created_at'],
                 $row['context'] ?? '',
+                true,
             );
         }
 
@@ -124,6 +126,7 @@ final class MySqlReviewRepository implements ReviewRepositoryInterface
                 $row['review_text'] ?? '',
                 $row['created_at'],
                 $row['context'] ?? '',
+                (bool) $row['is_visible'],
             );
         }
 
@@ -153,6 +156,7 @@ final class MySqlReviewRepository implements ReviewRepositoryInterface
             $row['review_text'] ?? '',
             $row['created_at'],
             $row['context'] ?? '',
+            (bool) $row['is_visible'],
         );
     }
 

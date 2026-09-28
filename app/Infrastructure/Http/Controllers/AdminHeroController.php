@@ -105,6 +105,7 @@ final class AdminHeroController extends AdminController
         $content = $this->render('hero/form.php', [
             'TITLE'            => 'Edit Hero Slide',
             'ACTION'           => 'hero/edit?id=' . $id,
+            'SLIDE'            => true,
             'SLIDE_TAGLINE'    => htmlspecialchars($slide->tagline(), ENT_QUOTES),
             'SLIDE_HEADLINE'   => htmlspecialchars($slide->headline(), ENT_QUOTES),
             'SLIDE_PARAGRAPH'  => htmlspecialchars($slide->paragraph(), ENT_QUOTES),

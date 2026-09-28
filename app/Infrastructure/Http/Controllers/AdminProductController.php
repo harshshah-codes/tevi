@@ -129,6 +129,7 @@ final class AdminProductController extends AdminController
         $content = $this->render('products/form.php', [
             'TITLE'            => 'Edit Product',
             'ACTION'           => 'products/edit?id=' . $id,
+            'PRODUCT'          => true,
             'PRODUCT_NAME'     => htmlspecialchars($product->name(), ENT_QUOTES),
             'PRODUCT_SLUG'     => htmlspecialchars($product->slug(), ENT_QUOTES),
             'PRODUCT_DESCRIPTION' => htmlspecialchars($product->description(), ENT_QUOTES),

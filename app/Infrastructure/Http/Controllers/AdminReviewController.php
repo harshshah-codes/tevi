@@ -23,6 +23,7 @@ final class AdminReviewController extends AdminController
         $rows = '';
         foreach ($reviews as $review) {
             $stars = str_repeat('★', $review->rating()) . str_repeat('☆', 5 - $review->rating());
+            $visible = $review->isVisible();
 
             $rows .= '<tr>'
                 . '<td>' . $review->id() . '</td>'
@@ -31,18 +32,15 @@ final class AdminReviewController extends AdminController
                 . '<td>' . $stars . '</td>'
                 . '<td>' . htmlspecialchars(substr($review->text(), 0, 100), ENT_QUOTES) . ($review->text() > 100 ? '...' : '') . '</td>'
                 . '<td>' . htmlspecialchars($review->date(), ENT_QUOTES) . '</td>'
+                . '<td><span class="badge bg-' . ($visible ? 'success' : 'secondary') . '">' . ($visible ? 'Visible' : 'Hidden') . '</span></td>'
                 . '<td>'
                 . '<form action="reviews/visibility" method="post" style="display:inline">'
                 . '<input type="hidden" name="csrf_token" value="' . $this->csToken() . '">'
                 . '<input type="hidden" name="id" value="' . $review->id() . '">'
-                . '<input type="hidden" name="visible" value="1">'
-                . '<button type="submit" class="btn btn-sm btn-outline-success">Show</button>'
-                . '</form> '
-                . '<form action="reviews/visibility" method="post" style="display:inline">'
-                . '<input type="hidden" name="csrf_token" value="' . $this->csToken() . '">'
-                . '<input type="hidden" name="id" value="' . $review->id() . '">'
-                . '<input type="hidden" name="visible" value="0">'
-                . '<button type="submit" class="btn btn-sm btn-outline-secondary">Hide</button>'
+                . '<input type="hidden" name="visible" value="' . ($visible ? '0' : '1') . '">'
+                . '<button type="submit" class="btn btn-sm btn-outline-' . ($visible ? 'secondary' : 'success') . '">'
+                . ($visible ? 'Hide' : 'Show')
+                . '</button>'
                 . '</form>'
                 . '</td>'
                 . '<td class="text-end">'
@@ -127,6 +125,7 @@ final class AdminReviewController extends AdminController
         $content = $this->render('reviews/form.php', [
             'TITLE'             => 'Edit Review',
             'ACTION'            => 'reviews/edit?id=' . $id,
+            'REVIEW'            => true,
             'REVIEW_PRODUCT_ID' => $review->productId(),
             'REVIEW_AUTHOR'     => htmlspecialchars($review->author(), ENT_QUOTES),
             'REVIEW_RATING_5'   => $review->rating() === 5,

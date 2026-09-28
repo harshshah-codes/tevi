@@ -49,8 +49,6 @@
                     <select name="badge" class="form-select">
                         <option value="">None</option>
                         <!--BADGES-->
-                        <option value="<!--BADGE_VALUE-->" <!--IF:PRODUCT_SELECTED_BADGE--><!--BADGE_SELECTED--><!--ENDIF:PRODUCT_SELECTED_BADGE-->><!--BADGE_LABEL--></option>
-                        <!--ENDBADGES-->
                     </select>
                 </div>
             </div>
@@ -83,11 +81,6 @@
                 <label class="col-sm-2 col-form-label">Categories</label>
                 <div class="col-sm-10">
                     <!--CATEGORIES-->
-                    <div class="form-check">
-                        <input type="checkbox" name="categories[]" value="<!--CATEGORY_ID-->" class="form-check-input" id="cat_<!--CATEGORY_ID-->" <!--IF:SELECTED_CATEGORIES--><!--CATEGORY_CHECKED--><!--ENDIF:SELECTED_CATEGORIES-->>
-                        <label class="form-check-label" for="cat_<!--CATEGORY_ID--><--><!--CATEGORY_NAME--></label>
-                    </div>
-                    <!--ENDCATEGORIES-->
                 </div>
             </div>
 

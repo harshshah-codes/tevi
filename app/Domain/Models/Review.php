@@ -13,6 +13,7 @@ final class Review
         private readonly string $text,
         private readonly string $date,
         private readonly string $context = '',
+        private readonly bool $isVisible = true,
     ) {
     }
 
@@ -49,5 +50,10 @@ final class Review
     public function context(): string
     {
         return $this->context;
+    }
+
+    public function isVisible(): bool
+    {
+        return $this->isVisible;
     }
 }
