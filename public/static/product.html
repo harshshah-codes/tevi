@@ -164,7 +164,7 @@
     .size-modal table{font-size:13px}
     .size-modal th{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:2px solid var(--line)}
     .size-modal td{border-bottom:1px solid var(--line)}
-    @media (max-width:991.98px){.navbar{min-height:76px}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:0}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.product-gallery{position:relative;top:auto;margin-bottom:40px}.product-info{padding-left:0}.details-section,.reviews-section,.related-section{padding:55px 0}}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.product-gallery{position:relative;top:auto;margin-bottom:40px}.product-info{padding-left:0}.details-section,.reviews-section,.related-section{padding:55px 0}}
     @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.footer-bottom{flex-direction:column;gap:8px}.product-section{padding:25px 0 60px}.gallery-layout{grid-template-columns:70px 1fr;gap:10px}.thumbnail{width:70px;height:88px}.product-title{font-size:32px}.product-price{font-size:22px}.purchase-row{flex-wrap:wrap}.quantity-control{width:100px}.details-heading h2,.reviews-heading h2,.related-heading h2{font-size:36px}}
   </style>
 </head>
@@ -174,15 +174,15 @@
   <header class="site-header sticky-top">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
-        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
-        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
-          <img src="images/logo.png" class="brand-logo" alt="Logo">
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link order-1">
+          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo">
           <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
         </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
           <div class="dropdown profile-dropdown">
-            <button class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person"></i></button>
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><h6 class="dropdown-header">Account</h6></li>
               <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
@@ -192,11 +192,11 @@
               <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
-          <a href="wishlist" class="icon-btn"><i class="bi bi-heart"></i></a>
-          <a href="cart" class="icon-btn position-relative"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
+          <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
+          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
         </div>
         <div class="collapse navbar-collapse order-2" id="mainNav">
-          <ul class="navbar-nav mx-auto">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="./">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="index#featured">Collections</a></li>
             <li class="nav-item"><a class="nav-link" href="index#new-arrivals">New Arrivals</a></li>
@@ -417,7 +417,7 @@
       let bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
       const existing = bag.find(i => i.name === product.name && i.size === selectedSize);
       if (existing) existing.qty += quantity;
-      else bag.push({id:Date.now(),name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
+      else bag.push({id:Date.now(),productId:product.id,name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
       localStorage.setItem("hovBag", JSON.stringify(bag));
       updateBagCount();
       showToast(product.name + " added to your bag.");
@@ -427,7 +427,7 @@
       let bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
       const existing = bag.find(i => i.name === product.name && i.size === selectedSize);
       if (existing) existing.qty += quantity;
-      else bag.push({id:Date.now(),name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
+      else bag.push({id:Date.now(),productId:product.id,name:product.name,price:product.price,image:product.image,category:product.category,size:selectedSize,color:selectedColor,qty:quantity});
       localStorage.setItem("hovBag", JSON.stringify(bag));
       window.location.href = "checkout";
     });

@@ -27,7 +27,7 @@
     .navbar { min-height: 88px; padding: 12px 0; }
     .brand-link { min-width: 285px; }
     .brand-logo { width: 62px; height: 62px; object-fit: contain; border-radius: 50%; background: var(--ivory); }
-    .brand-fallback { display: none; width: 48px; height: 48px; border: 1px solid var(--brown); border-radius: 50%; color: var(--wine); font-family: "Cormorant Garamond", serif; font-size: 24px; text-align: center; line-height: 46px; }
+    
     .brand-word { color: var(--espresso); font-family: "Cormorant Garamond", serif; font-weight: 700; font-size: 26px; line-height: 1; }
     .brand-word small { display: block; margin-top: 7px; color: var(--brown); font-family: "DM Sans", sans-serif; font-size: 7.5px; font-weight: 600; letter-spacing: .19em; }
     .navbar-nav { gap: 10px; }
@@ -97,7 +97,7 @@
       .brand-link { min-width: auto; }
       .brand-logo { width: 52px; height: 52px; }
       .brand-word { font-size: 22px; }
-      .header-actions { margin-left: 0; }
+      .header-actions { margin-left: auto !important; }
       .navbar-collapse { order: 4; padding-top: 12px; }
       .navbar-nav { gap: 0; border-top: 1px solid var(--line); padding-top: 8px; }
       .nav-link { padding: 11px 0 !important; }
@@ -125,18 +125,13 @@
   <header class="site-header sticky-top">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
-        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
-          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo" />
-          <span class="brand-fallback">hoV</span>
-          <span class="brand-word d-none d-sm-block">House of Viraasat
-            <small>KURTA · SHERWANI · ETHNIC WEAR</small>
-          </span>
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link order-1">
+          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo">
+          <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
         </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <a href="search" class="icon-btn" aria-label="Search"><i class="bi bi-search"></i></a>
+          <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
           <div class="dropdown profile-dropdown">
             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -149,10 +144,7 @@
             </ul>
           </div>
           <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
-          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag">
-            <i class="bi bi-bag"></i>
-            <span class="bag-count" id="bagCount">0</span>
-          </a>
+          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
         </div>
         <div class="collapse navbar-collapse order-2" id="mainNav">
           <ul class="navbar-nav mx-auto mb-2 mb-lg-0">

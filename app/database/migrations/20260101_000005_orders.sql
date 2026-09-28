@@ -1,0 +1,38 @@
+-- House of Viraasat — orders & order items
+
+CREATE TABLE IF NOT EXISTS orders (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id VARCHAR(20) NOT NULL,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  address TEXT NOT NULL,
+  city VARCHAR(100) NOT NULL,
+  state VARCHAR(100) NOT NULL,
+  pincode VARCHAR(10) NOT NULL,
+  payment_method VARCHAR(20) NOT NULL DEFAULT 'cod',
+  subtotal INT UNSIGNED NOT NULL DEFAULT 0,
+  shipping INT UNSIGNED NOT NULL DEFAULT 0,
+  tax INT UNSIGNED NOT NULL DEFAULT 0,
+  total INT UNSIGNED NOT NULL DEFAULT 0,
+  status VARCHAR(20) NOT NULL DEFAULT 'processing',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_orders_order_id (order_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS order_items (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  order_id INT UNSIGNED NOT NULL,
+  product_id INT UNSIGNED NULL,
+  product_name VARCHAR(255) NOT NULL,
+  size VARCHAR(20) NOT NULL DEFAULT '',
+  color VARCHAR(50) NOT NULL DEFAULT '',
+  price INT UNSIGNED NOT NULL DEFAULT 0,
+  qty INT UNSIGNED NOT NULL DEFAULT 1,
+  image VARCHAR(500) NOT NULL DEFAULT '',
+  PRIMARY KEY (id),
+  KEY idx_order_items_order (order_id),
+  CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

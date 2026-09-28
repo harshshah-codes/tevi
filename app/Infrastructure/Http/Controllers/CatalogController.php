@@ -185,6 +185,7 @@ final class CatalogController
             ? $product->categories()[0]->name()
             : '';
         $payload = json_encode([
+            'id'       => $product->id(),
             'name'     => $product->name(),
             'category' => $categoryName,
             'price'    => $product->price(),

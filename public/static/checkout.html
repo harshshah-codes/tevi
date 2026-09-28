@@ -72,18 +72,7 @@
       border-radius: 50%;
       background: var(--ivory);
     }
-    .brand-fallback {
-      display: none;
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--brown);
-      border-radius: 50%;
-      color: var(--wine);
-      font-family: "Cormorant Garamond", serif;
-      font-size: 24px;
-      text-align: center;
-      line-height: 46px;
-    }
+    
     .brand-word {
       color: var(--espresso);
       font-family: "Cormorant Garamond", serif;
@@ -491,7 +480,7 @@
       .brand-link { min-width: auto; }
       .brand-logo { width: 52px; height: 52px; }
       .brand-word { font-size: 22px; }
-      .header-actions { margin-left: 0; }
+      .header-actions { margin-left: auto !important; }
       .navbar-collapse { order: 4; padding-top: 12px; }
       .navbar-nav { gap: 0; border-top: 1px solid var(--line); padding-top: 8px; }
       .nav-link { padding: 11px 0 !important; }
@@ -529,47 +518,27 @@
   <header class="site-header sticky-top" id="top">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
-        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- logo -->
-        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
-          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo" />
-          <span class="brand-fallback">hoV</span>
-          <span class="brand-word d-none d-sm-block">House of Viraasat
-            <small>KURTA · SHERWANI · ETHNIC WEAR</small>
-          </span>
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link order-1">
+          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo">
+          <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
         </a>
-
-        <!-- HEADER ACTIONS -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <span class="icon-btn search-static" aria-label="Search" role="img" tabindex="-1">
-            <i class="bi bi-search"></i>
-          </span>
-
+          <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
           <div class="dropdown profile-dropdown">
-            <button class="icon-btn" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Profile">
-              <i class="bi bi-person"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end">
               <li><h6 class="dropdown-header">Account</h6></li>
               <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
               <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="myorder"><i class="bi bi-person-circle"></i> My Account</a></li>
-              <li><a class="dropdown-item" href="myaccount"><i class="bi bi-bag-check"></i> My Orders</a></li>
+              <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
+              <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
-
           <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
-          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag">
-            <i class="bi bi-bag"></i>
-            <span class="bag-count" id="bagCount">0</span>
-          </a>
+          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
         </div>
-
         <div class="collapse navbar-collapse order-2" id="mainNav">
           <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="./">Home</a></li>
@@ -609,25 +578,25 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>First Name *</label>
-                      <input type="text" class="form-control" id="firstName" value="Arjun" required>
+                      <input type="text" class="form-control" id="firstName" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Last Name *</label>
-                      <input type="text" class="form-control" id="lastName" value="Mehta" required>
+                      <input type="text" class="form-control" id="lastName" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Email Address *</label>
-                      <input type="email" class="form-control" id="email" value="arjun@example.com" required>
+                      <input type="email" class="form-control" id="email" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Phone Number *</label>
-                      <input type="tel" class="form-control" id="phone" value="+91 98765 43210" required>
+                      <input type="tel" class="form-control" id="phone" required>
                     </div>
                   </div>
                 </div>
@@ -638,7 +607,7 @@
                 <h4>Shipping <em>Address</em></h4>
                 <div class="form-group">
                   <label>Address Line 1 *</label>
-                  <input type="text" class="form-control" id="address1" value="42, Heritage Apartments" required>
+                  <input type="text" class="form-control" id="address1" required>
                 </div>
                 <div class="form-group">
                   <label>Address Line 2</label>
@@ -648,19 +617,19 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>City *</label>
-                      <input type="text" class="form-control" id="city" value="Mumbai" required>
+                      <input type="text" class="form-control" id="city" required>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>State *</label>
-                      <input type="text" class="form-control" id="state" value="Maharashtra" required>
+                      <input type="text" class="form-control" id="state" required>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Pincode *</label>
-                      <input type="text" class="form-control" id="pincode" value="400049" required maxlength="6">
+                      <input type="text" class="form-control" id="pincode" required maxlength="6">
                     </div>
                   </div>
                 </div>
@@ -990,7 +959,7 @@
 
       // Save order details to localStorage
       const orderData = {
-        orderId: "HOV-" + Date.now().toString().slice(-8),
+        orderId: "HOV-" + Date.now().toString().slice(-6) + Math.floor(10 + Math.random() * 90),
         firstName: $("#firstName").val(),
         lastName: $("#lastName").val(),
         email: $("#email").val(),
@@ -1007,6 +976,13 @@
         total: parseInt($("#total").text().replace(/[₹,]/g, "")),
         date: new Date().toISOString()
       };
+
+      // Persist order to server (fire-and-forget with localStorage fallback)
+      fetch("api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData)
+      }).catch(function () {});
 
       localStorage.setItem("hovLastOrder", JSON.stringify(orderData));
 

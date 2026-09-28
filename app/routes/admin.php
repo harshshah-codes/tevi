@@ -53,6 +53,10 @@ $productController = new \App\Infrastructure\Http\Controllers\AdminProductContro
 $categoryController = new \App\Infrastructure\Http\Controllers\AdminCategoryController($adminCategoryService);
 $reviewController = new \App\Infrastructure\Http\Controllers\AdminReviewController($adminReviewService);
 
+$orderRepository = new \App\Infrastructure\Persistence\MySqlOrderRepository($pdo);
+$orderService = new \App\Application\Services\OrderService($orderRepository);
+$ordersController = new \App\Infrastructure\Http\Controllers\AdminOrdersController($orderService);
+
 $action = 'dashboard';
 
 $parts = explode('/', ltrim($uri, '/'));
@@ -158,6 +162,18 @@ switch ($action) {
                 break;
             default:
                 $reviewController->index();
+                break;
+        }
+        break;
+
+    case 'orders':
+        $subAction = $parts[1] ?? 'index';
+        switch ($subAction) {
+            case 'detail':
+                $ordersController->detail();
+                break;
+            default:
+                $ordersController->index();
                 break;
         }
         break;

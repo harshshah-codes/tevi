@@ -92,7 +92,7 @@
     .footer .col-6 a:hover,.footer-mail:hover{color:#fff}
     .footer-bottom{border-top:1px solid #4c3027;margin-top:55px;padding-top:20px;display:flex;justify-content:space-between;color:#88766c;font-size:10px;letter-spacing:.05em}
     .toast{background:var(--espresso);color:#fff;border-radius:0}
-    @media (max-width:991.98px){.navbar{min-height:76px}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:0}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.orders-hero{padding:45px 0 25px}.orders-sidebar{position:relative;top:auto;margin-bottom:25px}.orders-content{padding:22px}}
+    @media (max-width:991.98px){.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.orders-hero{padding:45px 0 25px}.orders-sidebar{position:relative;top:auto;margin-bottom:25px}.orders-content{padding:22px}}
     @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.footer-bottom{flex-direction:column;gap:8px}.orders-title{font-size:38px}.orders-content-title{font-size:26px}.orders-content{padding:16px}.order-card{padding:16px}.order-header{flex-direction:column;align-items:flex-start;gap:6px}.order-footer{flex-direction:column;gap:12px}.order-products{flex-direction:column}.order-product-item{width:100%}}
   </style>
 </head>
@@ -102,15 +102,15 @@
   <header class="site-header sticky-top">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
-        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
-        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
-          <img src="images/logo.png" class="brand-logo" alt="Logo">
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link order-1">
+          <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo">
           <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
         </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <span class="icon-btn search-static"><i class="bi bi-search"></i></span>
+          <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
           <div class="dropdown profile-dropdown">
-            <button class="icon-btn" data-bs-toggle="dropdown"><i class="bi bi-person"></i></button>
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><h6 class="dropdown-header">Account</h6></li>
               <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
@@ -120,11 +120,11 @@
               <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
-          <a href="wishlist" class="icon-btn"><i class="bi bi-heart"></i></a>
-          <a href="cart" class="icon-btn position-relative"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
+          <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
+          <a href="cart" class="icon-btn position-relative" aria-label="Shopping bag"><i class="bi bi-bag"></i><span class="bag-count" id="bagCount">0</span></a>
         </div>
         <div class="collapse navbar-collapse order-2" id="mainNav">
-          <ul class="navbar-nav mx-auto">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="./">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="index#featured">Collections</a></li>
             <li class="nav-item"><a class="nav-link" href="index#new-arrivals">New Arrivals</a></li>
@@ -213,6 +213,17 @@
 
     const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
     $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
+
+    // Fill sidebar profile from the customer's most recent order
+    const allOrders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
+    if (allOrders.length > 0) {
+      const c = allOrders[0];
+      $(".profile-name").text(((c.firstName || "") + " " + (c.lastName || "")).trim() || "My Account");
+      $(".profile-email").text(c.email || "");
+    } else {
+      $(".profile-name").text("My Account");
+      $(".profile-email").text("");
+    }
 
     function renderOrders() {
       const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");

@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 use App\Application\Services\CatalogService;
 use App\Application\Services\HeroCarouselService;
+use App\Application\Services\OrderService;
 use App\Core\Database;
 use App\Core\MigrationRunner;
 use App\Infrastructure\Http\Controllers\CatalogController;
 use App\Infrastructure\Http\Controllers\HeroCarouselController;
 use App\Infrastructure\Http\Controllers\HomeController;
+use App\Infrastructure\Http\Controllers\OrderController;
 use App\Infrastructure\Http\Controllers\ProductController;
 use App\Infrastructure\Persistence\MySqlCategoryRepository;
 use App\Infrastructure\Persistence\MySqlHeroSlideRepository;
+use App\Infrastructure\Persistence\MySqlOrderRepository;
 use App\Infrastructure\Persistence\MySqlProductRepository;
 use App\Infrastructure\Persistence\MySqlReviewRepository;
 
@@ -34,9 +37,14 @@ $productController = new ProductController($catalogService);
 
 $homeController = new HomeController($heroController, $catalogController);
 
+$orderRepository = new MySqlOrderRepository($pdo);
+$orderService = new OrderService($orderRepository);
+$orderController = new OrderController($orderService);
+
 return [
     'heroCarousel' => $heroController,
     'catalog'      => $catalogController,
     'product'      => $productController,
     'home'         => $homeController,
+    'order'        => $orderController,
 ];

@@ -88,6 +88,9 @@
                     <a class="nav-link <!--IF:ACTIVE_CATEGORIES-->active<!--ENDIF:ACTIVE_CATEGORIES-->" href="/admin/categories">
                         <i class="bi bi-tags me-2"></i>Categories
                     </a>
+                    <a class="nav-link <!--IF:ACTIVE_ORDERS-->active<!--ENDIF:ACTIVE_ORDERS-->" href="/admin/orders">
+                        <i class="bi bi-receipt me-2"></i>Orders
+                    </a>
                     <a class="nav-link <!--IF:ACTIVE_REVIEWS-->active<!--ENDIF:ACTIVE_REVIEWS-->" href="/admin/reviews">
                         <i class="bi bi-star me-2"></i>Reviews
                     </a>

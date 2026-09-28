@@ -67,6 +67,14 @@ $routes = [
     '/terms'             => 'terms.html',
 ];
 
+// API endpoints (JSON)
+if ($uri === '/api/orders' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['order']->store();
+    exit;
+}
+
 // Check if the route exists in our map
 if (array_key_exists($uri, $routes)) {
     // Home is rendered by the Home controller (live hero + catalog from the DB backend)
