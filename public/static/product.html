@@ -121,6 +121,19 @@
     .review-date{color:var(--muted);font-size:11px}
     .review-stars{color:var(--gold);letter-spacing:2px;font-size:13px;margin-bottom:8px}
     .review-text{color:#665c56;font-size:13px;line-height:1.75;margin:0}
+    #reviewCarousel .carousel-control-prev,#reviewCarousel .carousel-control-next{width:auto;opacity:1}
+    #reviewCarousel .carousel-control-prev{left:0}#reviewCarousel .carousel-control-next{right:0}
+    #reviewCarousel,#reviewCarousel .carousel-inner,#reviewCarousel .carousel-item{height:auto !important;min-height:0 !important}
+    .testimonial-card{max-width:760px;margin:auto;padding:10px 65px 14px}
+    .stars{font-size:16px;letter-spacing:4px;color:#b08d57;margin-bottom:13px}
+    .testimonial-card blockquote{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,2.4vw,31px);line-height:1.25;font-style:italic;color:#2b2b2b;border:none;margin:0 0 16px}
+    .testimonial-author{font-size:11px;letter-spacing:.06em;color:#777}
+    .testimonial-author strong{color:var(--espresso)}
+    .testimonial-arrow{width:40px;height:40px;border:1px solid #d8cfc3;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--espresso);font-size:18px;transition:.25s}
+    .testimonial-arrow:hover{background:var(--espresso);color:#fff;border-color:var(--espresso)}
+    .testimonial-dots{display:flex;justify-content:center;gap:7px;margin-top:12px !important}
+    .dot{width:6px;height:6px;border-radius:50%;background:#cfc8bd;cursor:pointer;display:inline-block;border:0;padding:0;transition:.2s}
+    .active-dot{background:#b08d57;transform:scale(1.25)}
     .related-section{padding:70px 0;background:#fff}
     .related-heading{text-align:center;margin-bottom:40px}
     .related-heading h2{color:var(--espresso);font-family:"Cormorant Garamond",serif;font-size:48px;line-height:.95;font-weight:600;margin:0}
@@ -251,20 +264,6 @@
               </div>
               <button class="btn-buy-now" id="buyNow">Buy It Now</button>
 
-              <div class="service-box">
-                <div class="service-item"><div class="service-icon"><i class="bi bi-truck"></i></div><div class="service-content"><strong>Estimated Delivery</strong><span>12–15 September 2026</span></div></div>
-                <div class="service-item"><div class="service-icon"><i class="bi bi-arrow-repeat"></i></div><div class="service-content"><strong>Easy Returns</strong><span>7-day return &amp; exchange available</span></div></div>
-                <div class="service-item"><div class="service-icon"><i class="bi bi-shield-check"></i></div><div class="service-content"><strong>Secure Shopping</strong><span>Your payment and details are protected</span></div></div>
-              </div>
-
-              <div class="delivery-check">
-                <label>Check Delivery Availability</label>
-                <form class="pincode-form" id="pincodeForm">
-                  <input type="text" id="pincode" maxlength="6" placeholder="Enter 6-digit pincode">
-                  <button type="submit">Check</button>
-                </form>
-                <div id="deliveryResult">✓ Delivery available to your location.</div>
-              </div>
             </div>
           </div>
         </div>
@@ -472,6 +471,21 @@
       const nav = document.getElementById("mainNav");
       if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
     });
+
+    const reviewEl = document.getElementById('reviewCarousel');
+    if (reviewEl) {
+      bootstrap.Carousel.getOrCreateInstance(reviewEl, {interval:4000,pause:'hover',ride:'carousel'});
+      const dots = document.querySelectorAll('.testimonial-dots .dot');
+      reviewEl.addEventListener('slid.bs.carousel', function (e) {
+        dots.forEach(d => d.classList.remove('active-dot'));
+        if (dots[e.to]) dots[e.to].classList.add('active-dot');
+      });
+      dots.forEach(function(dot, i) {
+        dot.addEventListener('click', function () {
+          bootstrap.Carousel.getInstance(reviewEl).to(i);
+        });
+      });
+    }
 
     updateBagCount();
   });

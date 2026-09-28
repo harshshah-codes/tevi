@@ -13,6 +13,8 @@
   <style>
     :root{--espresso:#2d0f09;--wine:#4b1710;--brown:#6c3022;--cream:#f7f3ed;--ivory:#fcfaf7;--gold:#b58b57;--gold-light:#d0a76e;--text:#211815;--muted:#766b65;--line:#e7ded5;--success:#47704f;--danger:#9a3d32}
     *{box-sizing:border-box}html{scroll-behavior:smooth}
+    html,body{scrollbar-width:none;-ms-overflow-style:none}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
     body{margin:0;color:var(--text);background:var(--ivory);font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.7}
     a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
     .announcement{background:var(--espresso);color:#f7e8d7;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:8px 0}
@@ -128,7 +130,7 @@
     .about-copy h2 em{color:#7a541b;font-style:normal}
     .about-copy p{max-width:670px;color:#403c39;font-size:16px;line-height:1.9;margin:0 0 8px}
     .about-link{display:inline-flex;width:max-content;gap:10px;margin-top:24px;color:#6b4b18;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid #6b4b18;padding-bottom:5px}
-    .about-image{position:relative;min-height:700px;overflow:hidden}
+    .about-image{position:relative;aspect-ratio:1/1;overflow:hidden}
     .about-image img{width:100%;height:100%;object-fit:cover}
     .looking-for-section{background:#f8f6f2;padding:70px 0 60px;overflow:hidden}
     .looking-container{width:100%;margin:auto}
@@ -167,8 +169,8 @@
     .active-dot{background:#b08d57;transform:scale(1.25)}
     #testimonialCarousel,#testimonialCarousel .carousel-inner,#testimonialCarousel .carousel-item{height:auto !important;min-height:0 !important}
     @media (min-width:992px){.site-header .navbar > .container{display:flex;align-items:center}.site-header .navbar-collapse{order:2 !important}.site-header .header-actions{order:3 !important;margin-left:auto !important}.site-header .brand-link{order:1 !important}}
-    @media (max-width:991.98px){.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.hero-section,.hero-section .carousel,.hero-slide{height:650px;min-height:560px}.newsletter-box{flex-direction:column;align-items:flex-start}.newsletter-form{min-width:100%;width:100%}.catalog-row > .product-item{flex-basis:50%;max-width:50%}.about-viraasat{grid-template-columns:1fr}.about-image{min-height:520px;order:-1}.about-copy{padding:70px 7%}.category-slider-wrapper{padding:0 45px}.category-item{flex:0 0 calc((100% - 22px)/2);min-width:180px}.catalog-top{flex-direction:column;gap:14px;min-height:0}.catalog-tabs{width:100%}.catalog-tab{min-width:clamp(110px,20vw,180px);height:46px;padding:0 16px;font-size:10px}.catalog-view-all{position:static;align-self:center}}
-    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-word small{font-size:6px;letter-spacing:.11em}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.hero-section,.hero-section .carousel,.hero-slide{height:620px;min-height:620px}.hero-copy h1{font-size:56px}.hero-copy p{font-size:13px;max-width:340px}.collection-banner{min-height:560px}.collection-content{margin-left:6vw;padding-right:20px}.newsletter-section{padding-bottom:70px}.newsletter-box{padding:35px 24px}.newsletter-box h3{font-size:32px}.footer-bottom{flex-direction:column;gap:8px}.catalog-row > .product-item{flex-basis:88%;max-width:88%}.catalog-heading-centered h2{font-size:43px}.about-copy{padding:55px 7%}.about-copy h2{font-size:37px}.about-image{min-height:420px}.looking-for-section{padding:58px 0 48px}.looking-heading h2{font-size:35px;padding:0 15px}.category-slider-wrapper{padding:0 18px}.category-slider{gap:16px;padding-bottom:12px}.category-item{flex:0 0 72%;min-width:0}.category-arrow{display:none}.viraasat-testimonials{padding:52px 0 48px}.testimonial-card{padding:8px 48px 10px}.testimonial-card blockquote{font-size:22px}.testimonial-arrow{width:34px;height:34px;font-size:15px}.catalog-tabs{gap:8px}.catalog-tab{min-width:0;flex:1 1 calc(50% - 8px);height:42px;padding:0 10px;font-size:9px;letter-spacing:.04em}}
+    @media (max-width:991.98px){body{overflow-x:hidden}.navbar{min-height:76px}.brand-link{min-width:auto}.brand-logo{width:52px;height:52px}.brand-word{font-size:22px}.header-actions{margin-left:auto !important}.navbar-collapse{order:4;padding-top:12px}.navbar-nav{gap:0;border-top:1px solid var(--line);padding-top:8px}.nav-link{padding:11px 0 !important}.hero-section,.hero-section .carousel,.hero-slide{height:650px;min-height:560px}.newsletter-box{flex-direction:column;align-items:flex-start}.newsletter-form{min-width:100%;width:100%}.catalog-row > .product-item{flex:0 0 calc(50% - 12px) !important;max-width:calc(50% - 12px) !important;margin:0 6px}.about-viraasat{grid-template-columns:1fr}.about-image{order:-1}.about-copy{padding:70px 7%}.category-slider-wrapper{padding:0 45px}.category-item{flex:0 0 calc((100% - 22px)/2);min-width:180px}.catalog-top{flex-direction:column;gap:14px;min-height:0}.catalog-tabs{width:100%}.catalog-tab{min-width:clamp(110px,20vw,180px);height:46px;padding:0 16px;font-size:10px}.catalog-view-all{position:static;align-self:center}}
+    @media (max-width:575.98px){.announcement{font-size:8px}.brand-word{font-size:20px}.brand-word small{font-size:6px;letter-spacing:.11em}.brand-logo{width:48px;height:48px}.header-actions .icon-btn{width:35px;height:35px}.hero-section,.hero-section .carousel,.hero-slide{height:620px;min-height:620px}.hero-copy h1{font-size:56px}.hero-copy p{font-size:13px;max-width:340px}.collection-banner{min-height:560px}.collection-content{margin-left:6vw;padding-right:20px}.newsletter-section{padding-bottom:70px}.newsletter-box{padding:35px 24px}.newsletter-box h3{font-size:32px}.footer-bottom{flex-direction:column;gap:8px}.catalog-row > .product-item{flex:0 0 calc(50% - 12px) !important;max-width:calc(50% - 12px) !important;margin:0 6px}.catalog-heading-centered h2{font-size:43px}.about-copy{padding:55px 7%}.about-copy h2{font-size:37px}.looking-for-section{padding:58px 0 48px}.looking-heading h2{font-size:35px;padding:0 15px}.category-slider-wrapper{padding:0 18px}.category-slider{gap:16px;padding-bottom:12px}.category-item{flex:0 0 72%;min-width:0}.category-arrow{display:none}.viraasat-testimonials{padding:52px 0 48px}.testimonial-card{padding:8px 48px 10px}.testimonial-card blockquote{font-size:22px}.testimonial-arrow{width:34px;height:34px;font-size:15px}.catalog-tabs{gap:8px}.catalog-tab{min-width:0;flex:1 1 calc(50% - 8px);height:42px;padding:0 10px;font-size:9px;letter-spacing:.04em}}
   </style>
 </head>
 <body>
@@ -177,12 +179,12 @@
   <header class="site-header sticky-top" id="top">
     <nav class="navbar navbar-expand-lg">
       <div class="container">
-        <button class="navbar-toggler order-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
-        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link">
+        <a href="./" class="d-flex align-items-center gap-2 mx-auto mx-lg-0 brand-link order-1">
           <img src="images/logo.png" class="brand-logo" alt="House of Viraasat Logo">
           <span class="brand-fallback">hoV</span>
           <span class="brand-word d-none d-sm-block">House of Viraasat<small>KURTA · SHERWANI · ETHNIC WEAR</small></span>
         </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
           <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
           <div class="dropdown profile-dropdown">

@@ -249,18 +249,31 @@ final class ProductController
             return '<div class="review-card"><p class="review-text">No reviews yet. Be the first to review this product.</p></div>';
         }
 
-        $html = '';
-        foreach ($reviews as $review) {
+        $items = '';
+        $dots = '';
+        foreach ($reviews as $index => $review) {
+            $active = $index === 0 ? ' active' : '';
+            $activeDot = $index === 0 ? ' active-dot' : '';
             $author = htmlspecialchars($review->author(), ENT_QUOTES);
             $date = date('j M Y', strtotime($review->date())) ?: $review->date();
             $date = htmlspecialchars($date, ENT_QUOTES);
             $stars = $this->renderStars((float) $review->rating());
             $text = htmlspecialchars($review->text(), ENT_QUOTES);
 
-            $html .= '<div class="review-card"><div class="review-header"><span class="review-author">' . $author . '</span><span class="review-date">' . $date . '</span></div><div class="review-stars">' . $stars . '</div><p class="review-text">' . $text . '</p></div>' . "\n";
+            $items .= '<div class="carousel-item' . $active . '"><div class="testimonial-card text-center"><div class="stars">' . $stars . '</div><blockquote>"' . $text . '"</blockquote><div class="testimonial-author"><strong>— ' . $author . '</strong> <span>· ' . $date . '</span></div></div></div>' . "\n";
+            $dots .= '<button type="button" class="dot' . $activeDot . '" data-bs-target="#reviewCarousel" data-bs-slide-to="' . $index . '"></button>' . "\n";
         }
 
-        return rtrim($html, "\n");
+        return '<div id="reviewCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">' . "\n"
+            . '<div class="carousel-inner">' . "\n"
+            . $items
+            . '</div>' . "\n"
+            . '<a class="carousel-control-prev" href="#reviewCarousel" role="button" data-bs-slide="prev"><span class="testimonial-arrow">←</span></a>' . "\n"
+            . '<a class="carousel-control-next" href="#reviewCarousel" role="button" data-bs-slide="next"><span class="testimonial-arrow">→</span></a>' . "\n"
+            . '</div>' . "\n"
+            . '<div class="testimonial-dots text-center mt-4">' . "\n"
+            . $dots
+            . '</div>';
     }
 
     /**
