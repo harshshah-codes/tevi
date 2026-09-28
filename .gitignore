@@ -39,3 +39,10 @@ public/admin/uploads/
 # Temporary files
 *.tmp
 *.temp
+
+# Playwright
+.playwright-mcp/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
