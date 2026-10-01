@@ -67,9 +67,6 @@
               <li><h6 class="dropdown-header">Account</h6></li>
               <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
               <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
-              <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
           <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
@@ -130,5 +127,52 @@
       $("#bagCount").text(bag.reduce((a,b)=>a+(b.qty||1),0));
     });
   </script>
+<script>
+// Update navbar based on login state
+async function updateNavbar() {
+  try {
+    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const data = resp.ok ? await resp.json().catch(() => null) : null;
+    if (data && data.success && data.user) {
+        const u = data.user;
+        // Update name and email in header
+        const nameEl = document.querySelector('.profile-name');
+        if (nameEl) nameEl.textContent = (u.firstName || '') + ' ' + (u.lastName || '') || 'My Account';
+        const emailEl = document.querySelector('.profile-email');
+        if (emailEl) emailEl.textContent = u.email || '';
+        // Update dropdown menu
+        const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+        if (dropdownMenu) {
+          dropdownMenu.innerHTML = `
+            <li><h6 class="dropdown-header">Account</h6></li>
+            <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
+            <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+          `;
+        }
+    } else {
+      // Not logged in (or session expired)
+      const nameEl = document.querySelector('.profile-name');
+      if (nameEl) nameEl.textContent = 'Login / Register';
+      const emailEl = document.querySelector('.profile-email');
+      if (emailEl) emailEl.textContent = '';
+      const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <li><h6 class="dropdown-header">Account</h6></li>
+          <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+          <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
+        `;
+      }
+    }
+  } catch (err) {
+    console.error('Could not update navbar', err);
+  }
+}
+// Run on load
+updateNavbar();
+</script>
 </body>
 </html>

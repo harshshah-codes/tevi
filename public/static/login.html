@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Font Awesome for eye icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -192,14 +193,14 @@
         <p>Enter your details to continue to House of Viraasat.</p>
       </div>
 
-      <form id="loginForm">
+      <form id="loginForm" novalidate>
         <div class="mb-3">
-          <label class="label" for="email">Email address</label>
+          <label class="label" for="email">Email address <span style="color:#e53935;">*</span></label>
           <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
         </div>
 
         <div class="mb-0">
-          <label class="label" for="password">Password</label>
+          <label class="label" for="password">Password <span style="color:#e53935;">*</span></label>
           <div class="password-box">
             <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
             <button type="button" class="toggle-pass" id="togglePass" aria-label="Toggle password visibility">
@@ -239,6 +240,14 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+function showToast(message) {
+  const toastEl = document.getElementById('siteToast');
+  const toastBody = toastEl.querySelector('#toastMessage');
+  toastBody.textContent = message;
+  const toast = new bootstrap.Toast(toastEl, { delay: 2200 });
+  toast.show();
+}
+
 $(function(){
   // Toggle password visibility with eye icon
   $("#togglePass").on("click", function(){
@@ -253,13 +262,93 @@ $(function(){
   $("#loginForm").on("submit", function(e){
     e.preventDefault();
     const button = $(this).find("button[type='submit']");
-    button.text("Signing You In...");
-    setTimeout(function(){
+    const email = $("#email").val().trim();
+    const password = $("#password").val().trim();
+    
+    if (email === "" || password === "") {
+      showToast("Please fill in both fields");
       button.text("Sign In to Your Account");
-      $("#loginAlert").stop(true,true).fadeIn(250);
-    }, 700);
+      return;
+    }
+    
+    button.text("Signing You In...");
+    
+    fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    })
+    .then(response => {
+      if (response.ok) {
+        // Login successful, redirect to home or previous page
+        window.location.href = "/";
+      } else {
+        return response.json().then(err => {
+          throw new Error(err.error || "Login failed");
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Login error:", error);
+      showToast(error.message || "An error occurred during login");
+      button.text("Sign In to Your Account");
+    });
   });
 });
+</script>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="siteToast" class="toast border-0" role="alert">
+    <div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div>
+  </div>
+</div>
+<script>
+// Update navbar based on login state
+async function updateNavbar() {
+  try {
+    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const data = resp.ok ? await resp.json().catch(() => null) : null;
+    if (data && data.success && data.user) {
+        const u = data.user;
+        // Update name and email in header
+        const nameEl = document.querySelector('.profile-name');
+        if (nameEl) nameEl.textContent = (u.firstName || '') + ' ' + (u.lastName || '') || 'My Account';
+        const emailEl = document.querySelector('.profile-email');
+        if (emailEl) emailEl.textContent = u.email || '';
+        // Update dropdown menu
+        const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+        if (dropdownMenu) {
+          dropdownMenu.innerHTML = `
+            <li><h6 class="dropdown-header">Account</h6></li>
+            <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
+            <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+          `;
+        }
+    } else {
+      // Not logged in (or session expired)
+      const nameEl = document.querySelector('.profile-name');
+      if (nameEl) nameEl.textContent = 'Login / Register';
+      const emailEl = document.querySelector('.profile-email');
+      if (emailEl) emailEl.textContent = '';
+      const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <li><h6 class="dropdown-header">Account</h6></li>
+          <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+          <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
+        `;
+      }
+    }
+  } catch (err) {
+    console.error('Could not update navbar', err);
+  }
+}
+// Run on load
+updateNavbar();
 </script>
 </body>
 </html>

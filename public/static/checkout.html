@@ -531,9 +531,6 @@
               <li><h6 class="dropdown-header">Account</h6></li>
               <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
               <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
-              <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             </ul>
           </div>
           <a href="wishlist" class="icon-btn" aria-label="Wishlist"><i class="bi bi-heart"></i></a>
@@ -853,6 +850,28 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
   $(function () {
+    // Autofill user info if logged in
+    async function autofillUserInfo() {
+      try {
+        const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.success && data.user) {
+            const u = data.user;
+            console.log('User data from API:', u);
+            if (u.firstName !== undefined) $('#firstName').val(u.firstName);
+            if (u.lastName !== undefined) $('#lastName').val(u.lastName);
+            if (u.email !== undefined) $('#email').val(u.email);
+            if (u.phone !== undefined) $('#phone').val(u.phone !== null ? u.phone : '');
+          }
+        }
+      } catch (err) {
+        console.error('Could not autofill user info', err);
+      }
+    }
+    autofillUserInfo();
+
+
 
     // ===== Load cart from localStorage =====
     let cart = JSON.parse(localStorage.getItem("hovBag") || "[]");
@@ -930,44 +949,80 @@
       e.preventDefault();
 
       // Validate required fields
-      let valid = true;
-      $(this).find("input[required]").each(function () {
-        if (!$(this).val().trim()) {
-          $(this).addClass("error");
-          valid = false;
-        } else {
-          $(this).removeClass("error");
-        }
-      });
-
-      if (!valid) {
-        showToast("Please fill in all required fields.");
-        return;
-      }
-
-      // Validate pincode
+      const firstName = $("#firstName").val().trim();
+      const lastName = $("#lastName").val().trim();
+      const email = $("#email").val().trim();
+      const phone = $("#phone").val().trim();
+      const address1 = $("#address1").val().trim();
+      const address2 = $("#address2").val().trim();
+      const city = $("#city").val().trim();
+      const state = $("#state").val().trim();
       const pincode = $("#pincode").val().trim();
-      if (!/^[0-9]{6}$/.test(pincode)) {
-        $("#pincode").addClass("error");
-        showToast("Please enter a valid 6-digit pincode.");
+
+      const showFieldError = (fieldId, message) => {
+        showToast(message);
+        const field = $(fieldId);
+        field.focus();
+        field[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      };
+
+      if (firstName === "") {
+        showFieldError("#firstName", "Please enter your first name.");
         return;
       }
-
+      if (lastName === "") {
+        showFieldError("#lastName", "Please enter your last name.");
+        return;
+      }
+      if (email === "") {
+        showFieldError("#email", "Please enter your email address.");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showFieldError("#email", "Please enter a valid email address.");
+        return;
+      }
+      if (phone === "") {
+        showFieldError("#phone", "Please enter your phone number.");
+        return;
+      }
+      if (address1 === "") {
+        showFieldError("#address1", "Please enter your address line 1.");
+        return;
+      }
+      if (city === "") {
+        showFieldError("#city", "Please enter your city.");
+        return;
+      }
+      if (state === "") {
+        showFieldError("#state", "Please enter your state.");
+        return;
+      }
+      if (pincode === "") {
+        showFieldError("#pincode", "Please enter your pincode.");
+        return;
+      }
+      if (!/^[0-9]{6}$/.test(pincode)) {
+        showFieldError("#pincode", "Please enter a valid 6-digit pincode.");
+        return;
+      }
       // Show processing state
       const btn = $("#placeOrderBtn");
       btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2"></span>Processing Order...');
 
       // Save order details to localStorage
+      // Save order details to localStorage
       const orderData = {
         orderId: "HOV-" + Date.now().toString().slice(-6) + Math.floor(10 + Math.random() * 90),
-        firstName: $("#firstName").val(),
-        lastName: $("#lastName").val(),
-        email: $("#email").val(),
-        phone: $("#phone").val(),
-        address: $("#address1").val() + (($("#address2").val()) ? ", " + $("#address2").val() : ""),
-        city: $("#city").val(),
-        state: $("#state").val(),
-        pincode: $("#pincode").val(),
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        address: address1 + (address2 ? ", " + address2 : ""),
+        city: city,
+        state: state,
+        pincode: pincode,
         payment: $("input[name='paymentMethod']:checked").val(),
         items: cart,
         subtotal: parseInt($("#subtotal").text().replace(/[₹,]/g, "")),
@@ -976,28 +1031,57 @@
         total: parseInt($("#total").text().replace(/[₹,]/g, "")),
         date: new Date().toISOString()
       };
-
-      // Persist order to server (fire-and-forget with localStorage fallback)
+      // Persist order to server
       fetch("api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData)
-      }).catch(function () {});
+      })
+      .then(response => {
+        if (response.status === 401) {
+          showToast('Please log in to continue');
+          // Return a rejected promise to skip the next thens, but redirect after a delay to let toast show
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              window.location.href = "login";
+              reject({ redirect: true });
+            }, 1500);
+          });
+        }
+        if (!response.ok) {
+          throw new Error('Server error');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Save order to localStorage
+        localStorage.setItem("hovLastOrder", JSON.stringify(orderData));
 
-      localStorage.setItem("hovLastOrder", JSON.stringify(orderData));
+        // Save order to orders list
+        let orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
+        orders.unshift(orderData);
+        localStorage.setItem("hovOrders", JSON.stringify(orders));
 
-      // Save order to orders list
-      let orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-      orders.unshift(orderData);
-      localStorage.setItem("hovOrders", JSON.stringify(orders));
+        // Clear cart
+        localStorage.removeItem("hovBag");
 
-      // Clear cart
-      localStorage.removeItem("hovBag");
-
-      // Redirect after 2 seconds
-      setTimeout(function () {
-        window.location.href = "order-confirmation";
-      }, 1500);
+        // Redirect after a short delay
+        setTimeout(function () {
+          window.location.href = "order-confirmation";
+        }, 1500);
+      })
+      .catch(error => {
+        if (error.redirect) {
+          // Already handled redirect
+          return;
+        }
+        console.error('Error:', error);
+        showToast('An error occurred while placing your order. Please try again.');
+      })
+      .finally(() => {
+        // Re-enable button
+        btn.prop("disabled", false).html('<i class="bi bi-lock me-2"></i>Place Order — <span id="orderTotalBtn">₹' + orderData.total.toLocaleString("en-IN") + '</span>');
+      });
     });
 
     // ===== Close mobile menu =====
@@ -1014,5 +1098,52 @@
 
   });
   </script>
+<script>
+// Update navbar based on login state
+async function updateNavbar() {
+  try {
+    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const data = resp.ok ? await resp.json().catch(() => null) : null;
+    if (data && data.success && data.user) {
+        const u = data.user;
+        // Update name and email in header
+        const nameEl = document.querySelector('.profile-name');
+        if (nameEl) nameEl.textContent = (u.firstName || '') + ' ' + (u.lastName || '') || 'My Account';
+        const emailEl = document.querySelector('.profile-email');
+        if (emailEl) emailEl.textContent = u.email || '';
+        // Update dropdown menu
+        const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+        if (dropdownMenu) {
+          dropdownMenu.innerHTML = `
+            <li><h6 class="dropdown-header">Account</h6></li>
+            <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
+            <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
+            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+          `;
+        }
+    } else {
+      // Not logged in (or session expired)
+      const nameEl = document.querySelector('.profile-name');
+      if (nameEl) nameEl.textContent = 'Login / Register';
+      const emailEl = document.querySelector('.profile-email');
+      if (emailEl) emailEl.textContent = '';
+      const dropdownMenu = document.querySelector('.profile-dropdown .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.innerHTML = `
+          <li><h6 class="dropdown-header">Account</h6></li>
+          <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+          <li><a class="dropdown-item" href="registration"><i class="bi bi-person-plus"></i> Registration</a></li>
+        `;
+      }
+    }
+  } catch (err) {
+    console.error('Could not update navbar', err);
+  }
+}
+// Run on load
+updateNavbar();
+</script>
 </body>
 </html>

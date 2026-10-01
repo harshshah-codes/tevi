@@ -74,6 +74,38 @@ if ($uri === '/api/orders' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $app['order']->store();
     exit;
 }
+if ($uri === '/api/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['auth']->login();
+    exit;
+}
+if ($uri === '/api/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['auth']->register();
+    exit;
+}
+if ($uri === '/api/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['auth']->logout();
+    exit;
+}
+if ($uri === '/api/me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['auth']->me();
+    exit;
+}
+
+// Require login for account-only pages
+session_start();
+$protectedRoutes = ['/checkout', '/my-account', '/myaccount', '/my-orders', '/myorder'];
+if (in_array($uri, $protectedRoutes, true) && empty($_SESSION['user_id'])) {
+    header('Location: login');
+    exit;
+}
 
 // Check if the route exists in our map
 if (array_key_exists($uri, $routes)) {
