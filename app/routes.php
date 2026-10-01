@@ -105,6 +105,32 @@ if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PAT
     exit;
 }
 
+// --- Payments (Razorpay) ---
+if ($uri === '/api/payments/config' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['payment']->config();
+    exit;
+}
+if ($uri === '/api/payments/order' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['payment']->createOrder();
+    exit;
+}
+if ($uri === '/api/payments/verify' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['payment']->verify();
+    exit;
+}
+if ($uri === '/api/payments/simulate' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['payment']->simulate();
+    exit;
+}
+
 // --- Addresses ---
 if ($uri === '/api/addresses') {
     ob_start();

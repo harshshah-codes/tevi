@@ -26,4 +26,15 @@ return [
             ? password_hash($_ENV['ADMIN_PASSWORD'], PASSWORD_DEFAULT)
             : '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
     ],
+
+    // Razorpay. The defaults below are placeholders: with them
+    // RAZORPAY_SIMULATE stays true and the payment step runs in a clearly
+    // labelled sandbox mode that never touches Razorpay's servers.
+    // Set real rzp_test_* keys and RAZORPAY_SIMULATE=false to go live.
+    'razorpay' => [
+        'key_id'     => $_ENV['RAZORPAY_KEY_ID'] ?? 'rzp_test_DUMMY_KEY_ID',
+        'key_secret' => $_ENV['RAZORPAY_KEY_SECRET'] ?? 'DUMMY_KEY_SECRET_REPLACE_ME',
+        'simulate'   => filter_var($_ENV['RAZORPAY_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
+        'name'       => $_ENV['RAZORPAY_NAME'] ?? 'House of Viraasat',
+    ],
 ];

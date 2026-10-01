@@ -27,6 +27,8 @@ var/cache/
 # Environment
 .env
 .env.*
+# ...but the template is meant to be committed, unlike real .env files
+!.env.example
 
 # Database
 *.sqlite

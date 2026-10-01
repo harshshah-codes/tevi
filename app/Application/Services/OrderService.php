@@ -5,6 +5,7 @@ namespace App\Application\Services;
 
 use App\Domain\Models\Order;
 use App\Domain\Repositories\OrderRepositoryInterface;
+use App\Infrastructure\Payment\RazorpayClient;
 
 final class OrderService
 {
@@ -24,7 +25,13 @@ final class OrderService
 
     public function __construct(
         private readonly OrderRepositoryInterface $repository,
+        private readonly ?RazorpayClient $razorpay = null,
     ) {
+    }
+
+    public function razorpay(): ?RazorpayClient
+    {
+        return $this->razorpay;
     }
 
     public function createOrder(Order $order): int
@@ -128,6 +135,21 @@ final class OrderService
         return $this->repository->statusHistoryFor($orderId);
     }
 
+    public function attachRazorpayOrder(int $orderId, string $razorpayOrderId): bool
+    {
+        return $this->repository->attachRazorpayOrder($orderId, $razorpayOrderId);
+    }
+
+    public function recordPayment(int $orderId, string $paymentStatus, ?string $razorpayPaymentId = null, ?string $signature = null): bool
+    {
+        return $this->repository->recordPayment($orderId, $paymentStatus, $razorpayPaymentId, $signature);
+    }
+
+    public function getOrderByRazorpayOrderId(string $razorpayOrderId): ?Order
+    {
+        return $this->repository->findByRazorpayOrderId($razorpayOrderId);
+    }
+
     /**
      * Shape an order for the JSON API.
      *
@@ -152,6 +174,8 @@ final class OrderService
             'tax'       => $order->tax(),
             'total'     => $order->total(),
             'status'    => $order->status(),
+            'paymentMethod' => $order->paymentMethod(),
+            'paymentStatus' => $order->paymentStatus(),
             'cancelledAt' => $order->cancelledAt(),
             'cancelReason' => $order->cancelReason(),
             'canCancel' => $this->isCancellable($order),

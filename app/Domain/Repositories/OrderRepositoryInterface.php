@@ -47,6 +47,19 @@ interface OrderRepositoryInterface
     public function recordStatusChange(int $orderId, string $from, string $to, ?string $note = null, string $changedBy = 'admin'): void;
 
     /**
+     * Remember the gateway order id we opened for this order.
+     */
+    public function attachRazorpayOrder(int $orderId, string $razorpayOrderId): bool;
+
+    /**
+     * Record the outcome of a payment. Marks paid_at when $paymentStatus is
+     * 'paid'; that timestamp is the only record of when money arrived.
+     */
+    public function recordPayment(int $orderId, string $paymentStatus, ?string $razorpayPaymentId = null, ?string $signature = null): bool;
+
+    public function findByRazorpayOrderId(string $razorpayOrderId): ?Order;
+
+    /**
      * Cancel an order, but only if it is still in $expectedStatus.
      *
      * The status check lives in the WHERE clause so two concurrent cancel

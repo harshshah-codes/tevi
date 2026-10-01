@@ -283,6 +283,53 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
         return $history;
     }
 
+    public function findByRazorpayOrderId(string $razorpayOrderId): ?Order
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM orders WHERE razorpay_order_id = :rzp_id LIMIT 1');
+        $stmt->execute([':rzp_id' => $razorpayOrderId]);
+
+        $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
+
+        return $this->mapOrder($row);
+    }
+
+    public function attachRazorpayOrder(int $orderId, string $razorpayOrderId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders SET razorpay_order_id = :rzp_id WHERE id = :id AND razorpay_order_id IS NULL'
+        );
+        $stmt->execute([
+            ':rzp_id' => $razorpayOrderId,
+            ':id'     => $orderId,
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function recordPayment(int $orderId, string $paymentStatus, ?string $razorpayPaymentId = null, ?string $signature = null): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders
+                SET payment_status = :payment_status,
+                    razorpay_payment_id = :payment_id,
+                    razorpay_signature = :signature,
+                    paid_at = CASE WHEN :paid_flag = \'paid\' THEN CURRENT_TIMESTAMP ELSE paid_at END
+              WHERE id = :id'
+        );
+        $stmt->execute([
+            ':payment_status' => $paymentStatus,
+            ':payment_id'     => $razorpayPaymentId,
+            ':signature'      => $signature,
+            ':paid_flag'      => $paymentStatus,
+            ':id'             => $orderId,
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
     /**
      * @param array<string, mixed> $row
      */
@@ -330,6 +377,7 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
             $items,
             isset($row['cancelled_at']) && $row['cancelled_at'] !== null ? (string) $row['cancelled_at'] : null,
             isset($row['cancel_reason']) && $row['cancel_reason'] !== null ? (string) $row['cancel_reason'] : null,
+            isset($row['payment_status']) && $row['payment_status'] !== null ? (string) $row['payment_status'] : 'pending',
         );
     }
 }

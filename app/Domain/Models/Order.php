@@ -30,7 +30,13 @@ final class Order
         private readonly array $items = [],
         private readonly ?string $cancelledAt = null,
         private readonly ?string $cancelReason = null,
+        private readonly string $paymentStatus = 'pending',
     ) {
+    }
+
+    public function paymentStatus(): string
+    {
+        return $this->paymentStatus;
     }
 
     public function cancelledAt(): ?string

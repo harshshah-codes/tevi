@@ -9,6 +9,9 @@ use App\Application\Services\CatalogService;
 use App\Application\Services\HeroCarouselService;
 use App\Application\Services\OrderService;
 use App\Application\Services\PricingService;
+use App\Application\Services\PaymentService;
+use App\Infrastructure\Payment\RazorpayClient;
+use App\Infrastructure\Http\Controllers\PaymentController;
 use App\Application\Services\AuthService;
 use App\Application\Services\AddressService;
 use App\Core\Database;
@@ -50,9 +53,16 @@ $productController = new ProductController($catalogService);
 $homeController = new HomeController($heroController, $catalogController);
 
 $orderRepository = new MySqlOrderRepository($pdo);
-$orderService = new OrderService($orderRepository);
 $pricingService = new PricingService($productRepository);
+$razorpayClient = new RazorpayClient(
+    $config['razorpay']['key_id'],
+    $config['razorpay']['key_secret'],
+    (bool) $config['razorpay']['simulate']
+);
+$orderService = new OrderService($orderRepository, $razorpayClient);
 $orderController = new OrderController($orderService, $pricingService);
+$paymentService = new PaymentService($razorpayClient);
+$paymentController = new PaymentController($paymentService, $orderService);
 
 $userRepository = new MySqlUserRepository($pdo);
 $authService = new AuthService($userRepository);
@@ -70,4 +80,5 @@ return [
     'order'        => $orderController,
     'auth'         => $authController,
     'address'      => $addressController,
+    'payment'      => $paymentController,
 ];
