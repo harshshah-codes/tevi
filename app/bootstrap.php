@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 use App\Application\Services\CatalogService;
 use App\Application\Services\HeroCarouselService;

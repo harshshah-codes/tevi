@@ -100,7 +100,9 @@ if ($uri === '/api/me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // Require login for account-only pages
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 $protectedRoutes = ['/checkout', '/my-account', '/myaccount', '/my-orders', '/myorder'];
 if (in_array($uri, $protectedRoutes, true) && empty($_SESSION['user_id'])) {
     header('Location: login');
