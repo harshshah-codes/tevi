@@ -7,7 +7,7 @@ use PDO;
 
 final class MigrationRunner
 {
-    private const MIGRATIONS_DIR = __DIR__ . '/../../database/migrations';
+    private const MIGRATIONS_DIR = __DIR__ . '/../database/migrations';
     private const MIGRATION_TABLE = 'migrations';
 
     public function __construct(
