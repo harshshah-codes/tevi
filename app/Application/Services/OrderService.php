@@ -76,12 +76,12 @@ final class OrderService
     /**
      * Cancel an order, guarded on its current status.
      *
-     * @param string[] $allowedFrom statuses the order may be cancelled from
-     * @return bool false when the order was not in one of those statuses
+     * @param string $expectedStatus the status the order must currently be in
+     * @return bool false when it was not
      */
-    public function cancelOrderForUser(int $id, int $userId, array $allowedFrom, ?string $reason = null): bool
+    public function cancelOrderForUser(int $id, int $userId, string $expectedStatus, ?string $reason = null): bool
     {
-        return $this->repository->cancelForUser($id, $userId, $allowedFrom, $reason);
+        return $this->repository->cancelForUser($id, $userId, $expectedStatus, $reason);
     }
 
     /**
@@ -105,16 +105,16 @@ final class OrderService
     /**
      * Change an order's status from the admin panel.
      *
-     * @param string[] $allowedFrom statuses the admin is allowed to move it from
+     * @param string $expectedStatus status the order must currently be in
      * @param string $changedBy admin username for the audit trail
-     * @return bool false when the order was not in one of them
+     * @return bool false when the order was not in that status
      */
-    public function adminUpdateStatus(int $id, array $allowedFrom, string $status, ?string $note = null, string $changedBy = 'admin', string $fromStatus = ''): bool
+    public function adminUpdateStatus(int $id, string $expectedStatus, string $newStatus, ?string $note = null, string $changedBy = 'admin'): bool
     {
-        $updated = $this->repository->updateStatusByAdmin($id, $allowedFrom, $status, $note);
+        $updated = $this->repository->updateStatusByAdmin($id, $expectedStatus, $newStatus, $note);
 
         if ($updated) {
-            $this->repository->recordStatusChange($id, $fromStatus, $status, $note, $changedBy);
+            $this->repository->recordStatusChange($id, $expectedStatus, $newStatus, $note, $changedBy);
         }
 
         return $updated;

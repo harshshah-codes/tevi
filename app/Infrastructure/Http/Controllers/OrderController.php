@@ -127,8 +127,7 @@ final class OrderController
         }
 
         $allowedFrom = self::CUSTOMER_TRANSITIONS['cancelled'] ?? [];
-        if (!in_array($order->status(), $allowedFrom, true)) {
-            ob_end_clean();
+        if (!in_array($order->status(), $allowedFrom, true)) {            ob_end_clean();
             http_response_code(409);
             echo json_encode([
                 'success' => false,
@@ -143,6 +142,7 @@ final class OrderController
         $updated = $this->service->cancelOrderForUser(
             $order->id(),
             (int) $_SESSION['user_id'],
+            $order->status(),
             $reason
         );
 

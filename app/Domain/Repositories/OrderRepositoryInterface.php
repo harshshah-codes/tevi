@@ -36,10 +36,8 @@ interface OrderRepositoryInterface
      *
      * Reinstating a cancelled order clears cancelled_at / cancel_reason, so
      * those columns always describe the *current* state rather than history.
-     *
-     * @param string[] $allowedFrom
      */
-    public function updateStatusByAdmin(int $id, array $allowedFrom, string $status, ?string $note = null): bool;
+    public function updateStatusByAdmin(int $id, string $expectedStatus, string $newStatus, ?string $note = null): bool;
 
     /**
      * Append an entry to an order's status history.
@@ -49,12 +47,10 @@ interface OrderRepositoryInterface
     public function recordStatusChange(int $orderId, string $from, string $to, ?string $note = null, string $changedBy = 'admin'): void;
 
     /**
-     * Cancel an order, but only if it is still in one of $allowedFrom statuses.
+     * Cancel an order, but only if it is still in $expectedStatus.
      *
      * The status check lives in the WHERE clause so two concurrent cancel
      * clicks cannot both "win": the loser gets rowCount() === 0.
-     *
-     * @param string[] $allowedFrom
      */
-    public function cancelForUser(int $id, int $userId, array $allowedFrom, ?string $reason): bool;
+    public function cancelForUser(int $id, int $userId, string $expectedStatus, ?string $reason): bool;
 }

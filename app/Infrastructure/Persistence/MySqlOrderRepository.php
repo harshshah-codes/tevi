@@ -181,77 +181,59 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
     /**
      * @param string[] $allowedFrom
      */
-    public function cancelForUser(int $id, int $userId, array $allowedFrom, ?string $reason): bool
+    public function cancelForUser(int $id, int $userId, string $expectedStatus, ?string $reason): bool
     {
-        if ($allowedFrom === []) {
+        if ($expectedStatus === '') {
             return false;
-        }
-
-        $placeholders = [];
-        $params = [
-            ':id'         => $id,
-            ':user_id'    => $userId,
-            ':status'     => 'cancelled',
-            ':reason'     => $reason,
-        ];
-
-        foreach (array_values($allowedFrom) as $i => $from) {
-            $key = ':from' . $i;
-            $placeholders[] = $key;
-            $params[$key] = $from;
         }
 
         // Guarding on the *current* status inside the UPDATE makes the
         // transition atomic: only the first request to cancel changes a row.
         $stmt = $this->pdo->prepare(
             'UPDATE orders
-                SET status = :status,
+                SET status = :new_status,
                     cancelled_at = CURRENT_TIMESTAMP,
                     cancel_reason = :reason
               WHERE id = :id
                 AND user_id = :user_id
-                AND status IN (' . implode(', ', $placeholders) . ')'
+                AND status = :expected_status'
         );
-        $stmt->execute($params);
+        $stmt->execute([
+            ':id'              => $id,
+            ':user_id'         => $userId,
+            ':new_status'      => 'cancelled',
+            ':reason'          => $reason,
+            ':expected_status' => $expectedStatus,
+        ]);
 
         return $stmt->rowCount() > 0;
     }
 
-    /**
-     * @param string[] $allowedFrom
-     */
-    public function updateStatusByAdmin(int $id, array $allowedFrom, string $status, ?string $note = null): bool
+    public function updateStatusByAdmin(int $id, string $expectedStatus, string $newStatus, ?string $note = null): bool
     {
-        if ($allowedFrom === []) {
+        if ($expectedStatus === '' || $newStatus === '') {
             return false;
         }
 
-        $placeholders = [];
-        $params = [
-            ':id'      => $id,
-            ':status'  => $status,
-            ':note'    => $note,
-        ];
-
-        foreach (array_values($allowedFrom) as $i => $from) {
-            $key = ':from' . $i;
-            $placeholders[] = $key;
-            $params[$key] = $from;
-        }
-
-        // Leaving `cancelled` clears the cancellation columns so they always
-        // describe the order's current state, not its history.
+        // Guarded on the current status, and moving away from `cancelled`
+        // clears the cancellation columns so they always describe the
+        // present; the durable record lives in order_status_history.
         $stmt = $this->pdo->prepare(
             'UPDATE orders
-                SET status = :status,
-                    cancelled_at = CASE WHEN :status2 = \'cancelled\' THEN CURRENT_TIMESTAMP ELSE NULL END,
-                    cancel_reason = CASE WHEN :status3 = \'cancelled\' THEN :note ELSE NULL END
+                SET status = :new_status,
+                    cancelled_at = CASE WHEN :new_status2 = \'cancelled\' THEN CURRENT_TIMESTAMP ELSE NULL END,
+                    cancel_reason = CASE WHEN :new_status3 = \'cancelled\' THEN :note ELSE NULL END
               WHERE id = :id
-                AND status IN (' . implode(', ', $placeholders) . ')'
+                AND status = :expected_status'
         );
-        $params[':status2'] = $status;
-        $params[':status3'] = $status;
-        $stmt->execute($params);
+        $stmt->execute([
+            ':id'              => $id,
+            ':new_status'      => $newStatus,
+            ':new_status2'     => $newStatus,
+            ':new_status3'     => $newStatus,
+            ':note'            => $note,
+            ':expected_status' => $expectedStatus,
+        ]);
 
         return $stmt->rowCount() > 0;
     }

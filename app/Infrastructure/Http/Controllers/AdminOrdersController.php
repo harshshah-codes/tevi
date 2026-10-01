@@ -64,11 +64,10 @@ final class AdminOrdersController extends AdminController
 
         $updated = $this->service->adminUpdateStatus(
             $id,
-            $allowed,
+            $order->status(),
             $status,
             $note === '' ? null : $note,
-            $this->adminActor(),
-            $order->status()
+            $this->adminActor()
         );
 
         if (!$updated) {
@@ -176,11 +175,10 @@ final class AdminOrdersController extends AdminController
 
             $updated = $this->service->adminUpdateStatus(
                 $id,
-                $allowed,
+                $order->status(),
                 $status,
                 $note === '' ? null : $note,
-                $this->adminActor(),
-                $order->status()
+                $this->adminActor()
             );
 
             if (!$updated) {
