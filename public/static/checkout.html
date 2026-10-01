@@ -645,8 +645,7 @@
                 <h4>Payment <em>Method</em></h4>
 
                 <div class="payment-option active" data-payment="card">
-                  <input type="radio" name="paymentMethod" value="card" checked>
-                  <div>
+                  <input type="radio" name="paymentMethod" value="card" checked>                  <div>
                     <div class="payment-label"><i class="bi bi-credit-card me-2"></i>Credit / Debit Card</div>
                     <div class="payment-desc">Visa, Mastercard, RuPay, Amex</div>
                   </div>
@@ -676,36 +675,19 @@
                   </div>
                 </div>
 
-                <!-- Card Details -->
-                <div id="cardDetails" class="mt-3">
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="form-group">
-                        <label>Card Number</label>
-                        <input type="text" class="form-control" placeholder="1234 5678 9012 3456">
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label>Expiry Date</label>
-                        <input type="text" class="form-control" placeholder="MM/YY">
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label>CVV</label>
-                        <input type="text" class="form-control" placeholder="123" maxlength="3">
-                      </div>
-                    </div>
-                  </div>
+                <!-- Razorpay handles the actual card/UPI details in its own
+                     secure modal; nothing sensitive is typed on this page. -->
+                <div id="gatewayNote" class="mt-3">
+                  <p style="font-size:13px;color:var(--muted);margin:0;">
+                    <i class="bi bi-shield-lock me-2"></i>You will be taken to Razorpay's secure checkout to complete the payment.
+                  </p>
                 </div>
 
                 <!-- UPI Details -->
                 <div id="upiDetails" class="mt-3" style="display:none;">
-                  <div class="form-group">
-                    <label>UPI ID</label>
-                    <input type="text" class="form-control" placeholder="example@upi">
-                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin:0;">
+                    <i class="bi bi-info-circle me-2"></i>Enter your UPI ID in Razorpay's checkout window.
+                  </p>
                 </div>
 
                 <!-- Net Banking Details -->
@@ -937,11 +919,12 @@
       $(this).find('input[type="radio"]').prop("checked", true);
 
       const method = $(this).data("payment");
-      $("#cardDetails, #upiDetails, #netbankingDetails").hide();
+      $("#gatewayNote, #upiDetails, #netbankingDetails").hide();
 
-      if (method === "card") $("#cardDetails").show();
-      else if (method === "upi") $("#upiDetails").show();
+      if (method === "cod") return;
+      if (method === "upi") $("#upiDetails").show();
       else if (method === "netbanking") $("#netbankingDetails").show();
+      else $("#gatewayNote").show();
     });
 
     // ===== Form Validation & Submit =====
@@ -1051,24 +1034,25 @@
         }
         return response.json();
       })
-      .then(data => {
+      .then(function (data) {
         // The server recomputes money from catalog prices; if its total
         // differs from what the page displayed, tell the customer plainly.
         if (data.pricing && data.pricing.total !== orderData.total) {
           showToast("Updated total: " + formatPrice(data.pricing.total));
         }
 
-        // Only the confirmation page's last-order hint is cached; the order
-        // history itself lives in the database now.
-        localStorage.setItem("hovLastOrderId", data.orderId || orderData.orderId);
+        const createdOrderId = data.orderId || orderData.orderId;
 
-        // Clear cart
-        localStorage.removeItem("hovBag");
+        // Cash on delivery is settled when the parcel arrives, so the order is
+        // complete. Everything else goes through the payment gateway first.
+        if (orderData.payment === "cod") {
+          finishOrder(createdOrderId);
+          return;
+        }
 
-        // Redirect after a short delay
-        setTimeout(function () {
-          window.location.href = "order-confirmation";
-        }, 1500);
+        return startPayment(createdOrderId, orderData).then(function () {
+          finishOrder(createdOrderId);
+        });
       })
       .catch(error => {
         if (error.redirect) {
@@ -1083,6 +1067,119 @@
         btn.prop("disabled", false).html('<i class="bi bi-lock me-2"></i>Place Order — <span id="orderTotalBtn">₹' + orderData.total.toLocaleString("en-IN") + '</span>');
       });
     });
+
+    // ===== Razorpay =====
+    function postJson(url, payload) {
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function (r) {
+        return r.json().then(function (b) { return { ok: r.ok, body: b }; });
+      });
+    }
+
+    function finishOrder(orderId) {
+      // Only the confirmation page's last-order hint is cached; the order
+      // history itself lives in the database now.
+      localStorage.setItem("hovLastOrderId", orderId);
+      localStorage.removeItem("hovBag");
+      setTimeout(function () { window.location.href = "order-confirmation"; }, 1200);
+    }
+
+    // The order exists but is unpaid until the gateway confirms it, so a
+    // failed or abandoned payment must not leave a payable order behind.
+    function releaseOrder(orderId) {
+      return postJson("api/orders/" + encodeURIComponent(orderId) + "/cancel", { reason: "Payment not completed" })
+        .catch(function () { });
+    }
+
+    function loadRazorpayScript() {
+      if (window.Razorpay) return Promise.resolve();
+      return new Promise(function (resolve, reject) {
+        const s = document.createElement("script");
+        s.src = "https://checkout.razorpay.com/v1/checkout.js";
+        s.onload = resolve;
+        s.onerror = function () { reject(new Error("Could not load Razorpay checkout")); };
+        document.body.appendChild(s);
+      });
+    }
+
+    function startPayment(orderId, orderData) {
+      let config = { keyId: null, simulated: false };
+
+      return fetch("api/payments/config", { headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.success) throw new Error("Payment is unavailable right now");
+          config = data;
+
+          // Placeholder keys: no real gateway call is possible, so the order is
+          // marked paid by the server's sandbox-only endpoint instead.
+          if (config.simulated) {
+            return postJson("api/payments/simulate", { orderId: orderId }).then(function (res) {
+              if (!res.ok || !res.body.success) {
+                throw new Error((res.body && res.body.error) || "Simulated payment failed");
+              }
+              return res.body;
+            });
+          }
+
+          return postJson("api/payments/order", { orderId: orderId }).then(function (res) {
+            if (!res.ok || !res.body.success) {
+              throw new Error((res.body && res.body.error) || "Could not start the payment");
+            }
+            return openRazorpay(res.body, orderData);
+          });
+        })
+        .catch(function (err) {
+          return releaseOrder(orderId).then(function () {
+            throw err;
+          });
+        });
+    }
+
+    function openRazorpay(gateway, orderData) {
+      return loadRazorpayScript().then(function () {
+        return new Promise(function (resolve, reject) {
+          const options = {
+            key: gateway.keyId,
+            amount: gateway.amount,
+            currency: gateway.currency || "INR",
+            name: "House of Viraasat",
+            description: "Order #" + orderData.orderId,
+            order_id: gateway.razorpayOrderId,
+            prefill: {
+              name: orderData.firstName + " " + orderData.lastName,
+              email: orderData.email,
+              contact: orderData.phone
+            },
+            notes: { order_id: orderData.orderId },
+            theme: { color: "#1c1c1c" },
+            handler: function (response) {
+              postJson("api/payments/verify", {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature
+              })
+                .then(function (res) {
+                  if (!res.ok || !res.body.success) {
+                    reject(new Error((res.body && res.body.error) || "Payment verification failed"));
+                    return;
+                  }
+                  resolve(res.body);
+                })
+                .catch(reject);
+            },
+            modal: {
+              ondismiss: function () { reject(new Error("Payment cancelled")); }
+            }
+          };
+
+          new window.Razorpay(options).open();
+        });
+      });
+    }
 
     // ===== Close mobile menu =====
     $(".navbar-nav .nav-link").on("click", function () {

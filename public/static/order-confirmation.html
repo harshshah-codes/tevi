@@ -210,7 +210,10 @@
       );
 
       const paymentLabels = { card: "Credit / Debit Card", upi: "UPI", netbanking: "Net Banking", cod: "Cash on Delivery" };
-      $("#paymentBlock").text(paymentLabels[order.payment] || "Online Payment");
+      const methodLabel = paymentLabels[order.payment] || "Online Payment";
+      $("#paymentBlock").text(
+        methodLabel + (order.paymentStatus === "paid" ? " — Paid" : order.payment === "cod" ? " — Pay on delivery" : " — Payment pending")
+      );
 
       const delivery = new Date();
       delivery.setDate(delivery.getDate() + 4);
