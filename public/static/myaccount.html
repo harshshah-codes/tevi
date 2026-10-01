@@ -299,7 +299,7 @@
       // Shipping addresses live in their own table; see the Addresses tab.
 
       const $btn = $(this).prop("disabled", true);
-      fetch("/api/profile", {
+      fetch("api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -335,7 +335,7 @@
     }
 
     function loadProfile() {
-      return fetch("/api/me", { headers: { "Accept": "application/json" } })
+      return fetch("api/me", { headers: { "Accept": "application/json" } })
         .then(function (r) {
           if (!r.ok) { location.href = "login"; return null; }
           return r.json();
@@ -360,11 +360,11 @@
     function renderAddresses() {
       const $list = $("#addressList");
       if (!addresses.length) {
-        $list('<div class="col-12"><p style="color:var(--muted);font-size:13px;">No saved addresses yet. Add one below — it will be used to prefill checkout.</p></div>');
+        $list.html('<div class="col-12"><p style="color:var(--muted);font-size:13px;">No saved addresses yet. Add one below — it will be used to prefill checkout.</p></div>');
         return;
       }
 
-      $list(addresses.map(a => `
+      $list.html(addresses.map(a => `
         <div class="col-md-6">
           <div class="address-card">
             <h6>${escapeHtml(a.label)}${a.isDefault ? ' <span style="color:var(--brown);font-size:9px;letter-spacing:.1em;">DEFAULT</span>' : ""}</h6>
@@ -389,7 +389,7 @@
     }
 
     function loadAddresses() {
-      return fetch("/api/addresses", { headers: { "Accept": "application/json" } })
+      return fetch("api/addresses", { headers: { "Accept": "application/json" } })
         .then(function (r) {
           if (r.status === 401) { location.href = "login"; return null; }
           return r.json();
@@ -476,7 +476,7 @@
 
     $(document).on("click", "[data-default]", function () {
       const id = $(this).data("default");
-      fetch("/api/addresses/" + id + "/default", { method: "POST", headers: { "Content-Type": "application/json" } })
+      fetch("api/addresses/" + id + "/default", { method: "POST", headers: { "Content-Type": "application/json" } })
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.success) { showToast("Default address updated."); loadAddresses(); }
@@ -487,7 +487,7 @@
     $(document).on("click", "[data-delete]", function () {
       const id = $(this).data("delete");
       if (!confirm("Delete this address?")) return;
-      fetch("/api/addresses/" + id, { method: "DELETE" })
+      fetch("api/addresses/" + id, { method: "DELETE" })
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res.success) { showToast("Address deleted."); loadAddresses(); }
@@ -499,7 +499,7 @@
 
     function loadAccountOrders() {
       const $list = $("#accountOrdersList");
-      fetch("/api/orders", { headers: { "Accept": "application/json" } })
+      fetch("api/orders", { headers: { "Accept": "application/json" } })
         .then(function (r) {
           if (r.status === 401) { location.href = "login"; return null; }
           return r.json();
@@ -508,7 +508,7 @@
           if (!data || !data.success) return;
           const orders = data.orders || [];
           if (orders.length === 0) {
-            $list('<p style="color:var(--muted);font-size:13px;">No orders yet. Start shopping to see your orders here.</p>');
+            $list.html('<p style="color:var(--muted);font-size:13px;">No orders yet. Start shopping to see your orders here.</p>');
             return;
           }
           const html = orders.slice(0, 3).map(o => {
@@ -527,7 +527,7 @@
             </div>
           </div>`;
           }).join("");
-          $list(html);
+          $list.html(html);
         });
     }
 
@@ -535,7 +535,7 @@
       const wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
       const $list = $("#accountWishlist");
       if (wishlist.length === 0) {
-        $list('<p style="color:var(--muted);font-size:13px;">Your wishlist is empty.</p>');
+        $list.html('<p style="color:var(--muted);font-size:13px;">Your wishlist is empty.</p>');
         return;
       }
       const html = wishlist.map((w, i) => `
@@ -547,12 +547,14 @@
           </div>
           <button class="wishlist-item-remove"><i class="bi bi-x-lg"></i></button>
         </div>`).join("");
-      $list(html);
+      $list.html(html);
     }
 
     $(document).on("click", ".wishlist-item-remove", function () {
-      const idx = parseInt($(this).closest(".wishlist-item").data("/"));
+      const $row = $(this).closest(".wishlist-item");
+      const idx = parseInt($row.data("index"), 10);
       let wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      if (!Number.isInteger(idx) || !wishlist[idx]) return;
       wishlist.splice(idx, 1);
       localStorage.setItem("hovWishlist", JSON.stringify(wishlist));
       loadAccountWishlist();
@@ -561,7 +563,7 @@
 
     $("#sidebarSignOut").click(function (e) {
       e.preventDefault();
-      fetch("/api/logout", { method: "POST", headers: { "Content-Type": "application/json" } })
+      fetch("api/logout", { method: "POST", headers: { "Content-Type": "application/json" } })
         .then(function () { location.href = "login"; });
     });
 
@@ -582,7 +584,7 @@
 // Update navbar based on login state
 async function updateNavbar() {
   try {
-    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const resp = await fetch('api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
     const data = resp.ok ? await resp.json().catch(() => null) : null;
     if (data && data.success && data.user) {
         const u = data.user;
@@ -600,7 +602,7 @@ async function updateNavbar() {
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;
         }
     } else {

@@ -300,26 +300,34 @@
       $grid(html);
     }
 
+    // Wishlist rows render data-index; .data("/") was always undefined, so
+    // these lookups resolved to NaN.
+    function wishlistIndex($el, isItemRow) {
+      const $row = isItemRow ? $el.closest(".wishlist-item") : $el;
+      const idx = parseInt($row.data("index"), 10);
+      const list = getWishlist();
+      return Number.isInteger(idx) && list[idx] ? idx : -1;
+    }
+
     // Size selection
     $(document).on("click", ".wishlist-size:not(.unavailable)", function () {
       $(this).closest(".wishlist-sizes").find(".wishlist-size").removeClass("active");
       $(this).addClass("active");
       // Save selected size to wishlist item
       const $item = $(this).closest(".wishlist-item");
-      const index = parseInt($item.data("/"));
+      const index = wishlistIndex($item, true);
+      if (index === -1) return;
       const list = getWishlist();
-      if (list[index]) {
-        list[index].selectedSize = $(this).text().trim();
-        saveWishlist(list);
-      }
+      list[index].selectedSize = $(this).text().trim();
+      saveWishlist(list);
     });
 
     // Remove from wishlist
     $(document).on("click", ".wishlist-remove", function () {
-      const $item = $(this).closest(".wishlist-item");
-      const index = parseInt($item.data("/"));
+      const index = wishlistIndex($(this), true);
+      if (index === -1) return;
       const list = getWishlist();
-      const removedName = list[index] ? list[index].name : "Item";
+      const removedName = list[index].name;
       list.splice(index, 1);
       saveWishlist(list);
       showToast(removedName + " removed from wishlist.");
@@ -328,7 +336,8 @@
 
     // Add to bag
     $(document).on("click", ".add-to-bag", function () {
-      const index = parseInt($(this).data("/"));
+      const index = wishlistIndex($(this), false);
+      if (index === -1) return;
       const list = getWishlist();
       const product = list[index];
       if (!product) return;
@@ -372,7 +381,7 @@
 // Update navbar based on login state
 async function updateNavbar() {
   try {
-    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const resp = await fetch('api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
     const data = resp.ok ? await resp.json().catch(() => null) : null;
     if (data && data.success && data.user) {
         const u = data.user;
@@ -390,7 +399,7 @@ async function updateNavbar() {
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;
         }
     } else {
