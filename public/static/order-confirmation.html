@@ -193,53 +193,67 @@
   $(function () {
     function formatPrice(n) { return "₹" + Number(n).toLocaleString("en-IN"); }
 
-    const order = JSON.parse(localStorage.getItem("hovLastOrder") || "null");
+    const lastOrderId = localStorage.getItem("hovLastOrderId");
     const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
     $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
 
-    if (!order) {
+    function renderOrder(order) {
+      $("#customerName").text(order.firstName || "there");
+      $("#orderId").text("#" + (order.orderId || "HOV-00000000"));
+      $("#trackOrderBtn").attr("href", "track-order?id=" + order.orderId);
+
+      $("#addressBlock").html(
+        `<strong>${order.firstName} ${order.lastName}</strong><br>` +
+        `${order.address}<br>` +
+        `${order.city}, ${order.state} - ${order.pincode}<br>` +
+        `<span>Phone: ${order.phone}</span>`
+      );
+
+      const paymentLabels = { card: "Credit / Debit Card", upi: "UPI", netbanking: "Net Banking", cod: "Cash on Delivery" };
+      $("#paymentBlock").text(paymentLabels[order.payment] || "Online Payment");
+
+      const delivery = new Date();
+      delivery.setDate(delivery.getDate() + 4);
+      $("#deliveryBlock").text(delivery.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }));
+
+      const itemsHtml = (order.items || []).map(item => `
+        <div class="confirm-item">
+          <img src="${item.image || ''}" alt="${item.product_name || ''}">
+          <div class="confirm-item-details">
+            <div class="confirm-item-name">${item.product_name || ''}</div>
+            <div class="confirm-item-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1}</div>
+          </div>
+          <div class="confirm-item-price">${formatPrice((item.price || 0) * (item.qty || 1))}</div>
+        </div>`).join("");
+      $("#confirmItems").html(itemsHtml || "<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
+
+      $("#subtotal").text(formatPrice(order.subtotal || 0));
+      $("#shipping").text((order.shipping || 0) === 0 ? "FREE" : formatPrice(order.shipping));
+      $("#tax").text(formatPrice(order.tax || 0));
+      $("#total").text(formatPrice(order.total || 0));
+    }
+
+    function showNoOrder() {
       $("#orderId").text("#HOV-00000000");
       $("#customerName").text("there");
       $("#addressBlock").html("No order information available.<br>Please return to the <a href='index' style='color:var(--brown);'>homepage</a>.");
       $("#paymentBlock").text("—");
       $("#deliveryBlock").text("—");
       $("#confirmItems").html("<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
-      return;
     }
 
-    $("#customerName").text(order.firstName || "there");
-    $("#orderId").text("#" + (order.orderId || "HOV-00000000"));
-    $("#trackOrderBtn").attr("href", "track-order?id=" + order.orderId);
-
-    $("#addressBlock").html(
-      `<strong>${order.firstName} ${order.lastName}</strong><br>` +
-      `${order.address}<br>` +
-      `${order.city}, ${order.state} - ${order.pincode}<br>` +
-      `<span>Phone: ${order.phone}</span>`
-    );
-
-    const paymentLabels = { card: "Credit / Debit Card", upi: "UPI", netbanking: "Net Banking", cod: "Cash on Delivery" };
-    $("#paymentBlock").text(paymentLabels[order.payment] || "Online Payment");
-
-    const delivery = new Date();
-    delivery.setDate(delivery.getDate() + 4);
-    $("#deliveryBlock").text(delivery.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }));
-
-    const itemsHtml = (order.items || []).map(item => `
-      <div class="confirm-item">
-        <img src="${item.image || ''}" alt="${item.name}">
-        <div class="confirm-item-details">
-          <div class="confirm-item-name">${item.name}</div>
-          <div class="confirm-item-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1}</div>
-        </div>
-        <div class="confirm-item-price">${formatPrice((item.price || 0) * (item.qty || 1))}</div>
-      </div>`).join("");
-    $("#confirmItems").html(itemsHtml || "<p style='color:var(--muted);font-size:13px;'>No items found.</p>");
-
-    $("#subtotal").text(formatPrice(order.subtotal || 0));
-    $("#shipping").text((order.shipping || 0) === 0 ? "FREE" : formatPrice(order.shipping));
-    $("#tax").text(formatPrice(order.tax || 0));
-    $("#total").text(formatPrice(order.total || 0));
+    // The order is read back from the database, so a refresh still works.
+    fetch("/api/orders/" + encodeURIComponent(lastOrderId || ""), { headers: { "Accept": "application/json" } })
+      .then(function (r) {
+        if (r.status === 401) { location.href = "login"; return null; }
+        if (!r.ok) return { success: false };
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || !data.success) { showNoOrder(); return; }
+        renderOrder(data.order);
+      })
+      .catch(showNoOrder);
   });
   </script>
 <script>

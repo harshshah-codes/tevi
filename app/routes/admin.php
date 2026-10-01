@@ -172,6 +172,9 @@ switch ($action) {
             case 'detail':
                 $ordersController->detail();
                 break;
+            case 'update-status':
+                $ordersController->updateStatus();
+                break;
             default:
                 $ordersController->index();
                 break;

@@ -98,6 +98,66 @@ if ($uri === '/api/me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $app['auth']->me();
     exit;
 }
+if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PATCH'], true)) {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['auth']->updateProfile();
+    exit;
+}
+
+// --- Addresses ---
+if ($uri === '/api/addresses') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $app['address']->index();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $app['address']->store();
+    }
+    exit;
+}
+if ($uri === '/api/addresses/default' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['address']->showDefault();
+    exit;
+}
+if (preg_match('#^/api/addresses/(\d+)$#', $uri, $m)) {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'PATCH') {
+        $app['address']->update((int) $m[1]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $app['address']->destroy((int) $m[1]);
+    }
+    exit;
+}
+if (preg_match('#^/api/addresses/(\d+)/default$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['address']->makeDefault((int) $m[1]);
+    exit;
+}
+
+// --- Orders (read + cancel) ---
+if ($uri === '/api/orders' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['order']->index();
+    exit;
+}
+if (preg_match('#^/api/orders/([A-Za-z0-9\-_]+)/cancel$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['order']->cancel($m[1]);
+    exit;
+}
+if (preg_match('#^/api/orders/([A-Za-z0-9\-_]+)$#', $uri, $m) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['order']->show($m[1]);
+    exit;
+}
 
 // Require login for account-only pages
 if (session_status() !== PHP_SESSION_ACTIVE) {

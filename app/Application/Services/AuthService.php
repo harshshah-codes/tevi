@@ -54,6 +54,53 @@ final class AuthService
     }
 
     /**
+     * Look a user up by id.
+     */
+    public function findById(int $id): ?User
+    {
+        return $this->userRepository->findById($id);
+    }
+
+    /**
+     * Update the editable parts of a user's profile.
+     *
+     * @param array{firstName?: string, lastName?: string, phone?: string|null} $data
+     * @return array{id: int, email: string, firstName: string, lastName: string, phone: string|null}
+     * @throws \RuntimeException when the user no longer exists
+     */
+    public function updateProfile(int $userId, array $data): array
+    {
+        $user = $this->userRepository->findById($userId);
+        if ($user === null) {
+            throw new \RuntimeException('User not found');
+        }
+
+        $fields = [];
+        if (array_key_exists('firstName', $data)) {
+            $fields['first_name'] = $data['firstName'];
+        }
+        if (array_key_exists('lastName', $data)) {
+            $fields['last_name'] = $data['lastName'];
+        }
+        if (array_key_exists('phone', $data)) {
+            $phone = $data['phone'];
+            $fields['phone'] = ($phone === null || trim((string) $phone) === '') ? null : trim((string) $phone);
+        }
+
+        if ($fields !== []) {
+            $this->userRepository->update($userId, $fields);
+        }
+
+        return [
+            'id' => $user->id(),
+            'email' => $user->email(),
+            'firstName' => $fields['first_name'] ?? $user->firstName(),
+            'lastName' => $fields['last_name'] ?? $user->lastName(),
+            'phone' => array_key_exists('phone', $fields) ? $fields['phone'] : $user->phone(),
+        ];
+    }
+
+    /**
      * Attempt to log in a user.
      * @param string $email
      * @param string $password

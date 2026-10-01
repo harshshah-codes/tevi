@@ -1011,8 +1011,6 @@
       const btn = $("#placeOrderBtn");
       btn.prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2"></span>Processing Order...');
 
-      // Save order details to localStorage
-      // Save order details to localStorage
       const orderData = {
         orderId: "HOV-" + Date.now().toString().slice(-6) + Math.floor(10 + Math.random() * 90),
         firstName: firstName,
@@ -1054,13 +1052,15 @@
         return response.json();
       })
       .then(data => {
-        // Save order to localStorage
-        localStorage.setItem("hovLastOrder", JSON.stringify(orderData));
+        // The server recomputes money from catalog prices; if its total
+        // differs from what the page displayed, tell the customer plainly.
+        if (data.pricing && data.pricing.total !== orderData.total) {
+          showToast("Updated total: " + formatPrice(data.pricing.total));
+        }
 
-        // Save order to orders list
-        let orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-        orders.unshift(orderData);
-        localStorage.setItem("hovOrders", JSON.stringify(orders));
+        // Only the confirmation page's last-order hint is cached; the order
+        // history itself lives in the database now.
+        localStorage.setItem("hovLastOrderId", data.orderId || orderData.orderId);
 
         // Clear cart
         localStorage.removeItem("hovBag");
@@ -1092,7 +1092,33 @@
       }
     });
 
+    // ===== Prefill from the signed-in customer's details and saved address =====
+    function prefillFromAccount() {
+      fetch("/api/me", { headers: { "Accept": "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.success) return;
+          const u = data.user;
+          $("#firstName").val(u.firstName || "");
+          $("#lastName").val(u.lastName || "");
+          $("#email").val(u.email || "");
+          if (u.phone) $("#phone").val(u.phone);
+        });
+
+      fetch("/api/addresses/default", { headers: { "Accept": "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.success || !data.address) return;
+          const a = data.address;
+          $("#address1").val(a.line1 + (a.line2 ? ", " + a.line2 : ""));
+          $("#city").val(a.city);
+          $("#state").val(a.state);
+          $("#pincode").val(a.pincode);
+        });
+    }
+
     // ===== Initial render =====
+    prefillFromAccount();
     renderOrderSummary();
     updateBagCount();
 

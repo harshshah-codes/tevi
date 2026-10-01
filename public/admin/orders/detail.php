@@ -73,13 +73,38 @@
         <div class="card">
             <div class="card-header"><strong>Update Status</strong></div>
             <div class="card-body">
+                <!--IF:CANCEL_BLOCK--><!--CANCEL_BLOCK--><!--ENDIF:CANCEL_BLOCK-->
                 <form action="/admin/orders/detail?id=<!--ORDER_DB_ID-->" method="post" id="statusForm">
                     <input type="hidden" name="csrf_token" value="<!--CSRF_TOKEN-->">
-                    <div class="input-group">
+                    <div class="input-group mb-2">
                         <select name="status" class="form-select"><!--STATUS_OPTIONS--></select>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>
+                    <input type="text" name="note" class="form-control form-control-sm" maxlength="255" placeholder="Internal note (optional, e.g. courier tracking no.)">
+                    <p class="text-muted small mt-2 mb-0">Only valid next states are listed. Changing away from <em>cancelled</em> reinstates the order and clears its cancellation details.</p>
                 </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><strong>Status History</strong></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>When</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Note</th>
+                                <th>By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!--HISTORY_ROWS-->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

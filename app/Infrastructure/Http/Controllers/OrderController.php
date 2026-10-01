@@ -4,13 +4,183 @@ declare(strict_types=1);
 namespace App\Infrastructure\Http\Controllers;
 
 use App\Application\Services\OrderService;
+use App\Application\Services\PricingService;
 use App\Domain\Models\Order;
 
 final class OrderController
 {
+    /**
+     * Statuses a customer may move an order to themselves, and the statuses
+     * each transition is allowed from.
+     *
+     * processing -> cancelled            (customer, before it ships)
+     * cancelled -> processing            (admin reinstatement)
+     * processing|packed|shipped -> ...   (admin, via updateStatus)
+     */
+    private const CUSTOMER_TRANSITIONS = [
+        'processing' => ['cancelled'],
+        'cancelled'  => ['processing'],
+    ];
+
+    /** A customer may only cancel; reinstatement is an admin action. */
+    private const CUSTOMER_TARGETS = ['cancelled'];
+
     public function __construct(
         private readonly OrderService $service,
+        private readonly PricingService $pricing,
     ) {
+    }
+
+    /**
+     * GET /api/orders — the signed-in customer's order history.
+     */
+    public function index(): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+
+        if (empty($_SESSION['user_id'])) {
+            ob_end_clean();
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+            exit;
+        }
+
+        $orders = $this->service->getOrdersForUser((int) $_SESSION['user_id']);
+
+        ob_end_clean();
+        echo json_encode([
+            'success' => true,
+            'orders'  => array_map(fn(Order $o) => $this->service->toArray($o), $orders),
+        ]);
+        exit;
+    }
+
+    /**
+     * GET /api/orders/{orderId}
+     */
+    public function show(string $orderId): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+
+        if (empty($_SESSION['user_id'])) {
+            ob_end_clean();
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+            exit;
+        }
+
+        $order = $this->service->getOrderForUser((int) $_SESSION['user_id'], $orderId);
+        if ($order === null) {
+            ob_end_clean();
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Order not found']);
+            exit;
+        }
+
+        ob_end_clean();
+        echo json_encode(['success' => true, 'order' => $this->service->toArray($order)]);
+        exit;
+    }
+
+    /**
+     * POST /api/orders/{orderId}/cancel
+     *
+     * Body: { "reason": "..." } (optional). Idempotent: cancelling an already
+     * cancelled order succeeds and reports the existing status.
+     */
+    public function cancel(string $orderId): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            ob_end_clean();
+            http_response_code(405);
+            echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+            exit;
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            ob_end_clean();
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+            exit;
+        }
+
+        $order = $this->service->getOrderForUser((int) $_SESSION['user_id'], $orderId);
+        if ($order === null) {
+            ob_end_clean();
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Order not found']);
+            exit;
+        }
+
+        // Already cancelled: nothing to do, do not fail the click.
+        if ($order->status() === 'cancelled') {
+            ob_end_clean();
+            echo json_encode([
+                'success' => true,
+                'orderId' => $order->orderId(),
+                'status'  => 'cancelled',
+                'message' => 'Order was already cancelled.',
+            ]);
+            exit;
+        }
+
+        $allowedFrom = self::CUSTOMER_TRANSITIONS['cancelled'] ?? [];
+        if (!in_array($order->status(), $allowedFrom, true)) {
+            ob_end_clean();
+            http_response_code(409);
+            echo json_encode([
+                'success' => false,
+                'error'   => 'This order can no longer be cancelled',
+                'status'  => $order->status(),
+            ]);
+            exit;
+        }
+
+        $reason = $this->cancelReason();
+
+        $updated = $this->service->cancelOrderForUser(
+            $order->id(),
+            (int) $_SESSION['user_id'],
+            $reason
+        );
+
+        if (!$updated) {
+            // Lost a race with a concurrent status change; report current state.
+            $fresh = $this->service->getOrderForUser((int) $_SESSION['user_id'], $orderId);
+            ob_end_clean();
+            http_response_code($fresh && $fresh->status() === 'cancelled' ? 200 : 409);
+            echo json_encode([
+                'success' => $fresh !== null && $fresh->status() === 'cancelled',
+                'error'   => 'Could not cancel this order',
+                'status'  => $fresh?->status(),
+            ]);
+            exit;
+        }
+
+        ob_end_clean();
+        echo json_encode([
+            'success' => true,
+            'orderId' => $order->orderId(),
+            'status'  => 'cancelled',
+            'reason'  => $reason,
+            'refund'  => $order->paymentMethod() === 'cod'
+                ? 'No payment was taken, so there is nothing to refund.'
+                : 'Refund initiated to the original payment method in 5-7 working days.',
+        ]);
+        exit;
+    }
+
+    /**
+     * @return string
+     */
+    private function cancelReason(): string
+    {
+        $data = json_decode(file_get_contents('php://input') ?: '', true);
+        $reason = is_array($data) ? trim((string) ($data['reason'] ?? '')) : '';
+
+        return mb_substr($reason, 0, 255);
     }
 
     public function store(): void
@@ -42,8 +212,7 @@ final class OrderController
             exit;
         }
 
-        $required = ['orderId', 'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'items'];
-        foreach ($required as $field) {
+        $required = ['orderId', 'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'pincode', 'items'];        foreach ($required as $field) {
             if (empty($data[$field]) && $data[$field] !== '0') {
                 ob_end_clean();
                 http_response_code(422);
@@ -82,6 +251,21 @@ final class OrderController
             exit;
         }
 
+        // Money is recomputed from catalog prices; the payload's subtotal,
+        // shipping, tax and total are deliberately ignored.
+        $paymentMethod = (string) ($data['payment'] ?? 'cod');
+        $quote = $this->pricing->quote($items, $paymentMethod);
+
+        if ($quote['items'] === []) {
+            ob_end_clean();
+            http_response_code(422);
+            echo json_encode([
+                'success' => false,
+                'error'   => 'None of the items in this order exist in the catalog',
+            ]);
+            exit;
+        }
+
         $order = new Order(
             0,
             (string) $data['orderId'],
@@ -94,14 +278,14 @@ final class OrderController
             trim((string) $data['city']),
             trim((string) $data['state']),
             trim((string) $data['pincode']),
-            (string) ($data['payment'] ?? 'cod'),
-            (int) ($data['subtotal'] ?? 0),
-            (int) ($data['shipping'] ?? 0),
-            (int) ($data['tax'] ?? 0),
-            (int) ($data['total'] ?? 0),
+            $paymentMethod,
+            $quote['subtotal'],
+            $quote['shipping'],
+            $quote['tax'],
+            $quote['total'],
             'processing',
             date('Y-m-d H:i:s'),
-            $items,
+            $quote['items'],
         );
 
         try {
@@ -118,6 +302,12 @@ final class OrderController
             'success' => true,
             'id'      => $id,
             'orderId' => $order->orderId(),
+            'pricing' => [
+                'subtotal' => $quote['subtotal'],
+                'shipping' => $quote['shipping'],
+                'tax'      => $quote['tax'],
+                'total'    => $quote['total'],
+            ],
         ]);
         exit;
     }

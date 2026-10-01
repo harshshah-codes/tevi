@@ -292,9 +292,9 @@
       const orderDate = order.date ? new Date(order.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "—";
       const itemsHtml = (order.items || []).map(item => `
         <div class="track-item">
-          <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.name}">
+          <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.product_name || ''}">
           <div>
-            <div class="track-item-name">${item.name}</div>
+            <div class="track-item-name">${item.product_name || ''}</div>
             <div class="track-item-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1}</div>
           </div>
         </div>
@@ -309,7 +309,7 @@
               <div class="track-order-id">#${order.orderId}</div>
               <div class="track-order-date">Placed on ${orderDate}</div>
             </div>
-            <span class="track-status-badge">Processing</span>
+            <span class="track-status-badge">${(order.status || "processing").charAt(0).toUpperCase() + (order.status || "processing").slice(1)}</span>
           </div>
 
           <div class="progress-track">
@@ -358,15 +358,23 @@
       $("#trackResult").html(html);
     }
 
-    function findOrder(id) {
-      const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-      return orders.find(o => o.orderId === id || o.orderId === id.replace(/^#/, ""));
+    function fetchOrder(id) {
+      if (!id) return Promise.resolve(null);
+      return fetch("/api/orders/" + encodeURIComponent(String(id).replace(/^#/, "")), { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (r.status === 401) { location.href = "login"; return null; }
+          if (!r.ok) return { success: false };
+          return r.json();
+        })
+        .then(function (data) { return data && data.success ? data.order : null; })
+        .catch(function () { return null; });
     }
 
     $("#trackBtn").click(function () {
       const id = $("#trackInput").val().trim();
       if (!id) return;
-      renderOrder(findOrder(id));
+      $("#trackResult").html('<p style="color:var(--muted);font-size:13px;">Looking up your order…</p>');
+      fetchOrder(id).then(renderOrder);
     });
 
     $("#trackInput").on("keypress", function (e) {
@@ -375,7 +383,7 @@
 
     // Auto-load if order ID in URL
     if (presetId) {
-      renderOrder(findOrder(presetId));
+      fetchOrder(presetId).then(renderOrder);
     }
 
     // Bag count

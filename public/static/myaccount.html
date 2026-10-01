@@ -158,7 +158,7 @@
                 <li><a data-tab="orders"><i class="bi bi-box"></i> Orders</a></li>
                 <li><a data-tab="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
                 <li><a data-tab="addresses"><i class="bi bi-geo-alt"></i> Addresses</a></li>
-                <li><a href="./"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+                <li><a href="#" id="sidebarSignOut"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
               </ul>
             </div>
           </div>
@@ -167,17 +167,18 @@
             <div class="profile-content">
               <div id="tab-profile" class="tab-content">
                 <h2 class="profile-content-title">Profile <em>Details</em></h2>
-                <form id="profileForm">
+                <form id="profileForm" novalidate>
                   <div class="row">
-                    <div class="col-md-6"><div class="form-group"><label>First Name</label><input type="text" class="form-control" value="Arjun" readonly></div></div>
-                    <div class="col-md-6"><div class="form-group"><label>Last Name</label><input type="text" class="form-control" value="Mehta" readonly></div></div>
-                    <div class="col-md-6"><div class="form-group"><label>Email Address</label><input type="email" class="form-control" value="arjun@example.com" readonly></div></div>
-                    <div class="col-md-6"><div class="form-group"><label>Phone Number</label><input type="tel" class="form-control" value="+91 98765 43210" readonly></div></div>
-                    <div class="col-12"><div class="form-group"><label>Default Shipping Address</label><input type="text" class="form-control" value="42, Heritage Apartments, Juhu, Mumbai - 400049" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>First Name</label><input type="text" id="pfFirstName" class="form-control" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Last Name</label><input type="text" id="pfLastName" class="form-control" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Email Address</label><input type="email" id="pfEmail" class="form-control" readonly></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Phone Number</label><input type="tel" id="pfPhone" class="form-control" placeholder="+91 98765 43210" readonly></div></div>
+                    <div class="col-12"><div class="form-group"><label>Default Shipping Address</label><p class="mb-0" id="pfDefaultAddress" style="font-size:14px;">—</p><small class="text-muted">Manage shipping addresses in the <a href="#" data-tab="addresses">Addresses</a> tab.</small></div></div>
                   </div>
                   <div class="mt-3">
                     <button type="button" class="btn-edit" id="editProfileBtn"><i class="bi bi-pencil me-2"></i>Edit Profile</button>
                     <button type="button" class="btn-save ms-2 d-none" id="saveProfileBtn"><i class="bi bi-check2 me-2"></i>Save Changes</button>
+                    <span id="profileSaveHint" class="ms-3" style="font-size:13px;color:var(--muted);"></span>
                   </div>
                 </form>
               </div>
@@ -197,25 +198,32 @@
 
               <div id="tab-addresses" class="tab-content d-none">
                 <h2 class="profile-content-title">Saved <em>Addresses</em></h2>
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <div class="address-card">
-                      <h6>Default Address</h6>
-                      <p>Arjun Mehta</p><p>42, Heritage Apartments,</p><p>Juhu, Mumbai - 400049</p>
-                      <p class="phone">Phone: +91 98765 43210</p>
-                      <button class="btn-edit-address">Edit</button>
+                <div id="addressList" class="row g-3"></div>
+
+                <form id="addressForm" class="mt-4" novalidate>
+                  <h3 style="font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;"><em id="addressFormTitle">Add</em> Address</h3>
+                  <input type="hidden" id="addrId">
+                  <div class="row">
+                    <div class="col-md-4"><div class="form-group"><label>Label</label><input type="text" id="addrLabel" class="form-control" placeholder="Home / Work"></div></div>
+                    <div class="col-md-4"><div class="form-group"><label>Recipient Name</label><input type="text" id="addrName" class="form-control" required></div></div>
+                    <div class="col-md-4"><div class="form-group"><label>Phone</label><input type="tel" id="addrPhone" class="form-control" required></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Address Line 1</label><input type="text" id="addrLine1" class="form-control" required placeholder="Flat, building, street"></div></div>
+                    <div class="col-md-6"><div class="form-group"><label>Address Line 2 <span style="color:var(--muted);font-weight:400;">(optional)</span></label><input type="text" id="addrLine2" class="form-control" placeholder="Area, landmark"></div></div>
+                    <div class="col-md-3"><div class="form-group"><label>City</label><input type="text" id="addrCity" class="form-control" required></div></div>
+                    <div class="col-md-3"><div class="form-group"><label>State</label><input type="text" id="addrState" class="form-control" required></div></div>
+                    <div class="col-md-2"><div class="form-group"><label>PIN Code</label><input type="text" id="addrPincode" class="form-control" required maxlength="6"></div></div>
+                    <div class="col-md-4 d-flex align-items-end">
+                      <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="addrIsDefault">
+                        <label class="form-check-label" for="addrIsDefault" style="font-size:13px;">Set as default</label>
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="address-card">
-                      <h6>Work Address</h6>
-                      <p>Arjun Mehta</p><p>7th Floor, BKC Tower,</p><p>Bandra East, Mumbai - 400051</p>
-                      <p class="phone">Phone: +91 98765 43211</p>
-                      <button class="btn-edit-address">Edit</button>
-                    </div>
+                  <div class="mt-3">
+                    <button type="submit" class="btn-save" id="addressSaveBtn"><i class="bi bi-check2 me-2"></i>Save Address</button>
+                    <button type="button" class="btn-edit d-none" id="addressCancelBtn"><i class="bi bi-x me-2"></i>Cancel</button>
                   </div>
-                  <div class="col-12"><button class="add-address-btn"><i class="bi bi-plus me-2"></i>Add New Address</button></div>
-                </div>
+                </form>
               </div>
             </div>
           </div>
@@ -248,7 +256,7 @@
     const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
     $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
 
-    $(".sidebar-nav a[data-tab]").click(function (e) {
+    $("[data-tab]").click(function (e) {
       e.preventDefault();
       const tab = $(this).data("tab");
       $(".sidebar-nav a").removeClass("active");
@@ -262,7 +270,8 @@
     let isEditing = false;
     $("#editProfileBtn").click(function () {
       isEditing = !isEditing;
-      const inputs = $("#profileForm .form-control");
+      // Email is not editable here (it is the login identity)
+      const inputs = $("#pfFirstName, #pfLastName, #pfPhone, #pfAddress");
       inputs.prop("readonly", !isEditing);
       if (isEditing) {
         inputs.css("background", "#fff");
@@ -276,33 +285,250 @@
     });
 
     $("#saveProfileBtn").click(function () {
-      showToast("Profile updated successfully!");
-      $("#editProfileBtn").click();
-    });
+      const payload = {
+        firstName: $("#pfFirstName").val().trim(),
+        lastName: $("#pfLastName").val().trim(),
+        phone: $("#pfPhone").val().trim()
+      };
 
-    function loadAccountOrders() {
-      const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-      const $list = $("#accountOrdersList");
-      if (orders.length === 0) {
-        $list('<p style="color:var(--muted);font-size:13px;">No orders yet. Start shopping to see your orders here.</p>');
+      if (!payload.firstName || !payload.lastName) {
+        showToast("First and last name are required.");
         return;
       }
-      const html = orders.slice(0, 3).map(o => {
-        const d = o.date ? new Date(o.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
-        return `
-          <div class="order-card">
-            <div class="d-flex flex-wrap justify-content-between align-items-center">
-              <div>
-                <div class="order-number">#${o.orderId}</div>
-                <div class="order-date">Ordered on ${d}</div>
-              </div>
-              <div><span class="order-status status-processing">Processing</span></div>
+
+      // Shipping addresses live in their own table; see the Addresses tab.
+
+      const $btn = $(this).prop("disabled", true);
+      fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+        .then(function (res) {
+          $btn.prop("disabled", false);
+          if (!res.ok || !res.body.success) {
+            showToast((res.body && res.body.error) || "Could not save profile.");
+            return;
+          }
+          const u = res.body.user;
+          $("#pfFirstName").val(u.firstName);
+          $("#pfLastName").val(u.lastName);
+          $("#pfPhone").val(u.phone || "");
+          applyUserToProfile(u);
+          $(".profile-name").text((u.firstName + " " + u.lastName).trim());
+          $(".profile-email").text(u.email);
+          showToast("Profile updated successfully!");
+          $("#editProfileBtn").click();
+        })
+        .catch(function () {
+          $btn.prop("disabled", false);
+          showToast("Could not reach the server. Try again.");
+        });
+    });
+
+    function applyUserToProfile(u) {
+      $("#pfFirstName").val(u.firstName || "");
+      $("#pfLastName").val(u.lastName || "");
+      $("#pfEmail").val(u.email || "");
+      $("#pfPhone").val(u.phone || "");
+    }
+
+    function loadProfile() {
+      return fetch("/api/me", { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (!r.ok) { location.href = "login"; return null; }
+          return r.json();
+        })
+        .then(function (data) {
+          if (data && data.success && data.user) {
+            applyUserToProfile(data.user);
+            $(".profile-name").text((data.user.firstName + " " + data.user.lastName).trim());
+            $(".profile-email").text(data.user.email);
+          }
+        })
+        .catch(function () {
+          $("#profileSaveHint").text("Could not load your details. Refresh to try again.");
+        });
+    }
+
+    loadProfile();
+
+    // --- Addresses ------------------------------------------------------------
+    let addresses = [];
+
+    function renderAddresses() {
+      const $list = $("#addressList");
+      if (!addresses.length) {
+        $list('<div class="col-12"><p style="color:var(--muted);font-size:13px;">No saved addresses yet. Add one below — it will be used to prefill checkout.</p></div>');
+        return;
+      }
+
+      $list(addresses.map(a => `
+        <div class="col-md-6">
+          <div class="address-card">
+            <h6>${escapeHtml(a.label)}${a.isDefault ? ' <span style="color:var(--brown);font-size:9px;letter-spacing:.1em;">DEFAULT</span>' : ""}</h6>
+            <p>${escapeHtml(a.recipientName)}</p>
+            <p>${escapeHtml(a.oneLine)}</p>
+            <p class="phone">Phone: ${escapeHtml(a.phone)}</p>
+            <div class="d-flex gap-2">
+              <button class="btn-edit-address" data-edit="${a.id}">Edit</button>
+              ${a.isDefault ? "" : '<button class="btn-edit-address" data-default="' + a.id + '">Make Default</button>'}
+              <button class="btn-edit-address" data-delete="${a.id}" style="color:var(--danger);border-color:var(--danger);">Delete</button>
+            </div>
+          </div>
+        </div>`).join(""));
+
+      const def = addresses.find(a => a.isDefault);
+      $("#pfDefaultAddress").text(def ? def.oneLine : "No default address saved yet.");
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function loadAddresses() {
+      return fetch("/api/addresses", { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (r.status === 401) { location.href = "login"; return null; }
+          return r.json();
+        })
+        .then(function (data) {
+          if (data && data.success) {
+            addresses = data.addresses || [];
+            renderAddresses();
+          }
+        })
+        .catch(function () {
+          showToast("Could not load your addresses.");
+        });
+    }
+
+    function resetAddressForm() {
+      $("#addressForm")[0].reset();
+      $("#addrId").val("");
+      $("#addrIsDefault").prop("checked", false);
+      $("#addressFormTitle").text("Add");
+      $("#addressCancelBtn").addClass("d-none");
+    }
+
+    $("#addressCancelBtn").click(function () { resetAddressForm(); });
+
+    $("#addressForm").on("submit", function (e) {
+      e.preventDefault();
+
+      const payload = {
+        label: $("#addrLabel").val().trim(),
+        recipientName: $("#addrName").val().trim(),
+        phone: $("#addrPhone").val().trim(),
+        line1: $("#addrLine1").val().trim(),
+        line2: $("#addrLine2").val().trim(),
+        city: $("#addrCity").val().trim(),
+        state: $("#addrState").val().trim(),
+        pincode: $("#addrPincode").val().trim(),
+        isDefault: $("#addrIsDefault").prop("checked")
+      };
+
+      const id = $("#addrId").val();
+      const $btn = $("#addressSaveBtn").prop("disabled", true);
+
+      fetch(id ? "/api/addresses/" + id : "/api/addresses", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+        .then(function (res) {
+          $btn.prop("disabled", false);
+          if (!res.ok || !res.body.success) {
+            showToast((res.body && res.body.error) || "Could not save address.");
+            return;
+          }
+          showToast(id ? "Address updated." : "Address saved.");
+          resetAddressForm();
+          loadAddresses();
+        })
+        .catch(function () {
+          $btn.prop("disabled", false);
+          showToast("Could not reach the server. Try again.");
+        });
+    });
+
+    $(document).on("click", "[data-edit]", function () {
+      const a = addresses.find(x => x.id === Number($(this).data("edit")));
+      if (!a) return;
+      resetAddressForm();
+      $("#addrId").val(a.id);
+      $("#addrLabel").val(a.label);
+      $("#addrName").val(a.recipientName);
+      $("#addrPhone").val(a.phone);
+      $("#addrLine1").val(a.line1);
+      $("#addrLine2").val(a.line2 || "");
+      $("#addrCity").val(a.city);
+      $("#addrState").val(a.state);
+      $("#addrPincode").val(a.pincode);
+      $("#addrIsDefault").prop("checked", !!a.isDefault);
+      $("#addressFormTitle").text("Edit");
+      $("#addressCancelBtn").removeClass("d-none");
+      $("#addrName").trigger("focus");
+    });
+
+    $(document).on("click", "[data-default]", function () {
+      const id = $(this).data("default");
+      fetch("/api/addresses/" + id + "/default", { method: "POST", headers: { "Content-Type": "application/json" } })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.success) { showToast("Default address updated."); loadAddresses(); }
+          else showToast(res.error || "Could not update.");
+        });
+    });
+
+    $(document).on("click", "[data-delete]", function () {
+      const id = $(this).data("delete");
+      if (!confirm("Delete this address?")) return;
+      fetch("/api/addresses/" + id, { method: "DELETE" })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.success) { showToast("Address deleted."); loadAddresses(); }
+          else showToast(res.error || "Could not delete.");
+        });
+    });
+
+    loadAddresses();
+
+    function loadAccountOrders() {
+      const $list = $("#accountOrdersList");
+      fetch("/api/orders", { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (r.status === 401) { location.href = "login"; return null; }
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data || !data.success) return;
+          const orders = data.orders || [];
+          if (orders.length === 0) {
+            $list('<p style="color:var(--muted);font-size:13px;">No orders yet. Start shopping to see your orders here.</p>');
+            return;
+          }
+          const html = orders.slice(0, 3).map(o => {
+            const d = o.date ? new Date(o.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+            const statusText = (o.status || "processing").charAt(0).toUpperCase() + (o.status || "processing").slice(1);
+            return `
+              <div class="order-card">
+                <div class="d-flex flex-wrap justify-content-between align-items-center">
+                  <div>
+                    <div class="order-number">#${o.orderId}</div>
+                    <div class="order-date">Ordered on ${d}</div>
+                  </div>
+              <div><span class="order-status status-${o.status || "processing"}">${statusText}</span></div>
               <div><span class="order-total">${formatPrice(o.total)}</span></div>
               <div><a href="order-detail?id=${o.orderId}" class="order-view-btn">View Details <i class="bi bi-arrow-right"></i></a></div>
             </div>
           </div>`;
-      }).join("");
-      $list(html);
+          }).join("");
+          $list(html);
+        });
     }
 
     function loadAccountWishlist() {
@@ -333,8 +559,16 @@
       showToast("Removed from wishlist.");
     });
 
-    $(".add-address-btn").click(function () { showToast("Add address form coming soon."); });
-    $(".btn-edit-address").click(function () { showToast("Edit address form coming soon."); });
+    $("#sidebarSignOut").click(function (e) {
+      e.preventDefault();
+      fetch("/api/logout", { method: "POST", headers: { "Content-Type": "application/json" } })
+        .then(function () { location.href = "login"; });
+    });
+
+    // Entering the Addresses tab should also pull the latest list
+    $(".sidebar-nav a[data-tab]").on("click", function () {
+      if ($(this).data("tab") === "addresses") loadAddresses();
+    });
 
     $(".navbar-nav .nav-link").on("click", function () {
       const nav = document.getElementById("mainNav");

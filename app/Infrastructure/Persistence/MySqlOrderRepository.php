@@ -130,6 +130,178 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
     }
 
     /**
+     * @return Order[]
+     */
+    public function findByUser(int $userId, int $limit = 50): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM orders WHERE user_id = :user_id ORDER BY created_at DESC, id DESC LIMIT :lim'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $orders = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $orders[] = $this->mapOrder($row);
+        }
+
+        return $orders;
+    }
+
+    public function findByUserAndOrderId(int $userId, string $orderId): ?Order
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM orders WHERE user_id = :user_id AND order_id = :order_id LIMIT 1');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':order_id', $orderId);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
+
+        return $this->mapOrder($row);
+    }
+
+    public function updateStatusForUser(int $id, int $userId, string $status): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders SET status = :status WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->execute([
+            ':id'      => $id,
+            ':user_id' => $userId,
+            ':status'  => $status,
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * @param string[] $allowedFrom
+     */
+    public function cancelForUser(int $id, int $userId, array $allowedFrom, ?string $reason): bool
+    {
+        if ($allowedFrom === []) {
+            return false;
+        }
+
+        $placeholders = [];
+        $params = [
+            ':id'         => $id,
+            ':user_id'    => $userId,
+            ':status'     => 'cancelled',
+            ':reason'     => $reason,
+        ];
+
+        foreach (array_values($allowedFrom) as $i => $from) {
+            $key = ':from' . $i;
+            $placeholders[] = $key;
+            $params[$key] = $from;
+        }
+
+        // Guarding on the *current* status inside the UPDATE makes the
+        // transition atomic: only the first request to cancel changes a row.
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders
+                SET status = :status,
+                    cancelled_at = CURRENT_TIMESTAMP,
+                    cancel_reason = :reason
+              WHERE id = :id
+                AND user_id = :user_id
+                AND status IN (' . implode(', ', $placeholders) . ')'
+        );
+        $stmt->execute($params);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * @param string[] $allowedFrom
+     */
+    public function updateStatusByAdmin(int $id, array $allowedFrom, string $status, ?string $note = null): bool
+    {
+        if ($allowedFrom === []) {
+            return false;
+        }
+
+        $placeholders = [];
+        $params = [
+            ':id'      => $id,
+            ':status'  => $status,
+            ':note'    => $note,
+        ];
+
+        foreach (array_values($allowedFrom) as $i => $from) {
+            $key = ':from' . $i;
+            $placeholders[] = $key;
+            $params[$key] = $from;
+        }
+
+        // Leaving `cancelled` clears the cancellation columns so they always
+        // describe the order's current state, not its history.
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders
+                SET status = :status,
+                    cancelled_at = CASE WHEN :status2 = \'cancelled\' THEN CURRENT_TIMESTAMP ELSE NULL END,
+                    cancel_reason = CASE WHEN :status3 = \'cancelled\' THEN :note ELSE NULL END
+              WHERE id = :id
+                AND status IN (' . implode(', ', $placeholders) . ')'
+        );
+        $params[':status2'] = $status;
+        $params[':status3'] = $status;
+        $stmt->execute($params);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function recordStatusChange(int $orderId, string $from, string $to, ?string $note = null, string $changedBy = 'admin'): void
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO order_status_history (order_id, from_status, to_status, note, changed_by)
+             VALUES (:order_id, :from_status, :to_status, :note, :changed_by)'
+        );
+        $stmt->execute([
+            ':order_id'    => $orderId,
+            ':from_status' => $from,
+            ':to_status'   => $to,
+            ':note'        => $note,
+            ':changed_by'  => $changedBy !== '' ? $changedBy : 'admin',
+        ]);
+    }
+
+    /**
+     * @return array<int, array{from_status: string, to_status: string, note: string|null, changed_by: string, created_at: string}>
+     */
+    public function statusHistoryFor(int $orderId, int $limit = 50): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT from_status, to_status, note, changed_by, created_at
+               FROM order_status_history
+              WHERE order_id = :order_id
+              ORDER BY id DESC
+              LIMIT :lim'
+        );
+        $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $history = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $history[] = [
+                'from_status' => (string) $row['from_status'],
+                'to_status'   => (string) $row['to_status'],
+                'note'        => $row['note'] !== null ? (string) $row['note'] : null,
+                'changed_by'  => (string) $row['changed_by'],
+                'created_at'  => (string) $row['created_at'],
+            ];
+        }
+
+        return $history;
+    }
+
+    /**
      * @param array<string, mixed> $row
      */
     private function mapOrder(array $row): Order
@@ -174,6 +346,8 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
             (string) $row['status'],
             (string) $row['created_at'],
             $items,
+            isset($row['cancelled_at']) && $row['cancelled_at'] !== null ? (string) $row['cancelled_at'] : null,
+            isset($row['cancel_reason']) && $row['cancel_reason'] !== null ? (string) $row['cancel_reason'] : null,
         );
     }
 }

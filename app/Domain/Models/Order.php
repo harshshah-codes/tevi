@@ -28,7 +28,19 @@ final class Order
         private readonly string $status,
         private readonly string $createdAt,
         private readonly array $items = [],
+        private readonly ?string $cancelledAt = null,
+        private readonly ?string $cancelReason = null,
     ) {
+    }
+
+    public function cancelledAt(): ?string
+    {
+        return $this->cancelledAt;
+    }
+
+    public function cancelReason(): ?string
+    {
+        return $this->cancelReason;
     }
 
     public function userId(): int

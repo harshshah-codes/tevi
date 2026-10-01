@@ -211,19 +211,25 @@
     const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");
     $("#bagCount").text(bag.reduce((a, b) => a + (b.qty || 1), 0));
 
-    // Fill sidebar profile from the customer's most recent order
-    const allOrders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-    if (allOrders.length > 0) {
-      const c = allOrders[0];
-      $(".profile-name").text(((c.firstName || "") + " " + (c.lastName || "")).trim() || "My Account");
-      $(".profile-email").text(c.email || "");
-    } else {
-      $(".profile-name").text("My Account");
-      $(".profile-email").text("");
+    // Customer details come from the session, not from a cached order
+    function loadSidebar() {
+      fetch("/api/me", { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (!r.ok) { location.href = "login"; return null; }
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data || !data.success) return;
+          const u = data.user;
+          $(".profile-name").text(((u.firstName || "") + " " + (u.lastName || "")).trim() || "My Account");
+          $(".profile-email").text(u.email || "");
+        });
     }
 
+    let ORDERS = [];
+
     function renderOrders() {
-      const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
+      const orders = ORDERS;
       const $list = $("#ordersList");
 
       if (orders.length === 0) {
@@ -242,12 +248,12 @@
           <div class="order-product-item">
             <img src="${item.image || ''}" alt="${item.name}">
             <div>
-              <div class="order-product-name">${item.name}</div>
+              <div class="order-product-name">${item.product_name || item.name || ''}</div>
               <div class="order-product-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1}</div>
             </div>
           </div>`).join("");
 
-        const cancelBtn = (status === "processing") ?
+        const cancelBtn = (o.canCancel === false ? false : status === "processing") ?
           `<button class="order-btn cancel-order" data-id="${o.orderId}" style="color:var(--danger);border-color:var(--danger);">Cancel</button>` : "";
 
         return `
@@ -293,26 +299,63 @@
       const orderId = $(this).data("id");
       if (!confirm("Are you sure you want to cancel this order?")) return;
 
-      let orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-      const idx = orders.findIndex(o => o.orderId === orderId);
-      if (idx > -1) {
-        orders[idx].status = "cancelled";
-        localStorage.setItem("hovOrders", JSON.stringify(orders));
-      }
+      const reason = prompt("Optional: tell us why you are cancelling (helps us improve).", "");
+      if (reason === null) return; // user dismissed the prompt
 
-      const $card = $(this).closest(".order-card");
-      $card.attr("data-status", "cancelled");
-      $card.find(".order-status").removeClass("status-processing").addClass("status-cancelled").text("Cancelled");
-      $(this).remove();
-      showToast("Order #" + orderId + " cancelled.");
+      const $btn = $(this).prop("disabled", true);
+      fetch("/api/orders/" + encodeURIComponent(orderId) + "/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: reason })
+      })
+        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+        .then(function (res) {
+          $btn.prop("disabled", false);
+          if (!res.ok || !res.body.success) {
+            showToast((res.body && res.body.error) || "Could not cancel this order.");
+            loadOrders();
+            return;
+          }
+
+          ORDERS = ORDERS.map(function (o) {
+            return o.orderId === orderId ? Object.assign({}, o, { status: "cancelled" }) : o;
+          });
+          renderOrders();
+
+          const $card = $(".order-card[data-id='" + orderId + "']");
+          $card.find(".order-status").removeClass("status-processing").addClass("status-cancelled").text("Cancelled");
+          showToast("Order #" + orderId + " cancelled. " + (res.body.refund || ""));
+        })
+        .catch(function () {
+          $btn.prop("disabled", false);
+          showToast("Could not reach the server. Try again.");
+        });
     });
+
+    function loadOrders() {
+      $("#ordersList").html('<p style="color:var(--muted);font-size:13px;">Loading your orders…</p>');
+      fetch("/api/orders", { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (r.status === 401) { location.href = "login"; return null; }
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data || !data.success) return;
+          ORDERS = data.orders || [];
+          renderOrders();
+        })
+        .catch(function () {
+          $("#ordersList").html('<p style="color:var(--danger);font-size:13px;">Could not load your orders. Refresh to try again.</p>');
+        });
+    }
 
     $(".navbar-nav .nav-link").on("click", function () {
       const nav = document.getElementById("mainNav");
       if (window.innerWidth < 992 && nav.classList.contains("show")) bootstrap.Collapse.getOrCreateInstance(nav).hide();
     });
 
-    renderOrders();
+    loadSidebar();
+    loadOrders();
   });
   </script>
 <script>

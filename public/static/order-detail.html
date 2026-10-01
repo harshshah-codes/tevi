@@ -240,18 +240,15 @@
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get("id");
 
-    const orders = JSON.parse(localStorage.getItem("hovOrders") || "[]");
-    const order = orders.find(o => o.orderId === orderId || o.orderId === "#" + orderId);
-
-    if (!order) {
-      $("#notFound").removeClass("d-none");
-    } else {
+    function renderOrder(order) {
       const orderDate = order.date ? new Date(order.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "—";
+      const status = order.status || "processing";
+      const statusText = status.charAt(0).toUpperCase() + status.slice(1);
       const itemsHtml = (order.items || []).map(item => `
         <div class="detail-item">
-          <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.name}">
+          <img src="${item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=85'}" alt="${item.product_name || ''}">
           <div class="detail-item-details">
-            <div class="detail-item-name">${item.name}</div>
+            <div class="detail-item-name">${item.product_name || ''}</div>
             <div class="detail-item-meta">Size: ${item.size || "M"} · Qty: ${item.qty || 1} · ${item.color || ""}</div>
           </div>
           <div class="detail-item-price">${formatPrice((item.price || 0) * (item.qty || 1))}</div>
@@ -260,6 +257,8 @@
 
       const paymentLabels = { card: "Credit / Debit Card", upi: "UPI", netbanking: "Net Banking", cod: "Cash on Delivery" };
 
+      const canCancel = order.canCancel !== undefined ? order.canCancel : status === "processing";
+
       const html = `
         <div class="detail-card">
           <div class="detail-header-row">
@@ -267,7 +266,7 @@
               <div class="order-id">#${order.orderId}</div>
               <div class="order-date">Placed on ${orderDate}</div>
             </div>
-            <span class="status-badge status-processing">Processing</span>
+            <span class="status-badge status-${status}">${statusText}</span>
           </div>
 
           <div class="detail-info-grid">
@@ -304,26 +303,71 @@
           <div class="detail-actions">
             <a href="track-order?id=${order.orderId}" class="btn-detail"><i class="bi bi-truck me-2"></i>Track Order</a>
             <a href="index#featured" class="btn-detail-outline"><i class="bi bi-bag me-2"></i>Buy Again</a>
-            <button class="btn-detail-danger" id="cancelOrderBtn"><i class="bi bi-x-circle me-2"></i>Cancel Order</button>
+            ${canCancel ? '<button class="btn-detail-danger" id="cancelOrderBtn"><i class="bi bi-x-circle me-2"></i>Cancel Order</button>' : ""}
           </div>
+          ${order.cancelReason ? '<p style="margin-top:14px;font-size:12px;color:var(--muted);">Cancellation reason: ' + order.cancelReason + (order.cancelledAt ? ' (on ' + new Date(order.cancelledAt).toLocaleDateString("en-IN") + ')' : '') + '</p>' : ""}
         </div>
       `;
       $("#orderDetailWrap").html(html);
 
       // Cancel order
       $("#cancelOrderBtn").click(function () {
-        if (confirm("Are you sure you want to cancel this order?")) {
-          $(".status-badge").removeClass("status-processing").addClass("status-cancelled").text("Cancelled");
-          $(this).remove();
-          // Update in localStorage
-          const idx = orders.findIndex(o => o.orderId === order.orderId);
-          if (idx > -1) {
-            orders[idx].status = "cancelled";
-            localStorage.setItem("hovOrders", JSON.stringify(orders));
-          }
-        }
+        if (!confirm("Are you sure you want to cancel this order?")) return;
+        const reason = prompt("Optional: tell us why you are cancelling (helps us improve).", "");
+        if (reason === null) return;
+        const $btn = $(this).prop("disabled", true);
+
+        fetch("/api/orders/" + encodeURIComponent(order.orderId) + "/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: reason })
+        })
+          .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+          .then(function (res) {
+            $btn.prop("disabled", false);
+            if (!res.ok || !res.body.success) {
+              alert((res.body && res.body.error) || "Could not cancel this order.");
+              return;
+            }
+            order.status = "cancelled";
+            order.cancelReason = res.body.reason || "";
+            renderOrder(order);
+          })
+          .catch(function () {
+            $btn.prop("disabled", false);
+            alert("Could not reach the server. Try again.");
+          });
       });
     }
+
+    function loadOrder() {
+      if (!orderId) {
+        $("#notFound").removeClass("d-none");
+        return;
+      }
+
+      $("#orderDetailWrap").html('<p style="color:var(--muted);font-size:13px;">Loading order…</p>');
+      fetch("/api/orders/" + encodeURIComponent(orderId.replace(/^#/, "")), { headers: { "Accept": "application/json" } })
+        .then(function (r) {
+          if (r.status === 401) { location.href = "login"; return null; }
+          if (r.status === 404) return { success: false };
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data || !data.success) {
+            $("#orderDetailWrap").empty();
+            $("#notFound").removeClass("d-none");
+            return;
+          }
+          $("#notFound").addClass("d-none");
+          renderOrder(data.order);
+        })
+        .catch(function () {
+          $("#orderDetailWrap").html('<p style="color:var(--danger);font-size:13px;">Could not load this order. Refresh to try again.</p>');
+        });
+    }
+
+    loadOrder();
 
     // Bag count
     const bag = JSON.parse(localStorage.getItem("hovBag") || "[]");

@@ -8,10 +8,13 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 use App\Application\Services\CatalogService;
 use App\Application\Services\HeroCarouselService;
 use App\Application\Services\OrderService;
+use App\Application\Services\PricingService;
 use App\Application\Services\AuthService;
+use App\Application\Services\AddressService;
 use App\Core\Database;
 use App\Core\MigrationRunner;
 use App\Infrastructure\Http\Controllers\AuthController;
+use App\Infrastructure\Http\Controllers\AddressController;
 use App\Infrastructure\Http\Controllers\CatalogController;
 use App\Infrastructure\Http\Controllers\HeroCarouselController;
 use App\Infrastructure\Http\Controllers\HomeController;
@@ -23,6 +26,8 @@ use App\Infrastructure\Persistence\MySqlOrderRepository;
 use App\Infrastructure\Persistence\MySqlProductRepository;
 use App\Infrastructure\Persistence\MySqlReviewRepository;
 use App\Infrastructure\Persistence\MySqlUserRepository;
+use App\Infrastructure\Persistence\MySqlAddressRepository;
+use App\Domain\Repositories\AddressRepositoryInterface;
 
 $config = require __DIR__ . '/Config/config.php';
 
@@ -46,11 +51,16 @@ $homeController = new HomeController($heroController, $catalogController);
 
 $orderRepository = new MySqlOrderRepository($pdo);
 $orderService = new OrderService($orderRepository);
-$orderController = new OrderController($orderService);
+$pricingService = new PricingService($productRepository);
+$orderController = new OrderController($orderService, $pricingService);
 
 $userRepository = new MySqlUserRepository($pdo);
 $authService = new AuthService($userRepository);
 $authController = new AuthController($authService);
+
+$addressRepository = new MySqlAddressRepository($pdo);
+$addressService = new AddressService($addressRepository);
+$addressController = new AddressController($addressService);
 
 return [
     'heroCarousel' => $heroController,
@@ -59,4 +69,5 @@ return [
     'home'         => $homeController,
     'order'        => $orderController,
     'auth'         => $authController,
+    'address'      => $addressController,
 ];

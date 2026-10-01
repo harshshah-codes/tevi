@@ -73,10 +73,17 @@ final class MySqlUserRepository implements UserRepositoryInterface
 
     public function update(int $id, array $data): bool
     {
+        // Only these columns may be written; keys are caller-supplied so they
+        // must never be interpolated into the SQL unchecked.
+        $allowed = ['first_name', 'last_name', 'phone', 'password_hash', 'is_active'];
+
         // Build dynamic SET clause
         $sets = [];
         $params = [];
         foreach ($data as $key => $value) {
+            if (!in_array($key, $allowed, true)) {
+                continue;
+            }
             $sets[] = "$key = :$key";
             $params[":$key"] = $value;
         }
