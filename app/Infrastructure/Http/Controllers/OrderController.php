@@ -24,6 +24,14 @@ final class OrderController
             exit;
         }
 
+        // Check if user is logged in
+        if (empty($_SESSION['user_id'])) {
+            ob_end_clean();
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'User not logged in']);
+            exit;
+        }
+
         $raw = file_get_contents('php://input');
         $data = json_decode($raw ?: '', true);
 
@@ -77,6 +85,7 @@ final class OrderController
         $order = new Order(
             0,
             (string) $data['orderId'],
+            (int) $_SESSION['user_id'], // <-- set user_id from session
             trim((string) $data['firstName']),
             trim((string) $data['lastName']),
             trim((string) $data['email']),

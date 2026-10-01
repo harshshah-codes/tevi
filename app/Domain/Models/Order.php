@@ -11,6 +11,7 @@ final class Order
     public function __construct(
         private readonly int $id,
         private readonly string $orderId,
+        private readonly int $userId, // <-- added
         private readonly string $firstName,
         private readonly string $lastName,
         private readonly string $email,
@@ -28,6 +29,11 @@ final class Order
         private readonly string $createdAt,
         private readonly array $items = [],
     ) {
+    }
+
+    public function userId(): int
+    {
+        return $this->userId;
     }
 
     public function id(): int

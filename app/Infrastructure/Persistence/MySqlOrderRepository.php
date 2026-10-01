@@ -20,13 +20,14 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
 
         try {
             $stmt = $this->pdo->prepare(
-                'INSERT INTO orders (order_id, first_name, last_name, email, phone, address, city, state, pincode,
+                'INSERT INTO orders (order_id, user_id, first_name, last_name, email, phone, address, city, state, pincode,
                                      payment_method, subtotal, shipping, tax, total, status)
-                 VALUES (:order_id, :first_name, :last_name, :email, :phone, :address, :city, :state, :pincode,
+                 VALUES (:order_id, :user_id, :first_name, :last_name, :email, :phone, :address, :city, :state, :pincode,
                          :payment_method, :subtotal, :shipping, :tax, :total, :status)'
             );
             $stmt->execute([
                 ':order_id'       => $order->orderId(),
+                ':user_id'        => $order->userId(),
                 ':first_name'     => $order->firstName(),
                 ':last_name'      => $order->lastName(),
                 ':email'          => $order->email(),
@@ -156,6 +157,7 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
         return new Order(
             (int) $row['id'],
             (string) $row['order_id'],
+            (int) $row['user_id'], // <-- added
             (string) $row['first_name'],
             (string) $row['last_name'],
             (string) $row['email'],
