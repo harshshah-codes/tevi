@@ -853,7 +853,7 @@
     // Autofill user info if logged in
     async function autofillUserInfo() {
       try {
-        const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        const resp = await fetch('api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
         if (resp.ok) {
           const data = await resp.json();
           if (data.success && data.user) {
@@ -1094,7 +1094,7 @@
 
     // ===== Prefill from the signed-in customer's details and saved address =====
     function prefillFromAccount() {
-      fetch("/api/me", { headers: { "Accept": "application/json" } })
+      fetch("api/me", { headers: { "Accept": "application/json" } })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           if (!data || !data.success) return;
@@ -1105,7 +1105,7 @@
           if (u.phone) $("#phone").val(u.phone);
         });
 
-      fetch("/api/addresses/default", { headers: { "Accept": "application/json" } })
+      fetch("api/addresses/default", { headers: { "Accept": "application/json" } })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           if (!data || !data.success || !data.address) return;
@@ -1128,7 +1128,7 @@
 // Update navbar based on login state
 async function updateNavbar() {
   try {
-    const resp = await fetch('/api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    const resp = await fetch('api/me', { method: 'GET', headers: { 'Content-Type': 'application/json' } });
     const data = resp.ok ? await resp.json().catch(() => null) : null;
     if (data && data.success && data.user) {
         const u = data.user;
@@ -1146,7 +1146,7 @@ async function updateNavbar() {
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
             <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+            <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;
         }
     } else {
