@@ -105,6 +105,14 @@ if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PAT
     exit;
 }
 
+// --- Inbound courier webhooks (no session: authenticated by shared secret) ---
+if ($uri === '/api/webhooks/shiprocket' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['webhook']->shiprocket();
+    exit;
+}
+
 // --- Payments (Razorpay) ---
 if ($uri === '/api/payments/config' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     ob_start();
