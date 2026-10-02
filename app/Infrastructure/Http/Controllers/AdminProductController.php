@@ -31,6 +31,7 @@ final class AdminProductController extends AdminController
                 . '<td>' . htmlspecialchars($product->name(), ENT_QUOTES) . '</td>'
                 . '<td>' . htmlspecialchars($product->slug(), ENT_QUOTES) . '</td>'
                 . '<td>₹' . number_format($product->price()) . '</td>'
+                . '<td>' . rtrim(rtrim(number_format($product->weight(), 3, '.', ''), '0'), '.') . ' kg</td>'
                 . '<td><span class="badge bg-secondary">' . htmlspecialchars($badge, ENT_QUOTES) . '</span></td>'
                 . '<td>' . htmlspecialchars(implode(', ', $categoryNames), ENT_QUOTES) . '</td>'
                 . '<td>' . ($product->isFeatured() ? 'Yes' : 'No') . '</td>'
@@ -138,6 +139,7 @@ final class AdminProductController extends AdminController
             'PRODUCT_SIZES'    => htmlspecialchars(implode(', ', $product->sizes()), ENT_QUOTES),
             'PRODUCT_COLORS'   => htmlspecialchars(implode(', ', $product->colors()), ENT_QUOTES),
             'PRODUCT_FEATURED' => $product->isFeatured(),
+            'PRODUCT_WEIGHT'  => rtrim(rtrim(number_format($product->weight(), 3, '.', ''), '0'), '.'),
             'BADGES'           => $badgeOptions,
             'CATEGORIES'       => $categoryOptions,
             'CSRF_TOKEN'       => $this->csToken(),
@@ -170,6 +172,7 @@ final class AdminProductController extends AdminController
         $sizes       = array_filter(array_map('trim', explode(',', $_POST['sizes'] ?? '')));
         $colors      = array_filter(array_map('trim', explode(',', $_POST['colors'] ?? '')));
         $isFeatured  = isset($_POST['is_featured']) ? 1 : 0;
+        $weight      = $this->weightFromPost();
         $categoryIds = array_map('intval', $_POST['categories'] ?? []);
 
         $badge = $badgeVal !== '' ? Badge::tryFrom($badgeVal) : null;
@@ -185,7 +188,29 @@ final class AdminProductController extends AdminController
             array_values($sizes),
             array_values($colors),
             (bool) $isFeatured,
+            [],
+            $weight,
         );
+    }
+
+    /**
+     * Weight in kilograms, as entered by the admin.
+     *
+     * Anything unparseable or non-positive falls back to the 0.5kg default:
+     * Shiprocket rejects zero-weight parcels, and a wrong-but-plausible number
+     * is safer than a rejected shipment.
+     */
+    private function weightFromPost(): float
+    {
+        $raw = str_replace(',', '.', trim((string) ($_POST['weight'] ?? '')));
+
+        if ($raw === '' || !is_numeric($raw)) {
+            return 0.5;
+        }
+
+        $weight = (float) $raw;
+
+        return ($weight > 0 && $weight <= 100) ? round($weight, 3) : 0.5;
     }
 
     private function output(string $content): void

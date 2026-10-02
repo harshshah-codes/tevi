@@ -35,7 +35,7 @@ final class PricingService
      *
      * @param array<int, array{product_id?: int|null, qty: int}> $items
      * @return array{
-     *     items: array<int, array{product_id: int|null, product_name: string, size: string, color: string, price: int, qty: int, image: string}>,
+     *     items: array<int, array{product_id: int|null, product_name: string, size: string, color: string, price: int, qty: int, image: string, weight: float}>,
      *     subtotal: int,
      *     shipping: int,
      *     tax: int,
@@ -76,6 +76,9 @@ final class PricingService
                 'price'        => $price,
                 'qty'          => $qty,
                 'image'        => (string) $product->image(),
+                // Snapshotted so the declared parcel weight survives later
+                // edits to the product.
+                'weight'       => (float) $product->weight(),
             ];
         }
 

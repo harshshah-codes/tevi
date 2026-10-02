@@ -14,6 +14,7 @@
                         <th>Name</th>
                         <th>Slug</th>
                         <th>Price</th>
+                        <th>Weight</th>
                         <th>Badge</th>
                         <th>Categories</th>
                         <th>Featured</th>

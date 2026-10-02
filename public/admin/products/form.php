@@ -37,6 +37,14 @@
             </div>
 
             <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Weight (kg)</label>
+                <div class="col-sm-10">
+                    <input type="number" name="weight" class="form-control" value="<!--IF:PRODUCT--><!--PRODUCT_WEIGHT--><!--ENDIF:PRODUCT-->" placeholder="0.5" min="0.01" max="100" step="0.001" required>
+                    <div class="form-text">Packed shipping weight per garment. Used to declare the parcel to Shiprocket, which bills on it — so an under-declared weight means a COD surcharge at delivery. Leave at 0.5 if you are not sure yet.</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">Image URL</label>
                 <div class="col-sm-10">
                     <input type="url" name="image" class="form-control" value="<!--IF:PRODUCT--><!--PRODUCT_IMAGE--><!--ENDIF:PRODUCT-->" placeholder="https://example.com/image.jpg" required>

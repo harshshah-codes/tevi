@@ -26,7 +26,17 @@ final class Product
         private readonly array $colors,
         private readonly bool $isFeatured,
         private readonly array $categories = [],
+        private readonly float $weight = 0.5,
     ) {
+    }
+
+    /**
+     * Shipping weight in kilograms. Shiprocket bills on this, so it should be
+     * the real packed weight rather than the default guess.
+     */
+    public function weight(): float
+    {
+        return $this->weight;
     }
 
     public function id(): int

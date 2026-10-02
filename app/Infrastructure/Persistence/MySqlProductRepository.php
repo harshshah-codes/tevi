@@ -103,14 +103,15 @@ final class MySqlProductRepository implements ProductRepositoryInterface
         $this->pdo->beginTransaction();
         try {
             $stmt = $this->pdo->prepare(
-                'INSERT INTO products (name, slug, description, price, image, badge, sizes, colors, is_featured)
-                 VALUES (:name, :slug, :description, :price, :image, :badge, :sizes, :colors, :is_featured)'
+                'INSERT INTO products (name, slug, description, price, weight, image, badge, sizes, colors, is_featured)
+                 VALUES (:name, :slug, :description, :price, :weight, :image, :badge, :sizes, :colors, :is_featured)'
             );
             $stmt->execute([
                 ':name'        => $product->name(),
                 ':slug'        => $product->slug(),
                 ':description' => $product->description(),
                 ':price'       => $product->price(),
+                ':weight'      => $product->weight(),
                 ':image'       => $product->image(),
                 ':badge'       => $product->badge()?->value ?? '',
                 ':sizes'       => json_encode($product->sizes()),
@@ -136,7 +137,8 @@ final class MySqlProductRepository implements ProductRepositoryInterface
     {
         $stmt = $this->pdo->prepare(
             'UPDATE products SET name = :name, slug = :slug, description = :description, price = :price,
-             image = :image, badge = :badge, sizes = :sizes, colors = :colors, is_featured = :is_featured
+             weight = :weight, image = :image, badge = :badge, sizes = :sizes, colors = :colors,
+             is_featured = :is_featured
              WHERE id = :id'
         );
         $result = $stmt->execute([
@@ -145,6 +147,7 @@ final class MySqlProductRepository implements ProductRepositoryInterface
             ':slug'        => $product->slug(),
             ':description' => $product->description(),
             ':price'       => $product->price(),
+            ':weight'      => $product->weight(),
             ':image'       => $product->image(),
             ':badge'       => $product->badge()?->value ?? '',
             ':sizes'       => json_encode($product->sizes()),
@@ -226,6 +229,7 @@ final class MySqlProductRepository implements ProductRepositoryInterface
                 $this->decodeList($row['colors']),
                 (bool) $row['is_featured'],
                 $categoriesByProduct[(int) $row['id']] ?? [],
+                isset($row['weight']) ? (float) $row['weight'] : 0.5,
             );
         }
 
