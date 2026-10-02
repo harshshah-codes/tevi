@@ -47,8 +47,8 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
             $orderId = (int) $this->pdo->lastInsertId();
 
             $itemStmt = $this->pdo->prepare(
-                'INSERT INTO order_items (order_id, product_id, product_name, size, color, price, qty, image)
-                 VALUES (:order_id, :product_id, :product_name, :size, :color, :price, :qty, :image)'
+                'INSERT INTO order_items (order_id, product_id, product_name, size, color, price, qty, image, weight)
+                 VALUES (:order_id, :product_id, :product_name, :size, :color, :price, :qty, :image, :weight)'
             );
 
             foreach ($order->items() as $item) {
@@ -61,6 +61,7 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
                     ':price'        => $item['price'],
                     ':qty'          => $item['qty'],
                     ':image'        => $item['image'],
+                    ':weight'       => $item['weight'] ?? 0.5,
                 ]);
             }
 
@@ -330,13 +331,118 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
         return $stmt->rowCount() > 0;
     }
 
+    public function findByShiprocketShipmentId(string $shipmentId): ?Order
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM orders WHERE shiprocket_shipment_id = :shipment_id LIMIT 1');
+        $stmt->execute([':shipment_id' => $shipmentId]);
+
+        $row = $stmt->fetch();
+
+        return $row ? $this->mapOrder($row) : null;
+    }
+
+    public function findByWaybill(string $waybill): ?Order
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM orders WHERE shiprocket_waybill = :waybill LIMIT 1');
+        $stmt->execute([':waybill' => $waybill]);
+
+        $row = $stmt->fetch();
+
+        return $row ? $this->mapOrder($row) : null;
+    }
+
+    /**
+     * Store the latest courier status reported by a Shiprocket webhook.
+     *
+     * This is an observation, not a command: it must succeed even when the
+     * order is already delivered or cancelled, which is why it deliberately
+     * does not reuse the guarded status transition.
+     */
+    public function recordCourierStatus(int $orderId, string $status, bool $delivered = false, ?string $awb = null): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders
+                SET shiprocket_last_status = :status,
+                    shiprocket_last_update = CURRENT_TIMESTAMP,
+                    delivered_at = CASE WHEN :delivered = 1 THEN COALESCE(delivered_at, CURRENT_TIMESTAMP) ELSE delivered_at END,
+                    shiprocket_waybill = COALESCE(:awb, shiprocket_waybill)
+              WHERE id = :id'
+        );
+        $stmt->execute([
+            ':status'    => $status,
+            ':delivered' => $delivered ? 1 : 0,
+            ':awb'       => $awb,
+            ':id'        => $orderId,
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function attachShipment(int $orderId, string $shipmentId, string $waybill, string $labelUrl, ?string $pickupToken = null): bool
+    {
+        // The `shiprocket_shipment_id IS NULL` guard is what makes this
+        // idempotent under a double click or a retried request.
+        $stmt = $this->pdo->prepare(
+            'UPDATE orders
+                SET shiprocket_shipment_id = :shipment_id,
+                    shiprocket_waybill = :waybill,
+                    shiprocket_label_url = :label_url,
+                    shiprocket_pickup_token = :pickup_token,
+                    shiprocket_requested_at = CURRENT_TIMESTAMP
+              WHERE id = :id
+                AND shiprocket_shipment_id IS NULL'
+        );
+        $stmt->execute([
+            ':shipment_id'  => $shipmentId,
+            ':waybill'      => $waybill,
+            ':label_url'    => $labelUrl,
+            ':pickup_token' => $pickupToken,
+            ':id'           => $orderId,
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function recordShipmentAttempt(int $orderId, ?string $shipmentId, ?string $waybill, ?string $labelUrl, ?string $pickupToken, string $status, ?string $error = null, bool $simulated = false): void
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO order_shipments (order_id, shipment_id, waybill, label_url, pickup_token, shipment_status, error_message, simulated)
+             VALUES (:order_id, :shipment_id, :waybill, :label_url, :pickup_token, :shipment_status, :error_message, :simulated)'
+        );
+        $stmt->execute([
+            ':order_id'        => $orderId,
+            ':shipment_id'     => $shipmentId,
+            ':waybill'         => $waybill,
+            ':label_url'       => $labelUrl,
+            ':pickup_token'    => $pickupToken,
+            ':shipment_status' => $status,
+            ':error_message'   => $error,
+            ':simulated'       => $simulated ? 1 : 0,
+        ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function shipmentAttempts(int $orderId, int $limit = 20): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM order_shipments WHERE order_id = :order_id ORDER BY id DESC LIMIT :lim'
+        );
+        $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
     /**
      * @param array<string, mixed> $row
      */
     private function mapOrder(array $row): Order
     {
         $stmt = $this->pdo->prepare(
-            'SELECT product_id, product_name, size, color, price, qty, image
+            'SELECT product_id, product_name, size, color, price, qty, image, weight
                FROM order_items WHERE order_id = :order_id ORDER BY id ASC'
         );
         $stmt->bindValue(':order_id', (int) $row['id'], PDO::PARAM_INT);
@@ -352,6 +458,7 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
                 'price'        => (int) $item['price'],
                 'qty'          => (int) $item['qty'],
                 'image'        => (string) $item['image'],
+                'weight'       => isset($item['weight']) ? (float) $item['weight'] : 0.5,
             ];
         }
 
@@ -378,6 +485,14 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
             isset($row['cancelled_at']) && $row['cancelled_at'] !== null ? (string) $row['cancelled_at'] : null,
             isset($row['cancel_reason']) && $row['cancel_reason'] !== null ? (string) $row['cancel_reason'] : null,
             isset($row['payment_status']) && $row['payment_status'] !== null ? (string) $row['payment_status'] : 'pending',
+            isset($row['shiprocket_waybill']) && $row['shiprocket_waybill'] !== null ? (string) $row['shiprocket_waybill'] : null,
+            isset($row['shiprocket_label_url']) && $row['shiprocket_label_url'] !== null ? (string) $row['shiprocket_label_url'] : null,
+            isset($row['shiprocket_shipment_id']) && $row['shiprocket_shipment_id'] !== null ? (string) $row['shiprocket_shipment_id'] : null,
+            isset($row['shiprocket_pickup_token']) && $row['shiprocket_pickup_token'] !== null ? (string) $row['shiprocket_pickup_token'] : null,
+            isset($row['shiprocket_requested_at']) && $row['shiprocket_requested_at'] !== null ? (string) $row['shiprocket_requested_at'] : null,
+            isset($row['shiprocket_last_status']) && $row['shiprocket_last_status'] !== null ? (string) $row['shiprocket_last_status'] : null,
+            isset($row['shiprocket_last_update']) && $row['shiprocket_last_update'] !== null ? (string) $row['shiprocket_last_update'] : null,
+            isset($row['delivered_at']) && $row['delivered_at'] !== null ? (string) $row['delivered_at'] : null,
         );
     }
 }

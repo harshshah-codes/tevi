@@ -66,7 +66,22 @@
             <div class="card-header"><strong>Payment</strong></div>
             <div class="card-body">
                 <p class="mb-1 small text-muted">Method: <span class="text-capitalize"><!--PAYMENT--></span></p>
+                <p class="mb-0 small text-muted">Status: <span class="text-capitalize"><!--PAYMENT_STATUS--></span></p>
                 <p class="mb-0 small text-muted">Placed: <!--DATE--></p>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><strong>Delivery</strong></div>
+            <div class="card-body">
+                <!--IF:SHIPMENT_BLOCK--><!--SHIPMENT_BLOCK--><!--ENDIF:SHIPMENT_BLOCK-->
+                <!--IF:REQUEST_DELIVERY_FORM--><!--REQUEST_DELIVERY_FORM--><!--ENDIF:REQUEST_DELIVERY_FORM-->
+                <!--IF:SHIPMENT_HINT--><p class="text-muted small mb-0"><!--SHIPMENT_HINT--></p><!--ENDIF:SHIPMENT_HINT-->
+                <!--IF:SHIPMENT_ATTEMPTS-->
+                <hr>
+                <h6 style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);">Shipment attempts</h6>
+                <!--SHIPMENT_ATTEMPTS-->
+                <!--ENDIF:SHIPMENT_ATTEMPTS-->
             </div>
         </div>
 

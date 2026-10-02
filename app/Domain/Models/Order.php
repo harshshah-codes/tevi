@@ -6,7 +6,7 @@ namespace App\Domain\Models;
 final class Order
 {
     /**
-     * @param array<int, array{product_id:?int, product_name:string, size:string, color:string, price:int, qty:int, image:string}> $items
+     * @param array<int, array{product_id:?int, product_name:string, size:string, color:string, price:int, qty:int, image:string, weight?:float}> $items
      */
     public function __construct(
         private readonly int $id,
@@ -31,12 +31,65 @@ final class Order
         private readonly ?string $cancelledAt = null,
         private readonly ?string $cancelReason = null,
         private readonly string $paymentStatus = 'pending',
+        private readonly ?string $shiprocketWaybill = null,
+        private readonly ?string $shiprocketLabelUrl = null,
+        private readonly ?string $shiprocketShipmentId = null,
+        private readonly ?string $shiprocketPickupToken = null,
+        private readonly ?string $shiprocketRequestedAt = null,
+        private readonly ?string $shiprocketLastStatus = null,
+        private readonly ?string $shiprocketLastUpdate = null,
+        private readonly ?string $deliveredAt = null,
     ) {
+    }
+
+    public function shiprocketLastStatus(): ?string
+    {
+        return $this->shiprocketLastStatus;
+    }
+
+    public function shiprocketLastUpdate(): ?string
+    {
+        return $this->shiprocketLastUpdate;
+    }
+
+    public function deliveredAt(): ?string
+    {
+        return $this->deliveredAt;
     }
 
     public function paymentStatus(): string
     {
         return $this->paymentStatus;
+    }
+
+    public function shiprocketWaybill(): ?string
+    {
+        return $this->shiprocketWaybill;
+    }
+
+    public function shiprocketLabelUrl(): ?string
+    {
+        return $this->shiprocketLabelUrl;
+    }
+
+    public function shiprocketShipmentId(): ?string
+    {
+        return $this->shiprocketShipmentId;
+    }
+
+    public function shiprocketPickupToken(): ?string
+    {
+        return $this->shiprocketPickupToken;
+    }
+
+    public function shiprocketRequestedAt(): ?string
+    {
+        return $this->shiprocketRequestedAt;
+    }
+
+    public function hasShipment(): bool
+    {
+        return $this->shiprocketShipmentId !== null && $this->shiprocketShipmentId !== '';
     }
 
     public function cancelledAt(): ?string

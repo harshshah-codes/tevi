@@ -11,7 +11,10 @@ use App\Application\Services\OrderService;
 use App\Application\Services\PricingService;
 use App\Application\Services\PaymentService;
 use App\Infrastructure\Payment\RazorpayClient;
+use App\Infrastructure\Shipping\ShiprocketClient;
+use App\Application\Services\ShipmentService;
 use App\Infrastructure\Http\Controllers\PaymentController;
+use App\Infrastructure\Http\Controllers\WebhookController;
 use App\Application\Services\AuthService;
 use App\Application\Services\AddressService;
 use App\Core\Database;
@@ -62,6 +65,18 @@ $razorpayClient = new RazorpayClient(
 $orderService = new OrderService($orderRepository, $razorpayClient);
 $orderController = new OrderController($orderService, $pricingService);
 $paymentService = new PaymentService($razorpayClient);
+
+$shiprocketClient = new ShiprocketClient(
+    $config['shiprocket']['email'],
+    $config['shiprocket']['api_token'],
+    (bool) $config['shiprocket']['simulate']
+);
+$shipmentService = new ShipmentService($shiprocketClient);
+$webhookController = new WebhookController(
+    $orderService,
+    $shipmentService,
+    (string) $config['shiprocket']['webhook_secret']
+);
 $paymentController = new PaymentController($paymentService, $orderService);
 
 $userRepository = new MySqlUserRepository($pdo);
@@ -81,4 +96,6 @@ return [
     'auth'         => $authController,
     'address'      => $addressController,
     'payment'      => $paymentController,
+    'shipment'     => $shipmentService,
+    'webhook'      => $webhookController,
 ];

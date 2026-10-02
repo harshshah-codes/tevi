@@ -60,6 +60,30 @@ interface OrderRepositoryInterface
     public function findByRazorpayOrderId(string $razorpayOrderId): ?Order;
 
     /**
+     * Store the shipment Shiprocket created for this order.
+     *
+     * Returns false when a shipment already exists, so a double click cannot
+     * create two real shipments on the courier's side.
+     */
+    public function attachShipment(int $orderId, string $shipmentId, string $waybill, string $labelUrl, ?string $pickupToken = null): bool;
+
+    /**
+     * Log every delivery request, successful or not.
+     */
+    public function recordShipmentAttempt(int $orderId, ?string $shipmentId, ?string $waybill, ?string $labelUrl, ?string $pickupToken, string $status, ?string $error = null, bool $simulated = false): void;
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function shipmentAttempts(int $orderId, int $limit = 20): array;
+
+    public function recordCourierStatus(int $orderId, string $status, bool $delivered = false, ?string $awb = null): bool;
+
+    public function findByShiprocketShipmentId(string $shipmentId): ?Order;
+
+    public function findByWaybill(string $waybill): ?Order;
+
+    /**
      * Cancel an order, but only if it is still in $expectedStatus.
      *
      * The status check lives in the WHERE clause so two concurrent cancel

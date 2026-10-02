@@ -37,4 +37,17 @@ return [
         'simulate'   => filter_var($_ENV['RAZORPAY_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
         'name'       => $_ENV['RAZORPAY_NAME'] ?? 'House of Viraasat',
     ],
+
+    // Shiprocket courier API. Same story as Razorpay: the placeholder
+    // credentials below keep SHIPROCKET_SIMULATE on, so "Request Delivery"
+    // issues a fake waybill locally and never calls Shiprocket.
+    'shiprocket' => [
+        'email'     => $_ENV['SHIPROCKET_EMAIL'] ?? 'shiprocket@example.test',
+        'api_token' => $_ENV['SHIPROCKET_API_TOKEN'] ?? 'DUMMY_SHIPROCKET_TOKEN',
+        'simulate'  => filter_var($_ENV['SHIPROCKET_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
+        // Shiprocket does not sign its webhooks, so the callback URL carries
+        // this secret (?token=...) or the same value is sent as
+        // x-shiprocket-webhook-secret. Anything else gets a 401.
+        'webhook_secret' => $_ENV['SHIPROCKET_WEBHOOK_SECRET'] ?? 'DUMMY_WEBHOOK_SECRET',
+    ],
 ];

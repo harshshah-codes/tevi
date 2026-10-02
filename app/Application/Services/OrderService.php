@@ -150,6 +150,61 @@ final class OrderService
         return $this->repository->findByRazorpayOrderId($razorpayOrderId);
     }
 
+    public function getOrderByShiprocketShipmentId(string $shipmentId): ?Order
+    {
+        return $this->repository->findByShiprocketShipmentId($shipmentId);
+    }
+
+    public function getOrderByWaybill(string $waybill): ?Order
+    {
+        return $this->repository->findByWaybill($waybill);
+    }
+
+    public function attachShipment(int $orderId, string $shipmentId, string $waybill, string $labelUrl, ?string $pickupToken = null): bool
+    {
+        return $this->repository->attachShipment($orderId, $shipmentId, $waybill, $labelUrl, $pickupToken);
+    }
+
+    public function recordShipmentAttempt(int $orderId, ?string $shipmentId, ?string $waybill, ?string $labelUrl, ?string $pickupToken, string $status, ?string $error = null, bool $simulated = false): void
+    {
+        $this->repository->recordShipmentAttempt($orderId, $shipmentId, $waybill, $labelUrl, $pickupToken, $status, $error, $simulated);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function shipmentAttempts(int $orderId, int $limit = 20): array
+    {
+        return $this->repository->shipmentAttempts($orderId, $limit);
+    }
+
+    public function recordCourierStatus(int $orderId, string $status, bool $delivered = false, ?string $awb = null): bool
+    {
+        return $this->repository->recordCourierStatus($orderId, $status, $delivered, $awb);
+    }
+
+    /**
+     * Find the order a courier event refers to.
+     *
+     * Shiprocket identifies shipments by shipment_id and AWB, and a webhook
+     * may carry either, so both are tried.
+     */
+    public function findOrderForShipment(?string $shipmentId, ?string $waybill): ?Order
+    {
+        if ($shipmentId !== null && $shipmentId !== '') {
+            $order = $this->getOrderByShiprocketShipmentId($shipmentId);
+            if ($order !== null) {
+                return $order;
+            }
+        }
+
+        if ($waybill !== null && $waybill !== '') {
+            return $this->getOrderByWaybill($waybill);
+        }
+
+        return null;
+    }
+
     /**
      * Shape an order for the JSON API.
      *
@@ -176,6 +231,8 @@ final class OrderService
             'status'    => $order->status(),
             'paymentMethod' => $order->paymentMethod(),
             'paymentStatus' => $order->paymentStatus(),
+            'waybill'       => $order->shiprocketWaybill(),
+            'trackingUrl'   => $order->shiprocketLabelUrl(),
             'cancelledAt' => $order->cancelledAt(),
             'cancelReason' => $order->cancelReason(),
             'canCancel' => $this->isCancellable($order),

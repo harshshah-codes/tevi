@@ -55,7 +55,18 @@ $reviewController = new \App\Infrastructure\Http\Controllers\AdminReviewControll
 
 $orderRepository = new \App\Infrastructure\Persistence\MySqlOrderRepository($pdo);
 $orderService = new \App\Application\Services\OrderService($orderRepository);
-$ordersController = new \App\Infrastructure\Http\Controllers\AdminOrdersController($orderService);
+
+$shiprocketClient = new \App\Infrastructure\Shipping\ShiprocketClient(
+    $config['shiprocket']['email'],
+    $config['shiprocket']['api_token'],
+    (bool) $config['shiprocket']['simulate']
+);
+$shipmentService = new \App\Application\Services\ShipmentService($shiprocketClient);
+
+$ordersController = new \App\Infrastructure\Http\Controllers\AdminOrdersController(
+    $orderService,
+    $shipmentService
+);
 
 $action = 'dashboard';
 
@@ -174,6 +185,9 @@ switch ($action) {
                 break;
             case 'update-status':
                 $ordersController->updateStatus();
+                break;
+            case 'request-delivery':
+                $ordersController->requestDelivery();
                 break;
             default:
                 $ordersController->index();
