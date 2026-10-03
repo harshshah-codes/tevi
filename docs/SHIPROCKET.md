@@ -13,8 +13,8 @@ from Shiprocket to switch it on, and where each credential comes from.
 | 2 | **Email address** | The one on your Shiprocket account | HTTP Basic auth username |
 | 3 | **API token** | Shiprocket dashboard → **Settings → API → API Key → Generate Token** (or **Settings → Developer/API**) | HTTP Basic auth password |
 | 4 | **Pickup PIN code** | Set under **Settings → Pickup → Pickup Address**, verified with a location pin | Origin address on every shipment |
-| 5 | **Webhook URL** | You supply it: `https://<your-domain>/api/webhooks/shiprocket?token=<secret>` | Courier status updates |
-| 6 | **Webhook secret** | You generate it (`openssl rand -hex 32`). Shiprocket does not sign webhooks | Authenticates the callback |
+| 5 | **Webhook URL** | You supply it: `https://<your-domain>/api/webhooks/tracking` | Courier status updates |
+| 6 | **Webhook API key** | You generate it (`openssl rand -hex 32`) and send it as the `x-api-key` header | Authenticates the callback |
 
 > Item 3 is the one people get stuck on: the API token is **not** your login
 > password. It's generated on the API settings page and can be regenerated
@@ -27,8 +27,17 @@ Shiprocket sends the status of your *shipments*. Configure it under
 carrier. Paste:
 
 ```
-https://your-domain.example/api/webhooks/shiprocket?token=YOUR_SECRET
+https://your-domain.example/api/webhooks/tracking
 ```
+
+Then set an `x-api-key` header on that webhook carrying your secret. The URL
+itself holds no credential, so nothing sensitive lands in access logs, proxy
+logs or `Referer` headers.
+
+> If your webhook form genuinely cannot set custom headers, set
+> `SHIPROCKET_WEBHOOK_ALLOW_QUERY_TOKEN=true` and use `?token=<secret>`
+> instead. It is off by default because a secret in a query string leaks into
+> exactly those logs.
 
 ---
 
@@ -72,8 +81,10 @@ so a double click cannot create two real shipments with the courier.
 
 ## Inbound tracking (webhook)
 
-`POST /api/webhooks/shiprocket` — no session, authenticated by the shared
-secret in `?token=` or the `x-shiprocket-webhook-secret` header.
+`POST /api/webhooks/tracking` — no session, authenticated by the shared
+secret in the `x-api-key` header (the `x-shiprocket-webhook-secret` alias is
+also accepted). A `?token=` query parameter is refused unless
+`SHIPROCKET_WEBHOOK_ALLOW_QUERY_TOKEN=true`.
 
 Shiprocket courier statuses are mapped onto our order lifecycle:
 
@@ -154,7 +165,7 @@ Shiprocket rejects formatted numbers.
 - [ ] `SHIPROCKET_SIMULATE=false`
 - [ ] Real `SHIPROCKET_EMAIL` + `SHIPROCKET_API_TOKEN`
 - [ ] Pickup PIN code verified in Shiprocket settings
-- [ ] Webhook URL configured in Shiprocket with the matching secret
+- [ ] Webhook URL configured in Shiprocket, with an `x-api-key` header matching `SHIPROCKET_WEBHOOK_SECRET`
 - [ ] Weights entered for real products under **Products → Edit**, and one
       parcel checked against the courier's expected figure
 - [ ] `ADMIN_PASSWORD` set in `.env` (the hardcoded `admin`/`password` fallback is still live otherwise)

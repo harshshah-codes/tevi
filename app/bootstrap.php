@@ -75,7 +75,8 @@ $shipmentService = new ShipmentService($shiprocketClient);
 $webhookController = new WebhookController(
     $orderService,
     $shipmentService,
-    (string) $config['shiprocket']['webhook_secret']
+    (string) $config['shiprocket']['webhook_secret'],
+    (bool) $config['shiprocket']['webhook_allow_query_token']
 );
 $paymentController = new PaymentController($paymentService, $orderService);
 

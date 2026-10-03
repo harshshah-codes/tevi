@@ -106,10 +106,12 @@ if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PAT
 }
 
 // --- Inbound courier webhooks (no session: authenticated by shared secret) ---
-if ($uri === '/api/webhooks/shiprocket' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+// Deliberately courier-agnostic in the path: the URL is visible in Shiprocket's
+// settings and in access logs, so it says what it does, not who calls it.
+if ($uri === '/api/webhooks/tracking' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ob_start();
     $app = require __DIR__ . '/bootstrap.php';
-    $app['webhook']->shiprocket();
+    $app['webhook']->tracking();
     exit;
 }
 

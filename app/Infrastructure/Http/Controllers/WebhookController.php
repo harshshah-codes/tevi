@@ -4,15 +4,18 @@ declare(strict_types=1);
 namespace App\Infrastructure\Http\Controllers;
 
 use App\Application\Services\OrderService;
-use App\Application\Services\PaymentService;
 use App\Application\Services\ShipmentService;
 
 /**
  * Inbound courier events.
  *
- * Shiprocket does not sign its webhooks, so authentication rests on a shared
- * secret carried in the callback URL or a header. Shiprocket retries anything
- * that is not 2xx, and it repeats events, so every handler here is idempotent.
+ * Shiprocket does not sign its webhooks, so a shared secret is the only thing
+ * authenticating this endpoint. It is sent as the `x-api-key` header; a
+ * `?token=` query parameter is refused unless explicitly enabled, because
+ * secrets in URLs leak into access logs, proxy logs and Referer headers.
+ *
+ * Shiprocket retries anything that is not 2xx and repeats events, so every
+ * handler here is idempotent.
  */
 final class WebhookController
 {
@@ -20,13 +23,17 @@ final class WebhookController
         private readonly OrderService $orders,
         private readonly ShipmentService $shipments,
         private readonly string $webhookSecret,
+        private readonly bool $allowQueryToken = false,
     ) {
     }
 
     /**
-     * POST /api/webhooks/shiprocket
+     * POST /api/webhooks/tracking
+     *
+     * Named for the job, not the courier: the URL is visible to the courier and
+     * in our access logs, so it should not name a vendor we might change.
      */
-    public function shiprocket(): void
+    public function tracking(): void
     {
         $this->header();
 
@@ -34,8 +41,13 @@ final class WebhookController
             $this->respond(['success' => false, 'error' => 'Method not allowed'], 405);
         }
 
-        if (!$this->authorised()) {
-            $this->respond(['success' => false, 'error' => 'Invalid webhook token'], 401);
+        $authMethod = $this->authorise();
+        if ($authMethod === null) {
+            $this->respond([
+                'success' => false,
+                'error'   => 'Invalid webhook credentials',
+                'hint'    => 'Send the secret as an x-api-key header',
+            ], 401);
         }
 
         $event = json_decode(file_get_contents('php://input') ?: '', true);
@@ -157,23 +169,32 @@ final class WebhookController
         return '';
     }
 
-    private function authorised(): bool
+    /**
+     * Accept the standard x-api-key header, plus the Shiprocket-specific
+     * alias for anyone who set that up first.
+     */
+    private function authorise(): ?string
     {
         if ($this->webhookSecret === '') {
             // No secret configured: refuse rather than accept anything.
-            return false;
+            return null;
         }
 
-        $header = (string) ($_SERVER['HTTP_X_SHIPROCKET_WEBHOOK_SECRET'] ?? '');
-        $query = (string) ($_GET['token'] ?? $_POST['token'] ?? '');
-
-        foreach ([$header, $query] as $candidate) {
+        foreach (['HTTP_X_API_KEY', 'HTTP_X_SHIPROCKET_WEBHOOK_SECRET'] as $key) {
+            $candidate = (string) ($_SERVER[$key] ?? '');
             if ($candidate !== '' && hash_equals($this->webhookSecret, $candidate)) {
-                return true;
+                return 'header';
             }
         }
 
-        return false;
+        if ($this->allowQueryToken) {
+            $query = (string) ($_GET['token'] ?? $_POST['token'] ?? '');
+            if ($query !== '' && hash_equals($this->webhookSecret, $query)) {
+                return 'query';
+            }
+        }
+
+        return null;
     }
 
     private function header(): void

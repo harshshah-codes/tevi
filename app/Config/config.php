@@ -45,9 +45,11 @@ return [
         'email'     => $_ENV['SHIPROCKET_EMAIL'] ?? 'shiprocket@example.test',
         'api_token' => $_ENV['SHIPROCKET_API_TOKEN'] ?? 'DUMMY_SHIPROCKET_TOKEN',
         'simulate'  => filter_var($_ENV['SHIPROCKET_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
-        // Shiprocket does not sign its webhooks, so the callback URL carries
-        // this secret (?token=...) or the same value is sent as
-        // x-shiprocket-webhook-secret. Anything else gets a 401.
+        // Shiprocket does not sign its webhooks, so this secret is the only thing
+        // authenticating the callback. Send it as an x-api-key header rather
+        // than ?token=, which would end up in access logs and Referer headers.
+        // Query tokens stay off unless you knowingly enable them below.
         'webhook_secret' => $_ENV['SHIPROCKET_WEBHOOK_SECRET'] ?? 'DUMMY_WEBHOOK_SECRET',
+        'webhook_allow_query_token' => filter_var($_ENV['SHIPROCKET_WEBHOOK_ALLOW_QUERY_TOKEN'] ?? 'false', FILTER_VALIDATE_BOOL),
     ],
 ];
