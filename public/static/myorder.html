@@ -378,7 +378,6 @@ async function updateNavbar() {
             <li><h6 class="dropdown-header">Account</h6></li>
             <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
-            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;
