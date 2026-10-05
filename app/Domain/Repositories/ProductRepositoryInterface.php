@@ -34,6 +34,13 @@ interface ProductRepositoryInterface
      */
     public function findAll(): array;
 
+    /**
+     * Search the catalog by name, description or slug.
+     *
+     * @return Product[]
+     */
+    public function search(string $term, int $limit = 60): array;
+
     public function create(Product $product): int;
 
     public function update(Product $product): bool;

@@ -176,6 +176,14 @@ if ($uri === '/api/payments/simulate' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     exit;
 }
 
+// --- Catalog ---
+if ($uri === '/api/products' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['catalog']->search();
+    exit;
+}
+
 // --- Addresses ---
 if ($uri === '/api/addresses') {
     ob_start();

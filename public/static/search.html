@@ -131,7 +131,7 @@
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
         <div class="header-actions order-3 d-flex align-items-center gap-1">
-          <span class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></span>
+          <a href="search" class="icon-btn search-static" aria-label="Search"><i class="bi bi-search"></i></a>
           <div class="dropdown profile-dropdown">
             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Profile"><i class="bi bi-person"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -186,7 +186,7 @@
         <div class="no-results d-none" id="noResults">
           <i class="bi bi-search"></i>
           <h3>No results found</h3>
-          <p>We couldn't find anything matching your search. Try different keywords.</p>
+          <p id="noResultsMessage">We couldn't find anything matching your search. Try different keywords.</p>
           <a href="index#featured" class="btn-view" style="display:inline-block;padding:12px 28px;">Browse Collections</a>
         </div>
       </div>
@@ -237,23 +237,12 @@
   $(function () {
     function formatPrice(price) { return "₹" + Number(price).toLocaleString("en-IN"); }
 
-    const allProducts = [
-      { id: 1, name: "Ivory Handwork Kurta", category: "Kurta", price: 2899, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85", badge: "Bestseller" },
-      { id: 2, name: "Midnight Velvet Sherwani", category: "Sherwani", price: 8999, image: "https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85", badge: "Signature" },
-      { id: 3, name: "Sage Embroidered Kurta", category: "Kurta", price: 3499, image: "https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85", badge: "New" },
-      { id: 4, name: "Regal Bandhgala Set", category: "Sherwani", price: 7499, image: "https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85", badge: "Limited" },
-      { id: 5, name: "Maroon Silk Kurta", category: "Kurta", price: 3299, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=85", badge: "Just In" },
-      { id: 6, name: "Sandstone Textured Kurta", category: "Kurta", price: 2999, image: "https://images.unsplash.com/photo-1622445275576-721325763afe?auto=format&fit=crop&w=900&q=85", badge: "Just In" },
-      { id: 7, name: "Black Royal Sherwani", category: "Sherwani", price: 9499, image: "https://images.unsplash.com/photo-1610189020179-5f3cdb8b6f72?auto=format&fit=crop&w=900&q=85", badge: "Signature" },
-      { id: 8, name: "Olive Festive Sherwani", category: "Sherwani", price: 8299, image: "https://images.unsplash.com/photo-1597983073493-88cd35cf93c7?auto=format&fit=crop&w=900&q=85", badge: "New" },
-      { id: 9, name: "Sandstone Nehru Jacket", category: "Nehru Jacket", price: 7490, image: "https://images.unsplash.com/photo-1627225924765-552d49cf47ad?auto=format&fit=crop&w=900&q=85", badge: "Popular" },
-      { id: 10, name: "Maharaja Green Sherwani", category: "Sherwani", price: 11000, image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&w=900&q=85", badge: "Royal" },
-      { id: 11, name: "Antique Gold Jacket", category: "Nehru Jacket", price: 8990, image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=900&q=85", badge: "Limited" },
-      { id: 12, name: "Regal Ivory Kurta", category: "Kurta", price: 5490, image: "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=900&q=85", badge: "Elegant" }
-    ];
+    // Results come from /api/products so they reflect the real catalog.
+    // The previous hardcoded list ignored the database entirely.
+    let searchToken = 0;
 
     function performSearch(query) {
-      const q = query.toLowerCase().trim();
+      const q = String(query || "").trim();
       if (!q) {
         $("#resultHeader").hide();
         $("#resultsGrid").html("");
@@ -261,40 +250,61 @@
         return;
       }
 
-      const results = allProducts.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        (p.badge && p.badge.toLowerCase().includes(q))
-      );
+      // Keep the URL shareable so a search can be linked and reloaded.
+      history.replaceState(null, "", "search?q=" + encodeURIComponent(q));
 
+      const token = ++searchToken;
       $("#resultHeader").show();
-      $("#resultTitle").html(`Results for "<em style="color:var(--brown);">${query}</em>"`);
-      $("#resultCount").text(results.length + " product" + (results.length !== 1 ? "s" : ""));
+      $("#resultTitle").html('Results for "<em style="color:var(--brown);"></em>"');
+      $("#resultCount").text("Searching\u2026");
 
-      if (results.length === 0) {
-        $("#resultsGrid").html("");
-        $("#noResults").removeClass("d-none");
-        return;
-      }
-      $("#noResults").addClass("d-none");
+      fetch("api/products?search=" + encodeURIComponent(q), { headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (token !== searchToken) return;           // a newer search won
+          if (!data || !data.success) { showEmpty(); return; }
 
-      const html = results.map(p => `
+          $("#resultTitle").html('Results for "<em style="color:var(--brown);">' + escapeHtml(data.query) + '</em>"');
+          $("#resultCount").text(data.count + " product" + (data.count !== 1 ? "s" : ""));
+
+          if (data.count === 0) { showEmpty(); return; }
+          $("#noResults").addClass("d-none");
+          $("#noResultsMessage").text("We couldn't find anything matching your search. Try different keywords.");
+
+          $("#resultsGrid").html(data.results.map(function (p) {
+            return `
         <div class="col-6 col-lg-3">
           <article class="product-card">
             <div class="product-image-wrap">
-              <img src="${p.image}" alt="${p.name}">
-              <span class="product-badge">${p.badge}</span>
+              <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">
+              ${p.badge ? `<span class="product-badge">${escapeHtml(p.badge)}</span>` : ""}
             </div>
             <div class="product-info">
-              <div class="product-category">${p.category}</div>
-              <h3 class="product-name">${p.name}</h3>
+              <div class="product-category">${escapeHtml(p.category || "")}</div>
+              <h3 class="product-name">${escapeHtml(p.name)}</h3>
               <div class="product-price">${formatPrice(p.price)}</div>
               <a href="product?id=${p.id}" class="btn-view">View Details</a>
             </div>
           </article>
-        </div>
-      `).join("");
-      $("#resultsGrid").html(html);
+        </div>`;
+          }).join(""));
+        })
+        .catch(function () {
+          if (token !== searchToken) return;
+          $("#resultCount").text("");
+          showEmpty("Search is unavailable right now. Please try again.");
+        });
+    }
+
+    function showEmpty(message) {
+      $("#resultsGrid").html("");
+      if (message) $("#noResultsMessage").text(message);
+      $("#noResults").removeClass("d-none");
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
     $("#searchForm").on("submit", function (e) {

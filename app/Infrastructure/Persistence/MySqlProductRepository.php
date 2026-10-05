@@ -11,7 +11,7 @@ use PDO;
 
 final class MySqlProductRepository implements ProductRepositoryInterface
 {
-    private const COLUMNS = 'id, name, slug, description, price, image, badge, sizes, colors, is_featured';
+    private const COLUMNS = 'id, name, slug, description, price, weight, image, badge, sizes, colors, is_featured';
 
     public function __construct(
         private readonly PDO $pdo,
@@ -81,6 +81,35 @@ final class MySqlProductRepository implements ProductRepositoryInterface
         );
         $stmt->bindValue(':exclude', $excludeProductId, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $this->hydrate($stmt->fetchAll());
+    }
+
+    public function search(string $term, int $limit = 60): array
+    {
+        $term = trim($term);
+        if ($term === '') {
+            return [];
+        }
+
+        // Bound parameters carry the connection's collation (see Database.php);
+        // the explicit COLLATE keeps the comparison working whatever a table
+        // happens to be using.
+        $like = '%' . $term . '%';
+        $stmt = $this->pdo->prepare(
+            'SELECT ' . self::COLUMNS . '
+               FROM products
+              WHERE name LIKE :a
+                 OR slug LIKE :b
+                 OR description LIKE :c
+           ORDER BY (name LIKE :d) DESC, name ASC
+              LIMIT :lim'
+        );
+        foreach ([':a', ':b', ':c', ':d'] as $key) {
+            $stmt->bindValue($key, $like, PDO::PARAM_STR);
+        }
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $this->hydrate($stmt->fetchAll());

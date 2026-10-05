@@ -15,6 +15,51 @@ final class CatalogController
     ) {
     }
 
+    /**
+     * GET /api/products?search=...
+     *
+     * JSON feed for the storefront search page, so results come from the
+     * catalog rather than a hardcoded list in the page's script.
+     */
+    public function search(): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            ob_end_clean();
+            http_response_code(405);
+            echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+            exit;
+        }
+
+        $term = trim((string) ($_GET['search'] ?? $_GET['q'] ?? ''));
+        if ($term === '') {
+            ob_end_clean();
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => 'A search term is required']);
+            exit;
+        }
+
+        $results = array_map(static fn(Product $p) => [
+            'id'       => $p->id(),
+            'name'     => $p->name(),
+            'slug'     => $p->slug(),
+            'price'    => $p->price(),
+            'image'    => $p->image(),
+            'badge'    => $p->badge()?->value,
+            'category' => implode(', ', array_map(static fn(Category $c) => $c->name(), $p->categories())),
+        ], $this->service->searchProducts(mb_substr($term, 0, 80)));
+
+        ob_end_clean();
+        echo json_encode([
+            'success' => true,
+            'query'   => $term,
+            'count'   => count($results),
+            'results' => $results,
+        ]);
+        exit;
+    }
+
     public function renderCategorySlider(): string
     {
         try {
