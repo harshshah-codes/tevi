@@ -59,7 +59,8 @@ $orderService = new \App\Application\Services\OrderService($orderRepository);
 $shiprocketClient = new \App\Infrastructure\Shipping\ShiprocketClient(
     $config['shiprocket']['email'],
     $config['shiprocket']['api_token'],
-    (bool) $config['shiprocket']['simulate']
+    (bool) $config['shiprocket']['simulate'],
+    (string) $config['shiprocket']['api_base']
 );
 $shipmentService = new \App\Application\Services\ShipmentService($shiprocketClient);
 

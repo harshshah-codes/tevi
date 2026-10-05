@@ -45,6 +45,9 @@ return [
         'email'     => $_ENV['SHIPROCKET_EMAIL'] ?? 'shiprocket@example.test',
         'api_token' => $_ENV['SHIPROCKET_API_TOKEN'] ?? 'DUMMY_SHIPROCKET_TOKEN',
         'simulate'  => filter_var($_ENV['SHIPROCKET_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
+        // Shiprocket publish two hosts. Override this only if your account is
+        // served by the other one — see docs/SHIPROCKET.md.
+        'api_base'  => $_ENV['SHIPROCKET_API_BASE'] ?? 'https://api.shiprocket.in/v1',
         // Shiprocket does not sign its webhooks, so this secret is the only thing
         // authenticating the callback. Send it as an x-api-key header rather
         // than ?token=, which would end up in access logs and Referer headers.
