@@ -247,8 +247,9 @@
       bootstrap.Toast.getOrCreateInstance(document.getElementById("siteToast"), { delay: 2200 }).show();
     }
 
-    function getWishlist() { return JSON.parse(localStorage.getItem("hovWishlist") || "[]"); }
-    function saveWishlist(list) { localStorage.setItem("hovWishlist", JSON.stringify(list)); }
+    // Server-backed when signed in, localStorage when not: see js/wishlist.js
+    function getWishlist() { return window.Wishlist ? window.Wishlist.get() : JSON.parse(localStorage.getItem("hovWishlist") || "[]"); }
+    function saveWishlist(list) { if (window.Wishlist) { window.Wishlist.replaceAll ? window.Wishlist.replaceAll(list) : localStorage.setItem("hovWishlist", JSON.stringify(list)); } else { localStorage.setItem("hovWishlist", JSON.stringify(list)); } }
     function getBag() { return JSON.parse(localStorage.getItem("hovBag") || "[]"); }
     function saveBag(bag) { localStorage.setItem("hovBag", JSON.stringify(bag)); }
 
@@ -328,10 +329,17 @@
       if (index === -1) return;
       const list = getWishlist();
       const removedName = list[index].name;
+      const removedId = list[index].id;
       list.splice(index, 1);
       saveWishlist(list);
+      if (window.Wishlist) window.Wishlist.remove(removedId);
       showToast(removedName + " removed from wishlist.");
+      // Pull the server copy (and fold in any guest items) before rendering.
+    if (window.Wishlist) {
+      window.Wishlist.load().then(renderWishlist);
+    } else {
       renderWishlist();
+    }
     });
 
     // Add to bag
@@ -373,7 +381,12 @@
       }
     });
 
-    renderWishlist();
+    // Pull the server copy (and fold in any guest items) before rendering.
+    if (window.Wishlist) {
+      window.Wishlist.load().then(renderWishlist);
+    } else {
+      renderWishlist();
+    }
     updateBagCount();
   });
   </script>
@@ -397,7 +410,6 @@ async function updateNavbar() {
             <li><h6 class="dropdown-header">Account</h6></li>
             <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
-            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;

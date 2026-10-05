@@ -13,6 +13,9 @@ use App\Application\Services\PaymentService;
 use App\Infrastructure\Payment\RazorpayClient;
 use App\Infrastructure\Shipping\ShiprocketClient;
 use App\Application\Services\ShipmentService;
+use App\Application\Services\WishlistService;
+use App\Infrastructure\Persistence\MySqlWishlistRepository;
+use App\Infrastructure\Http\Controllers\WishlistController;
 use App\Infrastructure\Http\Controllers\PaymentController;
 use App\Infrastructure\Http\Controllers\WebhookController;
 use App\Application\Services\AuthService;
@@ -69,9 +72,14 @@ $paymentService = new PaymentService($razorpayClient);
 $shiprocketClient = new ShiprocketClient(
     $config['shiprocket']['email'],
     $config['shiprocket']['api_token'],
-    (bool) $config['shiprocket']['simulate']
+    (bool) $config['shiprocket']['simulate'],
+    (string) $config['shiprocket']['api_base']
 );
 $shipmentService = new ShipmentService($shiprocketClient);
+$wishlistRepository = new MySqlWishlistRepository($pdo);
+$wishlistService = new WishlistService($wishlistRepository, $productRepository);
+$wishlistController = new WishlistController($wishlistService);
+
 $webhookController = new WebhookController(
     $orderService,
     $shipmentService,
@@ -99,4 +107,5 @@ return [
     'payment'      => $paymentController,
     'shipment'     => $shipmentService,
     'webhook'      => $webhookController,
+    'wishlist'     => $wishlistController,
 ];

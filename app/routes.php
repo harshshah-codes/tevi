@@ -105,6 +105,41 @@ if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PAT
     exit;
 }
 
+// --- Wishlist ---
+if ($uri === '/api/wishlist') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $app['wishlist']->index();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $app['wishlist']->store();
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $app['wishlist']->clear();
+    }
+    exit;
+}
+if ($uri === '/api/wishlist/merge' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['wishlist']->merge();
+    exit;
+}
+if (preg_match('#^/api/wishlist/(\d+)$#', $uri, $m)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        ob_start();
+        $app = require __DIR__ . '/bootstrap.php';
+        $app['wishlist']->destroy((int) $m[1]);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'PATCH') {
+        ob_start();
+        $app = require __DIR__ . '/bootstrap.php';
+        $app['wishlist']->update((int) $m[1]);
+        exit;
+    }
+}
+
 // --- Inbound courier webhooks (no session: authenticated by shared secret) ---
 // Deliberately courier-agnostic in the path: the URL is visible in Shiprocket's
 // settings and in access logs, so it says what it does, not who calls it.

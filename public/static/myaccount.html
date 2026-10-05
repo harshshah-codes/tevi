@@ -246,6 +246,7 @@
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="siteToast" class="toast border-0"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div></div>
 
+  <script src="js/wishlist.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -448,6 +449,7 @@
           showToast(id ? "Address updated." : "Address saved.");
           resetAddressForm();
           loadAddresses();
+    if (window.Wishlist) window.Wishlist.load().then(loadAccountWishlist);
         })
         .catch(function () {
           $btn.prop("disabled", false);
@@ -532,7 +534,8 @@
     }
 
     function loadAccountWishlist() {
-      const wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      // Server-backed when signed in; falls back to localStorage for guests.
+      const wishlist = window.Wishlist ? window.Wishlist.get() : JSON.parse(localStorage.getItem("hovWishlist") || "[]");
       const $list = $("#accountWishlist");
       if (wishlist.length === 0) {
         $list.html('<p style="color:var(--muted);font-size:13px;">Your wishlist is empty.</p>');
@@ -553,10 +556,17 @@
     $(document).on("click", ".wishlist-item-remove", function () {
       const $row = $(this).closest(".wishlist-item");
       const idx = parseInt($row.data("index"), 10);
-      let wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
+      const wishlist = window.Wishlist ? window.Wishlist.get() : JSON.parse(localStorage.getItem("hovWishlist") || "[]");
       if (!Number.isInteger(idx) || !wishlist[idx]) return;
-      wishlist.splice(idx, 1);
-      localStorage.setItem("hovWishlist", JSON.stringify(wishlist));
+
+      const productId = wishlist[idx].id;
+      if (window.Wishlist) {
+        window.Wishlist.remove(productId);
+      } else {
+        const next = wishlist.slice();
+        next.splice(idx, 1);
+        localStorage.setItem("hovWishlist", JSON.stringify(next));
+      }
       loadAccountWishlist();
       showToast("Removed from wishlist.");
     });
@@ -600,7 +610,6 @@ async function updateNavbar() {
             <li><h6 class="dropdown-header">Account</h6></li>
             <li><a class="dropdown-item" href="myaccount"><i class="bi bi-person-circle"></i> My Account</a></li>
             <li><a class="dropdown-item" href="myorder"><i class="bi bi-bag-check"></i> My Orders</a></li>
-            <li><a class="dropdown-item" href="wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); fetch('api/logout', {method:'POST',headers:{'Content-Type':'application/json'}}).then(()=>{location.reload();});"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
           `;
