@@ -41,6 +41,7 @@ $routes = [
     '/contact'           => 'contact.html',
     '/faq'               => 'faq.html',
     '/search'            => 'search.html',
+    '/shop'              => 'shop.html',
 
     // --- Authentication ---
     '/login'             => 'login.html',
@@ -180,7 +181,7 @@ if ($uri === '/api/payments/simulate' && $_SERVER['REQUEST_METHOD'] === 'POST') 
 if ($uri === '/api/products' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     ob_start();
     $app = require __DIR__ . '/bootstrap.php';
-    $app['catalog']->search();
+    $app["catalog"]->products();
     exit;
 }
 

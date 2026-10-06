@@ -41,6 +41,13 @@ interface ProductRepositoryInterface
      */
     public function search(string $term, int $limit = 60): array;
 
+    /**
+     * List the catalog, optionally narrowed to a badge or category.
+     *
+     * @return Product[]
+     */
+    public function listFiltered(int $limit = 60, ?string $badge = null, ?string $categorySlug = null): array;
+
     public function create(Product $product): int;
 
     public function update(Product $product): bool;

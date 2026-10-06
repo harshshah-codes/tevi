@@ -42,8 +42,17 @@ require_once __DIR__ . '/../app/Core/Autoload.php';
 \App\Core\Autoload::register();
 
 echo "Validation\n";
-check('empty term is rejected', search($base, '')['status'] === 422);
-check('non-GET is rejected', search($base, 'kurta')['status'] === 200);
+check('GET works', search($base, 'kurta')['status'] === 200);
+
+// No search term now means "the whole catalog" rather than an error, because
+// the collection page loads through the same endpoint.
+$listing = search($base, '');
+check('empty term lists the catalog instead of erroring',
+    ($listing['status'] ?? 0) === 200 && ($listing['body']['success'] ?? false) === true,
+    'count=' . ($listing['body']['count'] ?? '?'));
+check('every product in the listing has a slug',
+    count(array_filter($listing['body']['results'] ?? [], static fn($p) => ($p['slug'] ?? '') !== ''))
+    === count($listing['body']['results'] ?? []));
 
 echo "\nResults come from the catalog\n";
 

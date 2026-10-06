@@ -115,6 +115,43 @@ final class MySqlProductRepository implements ProductRepositoryInterface
         return $this->hydrate($stmt->fetchAll());
     }
 
+    public function listFiltered(int $limit = 60, ?string $badge = null, ?string $categorySlug = null): array
+    {
+        $where = [];
+        $params = [];
+
+        if ($badge !== null && $badge !== '') {
+            $where[] = 'badge = :badge';
+            $params[':badge'] = $badge;
+        }
+
+        if ($categorySlug !== null && $categorySlug !== '') {
+            // EXISTS rather than a join: products sit in several categories, and
+            // joining would repeat a product once per category.
+            $where[] = 'EXISTS (
+                              SELECT 1
+                                FROM product_category pc
+                                JOIN categories c ON c.id = pc.category_id
+                               WHERE pc.product_id = products.id
+                                 AND c.slug = :category
+                            )';
+            $params[':category'] = $categorySlug;
+        }
+
+        $sql = 'SELECT ' . self::COLUMNS . ' FROM products'
+            . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where))
+            . ' ORDER BY is_featured DESC, id DESC LIMIT :lim';
+
+        $stmt = $this->pdo->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $this->hydrate($stmt->fetchAll());
+    }
+
     /**
      * @return Product[]
      */

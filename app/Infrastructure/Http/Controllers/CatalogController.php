@@ -16,12 +16,13 @@ final class CatalogController
     }
 
     /**
-     * GET /api/products?search=...
+     * GET /api/products[?search=…][?badge=…][?category=…]
      *
-     * JSON feed for the storefront search page, so results come from the
-     * catalog rather than a hardcoded list in the page's script.
+     * JSON feed for storefront pages: search, the full collection, and the
+     * filtered views. Results come from the catalog, not from any list baked
+     * into a page.
      */
-    public function search(): void
+    public function products(): void
     {
         header('Content-Type: application/json; charset=UTF-8');
 
@@ -33,11 +34,18 @@ final class CatalogController
         }
 
         $term = trim((string) ($_GET['search'] ?? $_GET['q'] ?? ''));
-        if ($term === '') {
-            ob_end_clean();
-            http_response_code(422);
-            echo json_encode(['success' => false, 'error' => 'A search term is required']);
-            exit;
+        $badge = trim((string) ($_GET['badge'] ?? ''));
+        $category = trim((string) ($_GET['category'] ?? ''));
+        $limit = min(200, max(1, (int) ($_GET['limit'] ?? 60)));
+
+        if ($term !== '') {
+            $products = $this->service->searchProducts(mb_substr($term, 0, 80), $limit);
+        } else {
+            $products = $this->service->listProducts(
+                $limit,
+                $badge === '' ? null : $badge,
+                $category === '' ? null : $category
+            );
         }
 
         $results = array_map(static fn(Product $p) => [
@@ -47,8 +55,11 @@ final class CatalogController
             'price'    => $p->price(),
             'image'    => $p->image(),
             'badge'    => $p->badge()?->value,
+            'sizes'    => $p->sizes(),
+            'colors'   => $p->colors(),
             'category' => implode(', ', array_map(static fn(Category $c) => $c->name(), $p->categories())),
-        ], $this->service->searchProducts(mb_substr($term, 0, 80)));
+            'categorySlug' => $p->categories()[0]->slug() ?? '',
+        ], $products);
 
         ob_end_clean();
         echo json_encode([

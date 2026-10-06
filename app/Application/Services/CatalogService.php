@@ -51,6 +51,14 @@ final class CatalogService
         return $this->productRepository->search($term, $limit);
     }
 
+    /**
+     * @return Product[]
+     */
+    public function listProducts(int $limit = 60, ?string $badge = null, ?string $categorySlug = null): array
+    {
+        return $this->productRepository->listFiltered($limit, $badge, $categorySlug);
+    }
+
     public function getProductBySlug(string $slug): ?Product
     {
         return $slug === '' ? null : $this->products->findBySlug($slug);

@@ -31,7 +31,8 @@
 
   function api(path, options) {
     return fetch("api/wishlist" + path, options || {}).then(function (r) {
-      if (r.status === 401) return null;
+      if (r.status === 401) { Wishlist.isSignedIn = false; return null; }
+      Wishlist.isSignedIn = true;
       return r.json().then(function (body) {
         return { ok: r.ok, body: body };
       });
@@ -47,6 +48,9 @@
   }
 
   var Wishlist = {
+    /** Whether the last API call succeeded, i.e. whether we are signed in. */
+    isSignedIn: null,
+
     /** Local copy, for rendering without a round trip. */
     get: readLocal,
 
