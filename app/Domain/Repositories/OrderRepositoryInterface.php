@@ -90,4 +90,10 @@ interface OrderRepositoryInterface
      * clicks cannot both "win": the loser gets rowCount() === 0.
      */
     public function cancelForUser(int $id, int $userId, string $expectedStatus, ?string $reason): bool;
+
+    /**
+     * Permanently delete an order. Only allowed when the order is cancelled
+     * (or already in a terminal state) so no data is accidentally destroyed.
+     */
+    public function delete(int $id): bool;
 }

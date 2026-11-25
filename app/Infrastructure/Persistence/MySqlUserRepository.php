@@ -114,7 +114,9 @@ final class MySqlUserRepository implements UserRepositoryInterface
             $row['phone'] !== null ? (string) $row['phone'] : null,
             (int) $row['is_active'],
             (string) $row['created_at'],
-            (string) $row['updated_at']
+            // Not every database has updated_at; a missing column must not
+            // emit a warning in front of the response body.
+            isset($row['updated_at']) ? (string) $row['updated_at'] : ''
         );
     }
 }

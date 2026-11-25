@@ -56,11 +56,23 @@ $reviewController = new \App\Infrastructure\Http\Controllers\AdminReviewControll
 $orderRepository = new \App\Infrastructure\Persistence\MySqlOrderRepository($pdo);
 $orderService = new \App\Application\Services\OrderService($orderRepository);
 
+$variantRepository = new \App\Infrastructure\Persistence\MySqlProductVariantRepository($pdo);
+$ledgerRepository = new \App\Infrastructure\Persistence\MySqlInventoryLedgerRepository($pdo);
+$shipmentInventory = new \App\Application\Services\InventoryService(
+    $variantRepository,
+    $ledgerRepository,
+    $productRepository,
+    $pdo
+);
+$inventoryController = new \App\Infrastructure\Http\Controllers\AdminInventoryController($shipmentInventory);
+
 $shiprocketClient = new \App\Infrastructure\Shipping\ShiprocketClient(
     $config['shiprocket']['email'],
-    $config['shiprocket']['api_token'],
+    $config['shiprocket']['api_password'],
     (bool) $config['shiprocket']['simulate'],
-    (string) $config['shiprocket']['api_base']
+    (string) $config['shiprocket']['api_base'],
+    3,
+    (string) $config['shiprocket']['token_cache']
 );
 $shipmentService = new \App\Application\Services\ShipmentService($shiprocketClient);
 
@@ -178,8 +190,13 @@ switch ($action) {
         }
         break;
 
+    case 'inventory':
+        $inventoryController->index();
+        break;
+
     case 'orders':
         $subAction = $parts[1] ?? 'index';
+        $subId = $parts[2] ?? null;
         switch ($subAction) {
             case 'detail':
                 $ordersController->detail();
@@ -189,6 +206,9 @@ switch ($action) {
                 break;
             case 'request-delivery':
                 $ordersController->requestDelivery();
+                break;
+            case 'delete':
+                $ordersController->delete((int) $subId);
                 break;
             default:
                 $ordersController->index();

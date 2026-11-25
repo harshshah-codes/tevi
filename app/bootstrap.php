@@ -14,8 +14,12 @@ use App\Infrastructure\Payment\RazorpayClient;
 use App\Infrastructure\Shipping\ShiprocketClient;
 use App\Application\Services\ShipmentService;
 use App\Application\Services\WishlistService;
+use App\Application\Services\InventoryService;
 use App\Infrastructure\Persistence\MySqlWishlistRepository;
+use App\Infrastructure\Persistence\MySqlProductVariantRepository;
+use App\Infrastructure\Persistence\MySqlInventoryLedgerRepository;
 use App\Infrastructure\Http\Controllers\WishlistController;
+use App\Infrastructure\Http\Controllers\InventoryController;
 use App\Infrastructure\Http\Controllers\PaymentController;
 use App\Infrastructure\Http\Controllers\WebhookController;
 use App\Application\Services\AuthService;
@@ -58,6 +62,10 @@ $productController = new ProductController($catalogService);
 
 $homeController = new HomeController($heroController, $catalogController);
 
+$variantRepository = new MySqlProductVariantRepository($pdo);
+$ledgerRepository = new MySqlInventoryLedgerRepository($pdo);
+$inventoryService = new InventoryService($variantRepository, $ledgerRepository, $productRepository, $pdo);
+
 $orderRepository = new MySqlOrderRepository($pdo);
 $pricingService = new PricingService($productRepository);
 $razorpayClient = new RazorpayClient(
@@ -66,19 +74,22 @@ $razorpayClient = new RazorpayClient(
     (bool) $config['razorpay']['simulate']
 );
 $orderService = new OrderService($orderRepository, $razorpayClient);
-$orderController = new OrderController($orderService, $pricingService);
+$orderController = new OrderController($orderService, $pricingService, $inventoryService);
 $paymentService = new PaymentService($razorpayClient);
 
 $shiprocketClient = new ShiprocketClient(
     $config['shiprocket']['email'],
-    $config['shiprocket']['api_token'],
+    $config['shiprocket']['api_password'],
     (bool) $config['shiprocket']['simulate'],
-    (string) $config['shiprocket']['api_base']
+    (string) $config['shiprocket']['api_base'],
+    3,
+    (string) $config['shiprocket']['token_cache']
 );
 $shipmentService = new ShipmentService($shiprocketClient);
 $wishlistRepository = new MySqlWishlistRepository($pdo);
 $wishlistService = new WishlistService($wishlistRepository, $productRepository);
 $wishlistController = new WishlistController($wishlistService);
+$inventoryController = new InventoryController($inventoryService);
 
 $webhookController = new WebhookController(
     $orderService,
@@ -108,4 +119,6 @@ return [
     'shipment'     => $shipmentService,
     'webhook'      => $webhookController,
     'wishlist'     => $wishlistController,
+    'inventory'    => $inventoryService,
+    'inventoryPublic' => $inventoryController,
 ];

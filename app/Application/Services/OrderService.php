@@ -92,6 +92,16 @@ final class OrderService
     }
 
     /**
+     * Delete an order. Only allowed when the order is cancelled.
+     *
+     * @return bool false when the order does not exist or is not cancelled
+     */
+    public function deleteOrder(int $id): bool
+    {
+        return $this->repository->delete($id);
+    }
+
+    /**
      * Whether a customer may still cancel this order themselves.
      */
     public function isCancellable(Order $order): bool

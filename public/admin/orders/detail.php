@@ -1,6 +1,12 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="mb-0">Order <!--ORDER_ID--></h5>
     <a href="/admin/orders" class="btn btn-outline-secondary">Back to List</a>
+    <!--IF:CAN_DELETE-->
+    <form action="/admin/orders/delete?id=<!--ORDER_DB_ID-->" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="<!--CSRF_TOKEN-->">
+        <button type="submit" class="btn btn-danger">Delete Order</button>
+    </form>
+    <!--ENDIF:CAN_DELETE-->
 </div>
 
 <!--FLASH-->

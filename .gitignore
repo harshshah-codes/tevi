@@ -51,3 +51,6 @@ playwright/.cache/
 
 # Backup files
 *.bak
+
+# Shiprocket bearer token cache
+storage/

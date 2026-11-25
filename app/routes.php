@@ -106,6 +106,14 @@ if ($uri === '/api/profile' && in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PAT
     exit;
 }
 
+// --- Inventory (public stock lookup for the storefront) ---
+if ($uri === '/api/inventory' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    ob_start();
+    $app = require __DIR__ . '/bootstrap.php';
+    $app['inventoryPublic']->show();
+    exit;
+}
+
 // --- Wishlist ---
 if ($uri === '/api/wishlist') {
     ob_start();

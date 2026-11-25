@@ -167,6 +167,41 @@ final class AdminOrdersController extends AdminController
     }
 
     /**
+     * Delete an order. Only allowed when the order is cancelled.
+     */
+    public function delete(int $id = 0): void
+    {
+        $this->requireAuth();
+        $this->validateCsrf();
+
+        $id = $id ?: (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
+        $back = '/admin/orders';
+
+        $order = $this->service->getOrder($id);
+        if ($order === null) {
+            $this->flash('Order not found', 'danger');
+            $this->redirect($back);
+        }
+
+        $target = isset($_GET['return_to']) && $_GET['return_to'] === 'detail'
+            ? '/admin/orders/detail?id=' . $id
+            : $back;
+
+        if ($order->status() !== 'cancelled') {
+            $this->flash('Only cancelled orders can be deleted.', 'danger');
+            $this->redirect($target);
+        }
+
+        if (!$this->service->deleteOrder($id)) {
+            $this->flash('Could not delete order ' . $order->orderId() . '.', 'danger');
+            $this->redirect($target);
+        }
+
+        $this->flash('Order ' . htmlspecialchars($order->orderId()) . ' deleted.', 'success');
+        $this->redirect($target);
+    }
+
+    /**
      * Who is making the change, recorded in order_status_history.
      */
     private function adminActor(): string
@@ -203,6 +238,13 @@ final class AdminOrdersController extends AdminController
                 . '<div class="d-inline-flex gap-2 align-items-center">'
                 . $this->quickStatusForm($order, $csrf)
                 . '<a href="/admin/orders/detail?id=' . $order->id() . '" class="btn btn-sm btn-outline-primary">View</a>'
+                . ($order->status() === 'cancelled'
+                    ? '<form action="/admin/orders/delete?id=' . $order->id() . '" method="post" class="d-inline" onsubmit="return confirm(\'Are you sure you want to delete this order? This cannot be undone.\');">'
+                      . '<input type="hidden" name="csrf_token" value="' . $csrf . '">'
+                      . '<button type="submit" class="btn btn-sm btn-danger">Delete</button>'
+                      . '</form>'
+                    : '')
+
                 . '</div>'
                 . '</td>'
                 . '</tr>';
@@ -364,6 +406,7 @@ final class AdminOrdersController extends AdminController
             'CANCEL_BLOCK'     => $cancelBlock,
             'HISTORY_ROWS'     => $historyRows,
             'CSRF_TOKEN'       => $this->csToken(),
+            'CAN_DELETE'       => $order->status() === 'cancelled',
         ]);
 
         $this->output($content);
@@ -484,6 +527,7 @@ final class AdminOrdersController extends AdminController
             'ACTIVE_PRODUCTS'   => '',
             'ACTIVE_CATEGORIES' => '',
             'ACTIVE_REVIEWS'    => '',
+            'ACTIVE_INVENTORY' => '',
         ]);
         header('Content-Type: text/html; charset=UTF-8');
         echo $layout;

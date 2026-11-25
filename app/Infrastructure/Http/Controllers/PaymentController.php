@@ -134,6 +134,8 @@ final class PaymentController
         );
 
         if (!$result['verified']) {
+            // Payment failed or verification failed - cancel the order
+            $this->orders->cancelOrderForUser($order->id(), $userId, 'processing', 'Payment failed or verification failed');
             $this->respond([
                 'success'       => false,
                 'error'         => 'Payment could not be verified',

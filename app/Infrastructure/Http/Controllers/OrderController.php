@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Http\Controllers;
 
 use App\Application\Services\OrderService;
+use App\Application\Services\InventoryService;
 use App\Application\Services\PricingService;
 use App\Domain\Models\Order;
 
@@ -28,6 +29,7 @@ final class OrderController
     public function __construct(
         private readonly OrderService $service,
         private readonly PricingService $pricing,
+        private readonly ?InventoryService $inventory = null,
     ) {
     }
 
@@ -159,6 +161,16 @@ final class OrderController
             exit;
         }
 
+        // A cancelled order's stock goes back on the shelf. A failure here must
+        // not lose the cancellation, so it is logged rather than thrown.
+        if ($this->inventory !== null) {
+            try {
+                $this->inventory->releaseForOrder($order->id(), (int) $_SESSION['user_id']);
+            } catch (\Throwable $e) {
+                error_log('Inventory release failed for order ' . $order->orderId() . ': ' . $e->getMessage());
+            }
+        }
+
         ob_end_clean();
         echo json_encode([
             'success' => true,
@@ -251,6 +263,24 @@ final class OrderController
             exit;
         }
 
+        // Stock first: a customer must not be able to pay for something we
+        // cannot ship. The check and the commit both re-read inside the
+        // transaction, so two checkouts racing for the last kurta cannot win.
+        if ($this->inventory !== null) {
+            $availability = $this->inventory->checkAvailability($items);
+
+            if (!$availability['ok']) {
+                ob_end_clean();
+                http_response_code(409);
+                echo json_encode([
+                    'success'  => false,
+                    'error'    => 'Some items are no longer available in that option',
+                    'problems' => $availability['problems'],
+                ]);
+                exit;
+            }
+        }
+
         // Money is recomputed from catalog prices; the payload's subtotal,
         // shipping, tax and total are deliberately ignored.
         $paymentMethod = (string) ($data['payment'] ?? 'cod');
@@ -295,6 +325,31 @@ final class OrderController
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'Failed to save order: ' . $e->getMessage()]);
             exit;
+        }
+
+        // Stock is taken against the saved order so the ledger can point at
+        // it. If that fails the order is cancelled rather than left standing
+        // as an order we cannot fulfil.
+        if ($this->inventory !== null) {
+            try {
+                $this->inventory->commitForOrder($id, $items, (int) $_SESSION['user_id']);
+            } catch (\Throwable $e) {
+                $this->service->adminUpdateStatus(
+                    $id,
+                    $order->status(),
+                    'cancelled',
+                    'Out of stock at checkout',
+                    'system'
+                );
+
+                ob_end_clean();
+                http_response_code(409);
+                echo json_encode([
+                    'success' => false,
+                    'error'   => 'We ran out of stock while saving your order: ' . $e->getMessage(),
+                ]);
+                exit;
+            }
         }
 
         ob_end_clean();

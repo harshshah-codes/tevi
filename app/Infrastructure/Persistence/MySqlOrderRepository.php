@@ -210,6 +210,21 @@ final class MySqlOrderRepository implements OrderRepositoryInterface
         return $stmt->rowCount() > 0;
     }
 
+    public function delete(int $id): bool
+    {
+        // Only allow deletion of cancelled orders so we never accidentally
+        // remove an active/processing/shipped order.
+        $stmt = $this->pdo->prepare(
+            'DELETE FROM orders WHERE id = :id AND status = :status'
+        );
+        $stmt->execute([
+            ':id'      => $id,
+            ':status'  => 'cancelled',
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
     public function updateStatusByAdmin(int $id, string $expectedStatus, string $newStatus, ?string $note = null): bool
     {
         if ($expectedStatus === '' || $newStatus === '') {

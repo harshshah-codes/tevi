@@ -42,16 +42,25 @@ return [
     // credentials below keep SHIPROCKET_SIMULATE on, so "Request Delivery"
     // issues a fake waybill locally and never calls Shiprocket.
     'shiprocket' => [
-        'email'     => $_ENV['SHIPROCKET_EMAIL'] ?? 'shiprocket@example.test',
-        'api_token' => $_ENV['SHIPROCKET_API_TOKEN'] ?? 'DUMMY_SHIPROCKET_TOKEN',
-        'simulate'  => filter_var($_ENV['SHIPROCKET_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
-        // Shiprocket publish two hosts. Override this only if your account is
-        // served by the other one — see docs/SHIPROCKET.md.
-        'api_base'  => $_ENV['SHIPROCKET_API_BASE'] ?? 'https://api.shiprocket.in/v1',
-        // Shiprocket does not sign its webhooks, so this secret is the only thing
-        // authenticating the callback. Send it as an x-api-key header rather
-        // than ?token=, which would end up in access logs and Referer headers.
-        // Query tokens stay off unless you knowingly enable them below.
+        // API-user credentials from Settings -> API -> Create an API User.
+        // Shiprocket authenticates with a bearer token from /auth/login, not
+        // with these credentials directly, and the email must be an address
+        // that is not already registered on the account.
+        'email'         => $_ENV['SHIPROCKET_EMAIL'] ?? 'shiprocket@example.test',
+        'api_password'  => $_ENV['SHIPROCKET_API_PASSWORD'] ?? 'DUMMY_SHIPROCKET_PASSWORD',
+        'simulate'      => filter_var($_ENV['SHIPROCKET_SIMULATE'] ?? 'true', FILTER_VALIDATE_BOOL),
+        // Their documented base host. The older api.shiprocket.in answers with
+        // a 503 gateway page.
+        'api_base'      => $_ENV['SHIPROCKET_API_BASE'] ?? 'https://apiv2.shiprocket.in/v1/external',
+        // Where the bearer token is cached between requests; it lasts 240 hours.
+        // dirname(__DIR__, 2) is the project root: config.php lives in app/Config,
+        // and a cache file inside app/ would sit in the deployable tree.
+        'token_cache'   => $_ENV['SHIPROCKET_TOKEN_CACHE']
+            ?? dirname(__DIR__, 2) . '/storage/shiprocket-token.json',
+        // Shiprocket does not sign its webhooks, so this secret is the only
+        // thing authenticating the callback. Send it as an x-api-key header
+        // rather than ?token=, which would end up in access logs and Referer
+        // headers. Query tokens stay off unless you knowingly enable them.
         'webhook_secret' => $_ENV['SHIPROCKET_WEBHOOK_SECRET'] ?? 'DUMMY_WEBHOOK_SECRET',
         'webhook_allow_query_token' => filter_var($_ENV['SHIPROCKET_WEBHOOK_ALLOW_QUERY_TOKEN'] ?? 'false', FILTER_VALIDATE_BOOL),
     ],

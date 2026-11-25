@@ -10,15 +10,17 @@ from Shiprocket to switch it on, and where each credential comes from.
 | # | What | Where to get it | Used for |
 |---|------|-----------------|----------|
 | 1 | **Account** | [shiprocket.in](https://www.shiprocket.in) → Sign up | Basic access |
-| 2 | **Email address** | The one on your Shiprocket account | HTTP Basic auth username |
-| 3 | **API token** | Shiprocket dashboard → **Settings → API → API Key → Generate Token** (or **Settings → Developer/API**) | HTTP Basic auth password |
+| 2 | **API user email** | Shiprocket → **Settings → API → Configure → Create an API User**. It must be an address **not already registered** on the account | Login for `/auth/login` |
+| 3 | **API user password** | Set when you create the API user | Login for `/auth/login` |
 | 4 | **Pickup PIN code** | Set under **Settings → Pickup → Pickup Address**, verified with a location pin | Origin address on every shipment |
 | 5 | **Webhook URL** | You supply it: `https://<your-domain>/api/webhooks/tracking` | Courier status updates |
 | 6 | **Webhook API key** | You generate it (`openssl rand -hex 32`) and send it as the `x-api-key` header | Authenticates the callback |
 
-> Item 3 is the one people get stuck on: the API token is **not** your login
-> password. It's generated on the API settings page and can be regenerated
-> there. Regenerating it immediately invalidates the old one.
+> Authentication is **not** HTTP Basic. Shiprocket exchanges your API-user
+> credentials for a bearer token via `POST /v1/external/auth/login`, then
+> expects `Authorization: Bearer <token>` on every call. The token is valid
+> for **240 hours (10 days)**, so the app caches it and refreshes it two
+> minutes before expiry.
 
 ### Callback URL to paste into Shiprocket
 
@@ -46,10 +48,11 @@ logs or `Referer` headers.
 Add to `.env` (see `.env.example`):
 
 ```ini
-SHIPROCKET_EMAIL=you@yourdomain.com
-SHIPROCKET_API_TOKEN=paste_token_here
+SHIPROCKET_EMAIL=api-user@yourdomain.com
+SHIPROCKET_API_PASSWORD=paste_api_user_password
 SHIPROCKET_SIMULATE=false
 SHIPROCKET_WEBHOOK_SECRET=paste_generated_secret_here
+SHIPROCKET_TOKEN_CACHE=storage/shiprocket-token.json
 ```
 
 `SHIPROCKET_SIMULATE` is ours, not Shiprocket's:
@@ -63,6 +66,21 @@ The admin UI states plainly which mode is active, and every simulated shipment
 is flagged `(sandbox)` in the attempt log.
 
 ---
+
+## The call sequence
+
+"Request Delivery" performs their documented three-step flow:
+
+| # | Call | Gets us |
+|---|------|----------|
+| 1 | `POST /orders/create/adhoc` | `shipment_id` |
+| 2 | `POST /courier/assign/awb` | `awb_code` (tracking number) |
+| 3 | `POST /courier/generate/pickup` | `pickup_token`, label URL |
+
+The AWB and pickup are separate calls — step 1 alone gives you a shipment with
+no tracking number. Also available on the client but not wired to the UI:
+`GET /courier/serviceability/` (rate lookup) and
+`GET /courier/track/awb/{awb}` (poll tracking).
 
 ## The admin flow
 
@@ -163,7 +181,8 @@ Shiprocket rejects formatted numbers.
 ## Go-live checklist
 
 - [ ] `SHIPROCKET_SIMULATE=false`
-- [ ] Real `SHIPROCKET_EMAIL` + `SHIPROCKET_API_TOKEN`
+- [ ] API-user email + password (`SHIPROCKET_EMAIL`, `SHIPROCKET_API_PASSWORD`)
+- [ ] `storage/` writable by the web user, and not inside the web root
 - [ ] Pickup PIN code verified in Shiprocket settings
 - [ ] Webhook URL configured in Shiprocket, with an `x-api-key` header matching `SHIPROCKET_WEBHOOK_SECRET`
 - [ ] Weights entered for real products under **Products → Edit**, and one

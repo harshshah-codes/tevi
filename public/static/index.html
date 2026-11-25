@@ -339,6 +339,7 @@
     <div id="siteToast" class="toast border-0" role="alert"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div>
   </div>
 
+  <script src="js/inventory.js"></script>
   <script src="js/wishlist.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -353,56 +354,114 @@
       $("#bagCount").text(count);
     }
 
+    // Cards are rendered server-side, so re-check stock after they are in place.
+    $(paintCardStock);
+
     $(document).on("click", ".catalog-card", function (e) {
       if ($(e.target).closest("a, button").length) return;
       const url = $(this).data("product-url");
       if (url) window.location.href = url;
     });
 
+    // Quick add picks a real variant: the first colour and size the product
+    // offers. It used to hardcode "M" / "Default", which matched no stocked
+    // variant at all — those lines were only rejected later, at checkout.
+    function defaultVariant(p) {
+      return {
+        colour: (p.colors && p.colors[0]) || "",
+        size: (p.sizes && p.sizes[0]) || ""
+      };
+    }
+
     $(document).on("click", ".quick-add", function () {
       const p = $(this).data("product");
-      let hovBag = JSON.parse(localStorage.getItem("hovBag") || "[]");
-      const existing = hovBag.find(item => item.name === p.name && item.size === "M");
-      if (existing) {
-        existing.qty = (existing.qty || 1) + 1;
-      } else {
-        hovBag.push({
-          id: Date.now(), productId: p.id, name: p.name, price: p.price, image: p.image,
-          category: p.category, size: "M", color: "Default", qty: 1
-        });
-      }
-      localStorage.setItem("hovBag", JSON.stringify(hovBag));
-      updateBagFromLocalStorage();
-      showToast(p.name + " added to your bag.");
+      const choice = defaultVariant(p);
+      const $btn = $(this).prop("disabled", true);
+
+      const add = function () {
+        let hovBag = JSON.parse(localStorage.getItem("hovBag") || "[]");
+        const existing = hovBag.find(item =>
+          item.productId === p.id && item.size === choice.size && item.color === choice.colour
+        );
+        if (existing) {
+          existing.qty = (existing.qty || 1) + 1;
+        } else {
+          hovBag.push({
+            id: Date.now(), productId: p.id, name: p.name, price: p.price, image: p.image,
+            category: p.category, size: choice.size, color: choice.colour, qty: 1
+          });
+        }
+        localStorage.setItem("hovBag", JSON.stringify(hovBag));
+        updateBagFromLocalStorage();
+        showToast(p.name + " (" + [choice.colour, choice.size].filter(Boolean).join(" / ") + ") added to your bag.");
+        $btn.prop("disabled", false);
+      };
+
+      if (!window.Inventory) { add(); return; }
+
+      window.Inventory.load(p.id).then(function (map) {
+        if (window.Inventory.isAvailable(map, choice.colour, choice.size, 1)) {
+          add();
+          return;
+        }
+
+        $btn.prop("disabled", false);
+        showToast(p.name + " is out of stock — pick a size and colour on its page.");
+      });
     });
+
+    // Grey out the quick-add button where nothing is available.
+    function paintCardStock() {
+      if (!window.Inventory) return;
+
+      $(".quick-add").each(function () {
+        const p = $(this).data("product");
+        if (!p || !p.id) return;
+        const choice = defaultVariant(p);
+
+        window.Inventory.load(p.id).then(function (map) {
+          if (window.Inventory.isAvailable(map, choice.colour, choice.size, 1)) return;
+          $(this).prop("disabled", true).attr("title", "Out of stock in this option");
+        }.bind(this));
+      });
+    }
 
     // Saves to the account when signed in, to localStorage when not.
     $(document).on("click", ".wishlist-btn", function () {
       const p = $(this).data("product");
       const icon = $(this).find("i");
-      const wasSaved = window.Wishlist ? window.Wishlist.has(p.id) : false;
-
-      const apply = (saved) => {
-        icon.toggleClass("bi-heart-fill", saved).toggleClass("bi-heart", !saved);
-        showToast(saved ? "Added to wishlist." : "Removed from wishlist.");
-      };
 
       if (!window.Wishlist) {
+        // Wishlist module not loaded yet, fall back to localStorage
         let wishlist = JSON.parse(localStorage.getItem("hovWishlist") || "[]");
-        if (wishlist.some((w) => w.name === p.name)) {
-          wishlist = wishlist.filter((w) => w.name !== p.name);
-          apply(false);
+        const existing = wishlist.find(w => w.name === p.name);
+        if (existing) {
+          wishlist = wishlist.filter(w => w.name !== p.name);
+          showToast("Removed from wishlist.");
         } else {
-          wishlist.push({id:p.id,name:p.name,price:p.price,image:p.image,category:p.category,size:"M",color:"Default"});
-          apply(true);
+          wishlist.push({id: p.id, name: p.name, price: p.price, image: p.image, category: p.category, size: "M", color: "Default", qty: 1});
+          showToast("Added to wishlist.");
         }
         localStorage.setItem("hovWishlist", JSON.stringify(wishlist));
         return;
       }
 
-      window.Wishlist.toggle(p, "M", "Default").then((saved) => {
-        if (saved !== null) apply(saved);
-      });
+      // Use centralized Wishlist.toggle which handles auth and 401
+      window.Wishlist.toggle({id: p.id, name: p.name, price: p.price, image: p.image, category: p.category}, "M", "Default")
+        .then(function(saved) {
+          if (saved === null) {
+            // Not signed in - modal was shown, revert UI
+            return;
+          }
+          // Update heart icon based on result
+          const icon = $(this).find("i");
+          icon.toggleClass("bi-heart-fill", saved).toggleClass("bi-heart", !saved);
+          showToast(saved ? "Added to wishlist." : "Removed from wishlist.");
+        })
+        .catch(function() {
+          // Error (e.g., 401) - modal was shown, no UI change needed
+          return;
+        });
     });
 
     $(document).on("click", ".catalog-tab", function () {

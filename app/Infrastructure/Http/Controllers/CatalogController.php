@@ -39,27 +39,31 @@ final class CatalogController
         $limit = min(200, max(1, (int) ($_GET['limit'] ?? 60)));
 
         if ($term !== '') {
-            $products = $this->service->searchProducts(mb_substr($term, 0, 80), $limit);
+            $products = $this->catalog->searchProducts(mb_substr($term, 0, 80), $limit);
         } else {
-            $products = $this->service->listProducts(
+            $products = $this->catalog->listProducts(
                 $limit,
                 $badge === '' ? null : $badge,
                 $category === '' ? null : $category
             );
         }
 
-        $results = array_map(static fn(Product $p) => [
-            'id'       => $p->id(),
-            'name'     => $p->name(),
-            'slug'     => $p->slug(),
-            'price'    => $p->price(),
-            'image'    => $p->image(),
-            'badge'    => $p->badge()?->value,
-            'sizes'    => $p->sizes(),
-            'colors'   => $p->colors(),
-            'category' => implode(', ', array_map(static fn(Category $c) => $c->name(), $p->categories())),
-            'categorySlug' => $p->categories()[0]->slug() ?? '',
-        ], $products);
+        $results = array_map(static function (Product $p) {
+            $categories = $p->categories();
+
+            return [
+                'id'       => $p->id(),
+                'name'     => $p->name(),
+                'slug'     => $p->slug(),
+                'price'    => $p->price(),
+                'image'    => $p->image(),
+                'badge'    => $p->badge()?->value,
+                'sizes'    => $p->sizes(),
+                'colors'   => $p->colors(),
+                'category'     => implode(', ', array_map(static fn(Category $c) => $c->name(), $categories)),
+                'categorySlug' => $categories !== [] ? $categories[0]->slug() : '',
+            ];
+        }, $products);
 
         ob_end_clean();
         echo json_encode([
@@ -240,6 +244,8 @@ final class CatalogController
         $categoryName = $product->categories() !== []
             ? $product->categories()[0]->name()
             : '';
+        // sizes/colors ride along so the storefront can check stock for the
+        // exact variant being added to the bag, not just the product.
         $payload = json_encode([
             'id'       => $product->id(),
             'name'     => $product->name(),
@@ -247,6 +253,8 @@ final class CatalogController
             'price'    => $product->price(),
             'image'    => $product->image(),
             'badge'    => $badgeValue,
+            'sizes'    => $product->sizes(),
+            'colors'   => $product->colors(),
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $payloadAttr = htmlspecialchars($payload, ENT_QUOTES, 'UTF-8');
 

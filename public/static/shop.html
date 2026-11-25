@@ -138,6 +138,8 @@
     .size-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
     .size-btn { border: 1px solid var(--line); background: transparent; font-size: 10px; padding: 4px 9px; cursor: pointer; color: var(--muted); }
     .size-btn.active { border-color: var(--espresso); color: var(--espresso); }
+    .out-of-stock .catalog-image-wrap img { filter: grayscale(.7); opacity:.75; }
+    .stock-note { display: block; margin-top: 8px; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--danger); }
     .shop-state { padding: 70px 0; text-align: center; color: var(--muted); }
     .shop-state h3 { font-family: "Cormorant Garamond", serif; color: var(--espresso); }
   </style>
@@ -248,6 +250,7 @@
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="siteToast" class="toast border-0"><div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMessage">Message</span></div></div></div>
 
+  <script src="js/inventory.js"></script>
   <script src="js/wishlist.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -272,10 +275,11 @@
       }).join("");
       const payload = escapeHtml(JSON.stringify({
         id: p.id, name: p.name, category: p.category,
-        price: p.price, image: p.image, badge: p.badge || ""
+        price: p.price, image: p.image, badge: p.badge || "",
+        sizes: p.sizes || [], colors: p.colors || []
       }));
 
-      return '<div class="col-6 col-lg-3">'
+      return '<div class="col-6 col-lg-3" data-product-id="' + p.id + '">'
         + '<article class="catalog-card">'
         +   '<div class="catalog-image-wrap">'
         +     '<a href="' + url + '"><img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" loading="lazy"></a>'
@@ -301,6 +305,7 @@
       $("#shopCount").text(shown.length + " product" + (shown.length !== 1 ? "s" : ""));
       $("#shopGrid").html(shown.map(card).join(""));
       paintHearts();
+      paintStock();
     }
 
     // Hearts should show what is already saved, not just what the server holds.
@@ -405,6 +410,30 @@
     }
 
     readUrlFilter();
+
+    // A card adds its default option (first colour, first size). If that
+    // combination is empty we say so on the card rather than letting the
+    // customer pick something we cannot ship.
+    function paintStock() {
+      if (!window.Inventory || !products.length) return;
+
+      products.forEach(function (p) {
+        window.Inventory.load(p.id).then(function (map) {
+          const colour = (p.colors && p.colors[0]) || "";
+          const size = (p.sizes && p.sizes[0]) || "";
+          const entry = map[String(colour).trim().toLowerCase() + "|" + String(size).trim().toLowerCase()];
+          const available = !!entry && entry.isInStock;
+
+          const $card = $('[data-product-id="' + p.id + '"]');
+          $card.toggleClass("out-of-stock", !available);
+          $card.find(".stock-note").remove();
+          if (!available) {
+            $card.append('<span class="stock-note">Out of stock in ' +
+              (colour || "this colour") + " / " + (size || "this size") + "</span>");
+          }
+        });
+      });
+    }
 
     // Saved items first, so the hearts are right on first paint.
     if (window.Wishlist) { window.Wishlist.load().then(load); } else { load(); }

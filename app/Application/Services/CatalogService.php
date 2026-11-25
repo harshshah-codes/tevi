@@ -48,7 +48,7 @@ final class CatalogService
      */
     public function searchProducts(string $term, int $limit = 60): array
     {
-        return $this->productRepository->search($term, $limit);
+        return $this->products->search($term, $limit);
     }
 
     /**
@@ -56,7 +56,7 @@ final class CatalogService
      */
     public function listProducts(int $limit = 60, ?string $badge = null, ?string $categorySlug = null): array
     {
-        return $this->productRepository->listFiltered($limit, $badge, $categorySlug);
+        return $this->products->listFiltered($limit, $badge, $categorySlug);
     }
 
     public function getProductBySlug(string $slug): ?Product
