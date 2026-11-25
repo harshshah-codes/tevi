@@ -101,6 +101,10 @@
                     <a class="nav-link" href="/" target="_blank">
                         <i class="bi bi-box-arrow-up-right me-2"></i>View Site
                     </a>
+                    <hr class="text-secondary mx-3">
+                    <a class="nav-link" href="/admin/logout" onclick="return confirm('Are you sure you want to log out?');">
+                        <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                    </a>
                 </nav>
             </aside>
 

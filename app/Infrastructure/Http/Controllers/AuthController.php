@@ -297,8 +297,16 @@ final class AuthController
         }
         session_destroy();
 
+        // Admin logout: redirect to login page
+        if (strpos($_SERVER['REQUEST_URI'] ?? '', '/admin') !== false) {
+            header('Location: /admin/login');
+            exit;
+        }
+
+        header('Content-Type: application/json; charset=UTF-8');
         ob_end_clean();
         echo json_encode(['success' => true, 'message' => 'Logged out']);
         exit;
     }
+
 }
