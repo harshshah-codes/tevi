@@ -117,6 +117,9 @@ final class AdminOrdersController extends AdminController
 
         $order = $this->service->getOrder($id);
         if ($order === null) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Order not found'], 404);
+            }
             $this->flash('Order not found', 'danger');
             $this->redirect($back);
         }
@@ -126,24 +129,31 @@ final class AdminOrdersController extends AdminController
             : $back;
 
         if (!in_array($status, self::STATUSES, true)) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Unknown status: ' . htmlspecialchars($status, ENT_QUOTES)], 400);
+            }
             $this->flash('Unknown status: ' . htmlspecialchars($status, ENT_QUOTES), 'danger');
             $this->redirect($target);
         }
 
         if ($status === $order->status()) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Order is already marked as ' . $status . '.'], 400);
+            }
             $this->flash('Order is already marked as ' . $status . '.', 'warning');
             $this->redirect($target);
         }
 
         $allowed = $this->service->adminTransitionsFrom($order->status());
         if (!in_array($status, $allowed, true)) {
-            $this->flash(
-                'Cannot move an order from "' . $order->status() . '" to "' . $status . '". '
+            $msg = 'Cannot move an order from "' . $order->status() . '" to "' . $status . '". '
                 . ($allowed === []
                     ? 'Orders that are ' . $order->status() . ' are final.'
-                    : 'Allowed next: ' . implode(', ', $allowed) . '.'),
-                'danger'
-            );
+                    : 'Allowed next: ' . implode(', ', $allowed) . '.');
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => $msg], 400);
+            }
+            $this->flash($msg, 'danger');
             $this->redirect($target);
         }
 
@@ -158,47 +168,72 @@ final class AdminOrdersController extends AdminController
         );
 
         if (!$updated) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Could not update this order — someone else may have changed it first.'], 409);
+            }
             $this->flash('Could not update this order — someone else may have changed it first.', 'danger');
             $this->redirect($target);
         }
 
         $this->flash('Order ' . $order->orderId() . ' moved from ' . $order->status() . ' to ' . $status . '.');
+
+        if ($this->isAjax()) {
+            $this->respondJson([
+                'success' => true,
+                'orderId' => $order->id(),
+                'orderIdStr' => $order->orderId(),
+                'status' => $status,
+                'message' => 'Order ' . $order->orderId() . ' moved from ' . $order->status() . ' to ' . $status . '.'
+            ]);
+        }
+
         $this->redirect($target);
     }
 
     /**
      * Delete an order. Only allowed when the order is cancelled.
      */
-    public function delete(int $id = 0): void
+    public function delete(): void
     {
         $this->requireAuth();
         $this->validateCsrf();
 
-        $id = $id ?: (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
-        $back = '/admin/orders';
-
+        $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
         $order = $this->service->getOrder($id);
         if ($order === null) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Order not found'], 404);
+            }
             $this->flash('Order not found', 'danger');
-            $this->redirect($back);
+            $this->redirect('/admin/orders');
         }
 
-        $target = isset($_GET['return_to']) && $_GET['return_to'] === 'detail'
-            ? '/admin/orders/detail?id=' . $id
-            : $back;
-
         if ($order->status() !== 'cancelled') {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Only cancelled orders can be deleted'], 400);
+            }
             $this->flash('Only cancelled orders can be deleted.', 'danger');
-            $this->redirect($target);
+            $this->redirect('/admin/orders');
         }
 
         if (!$this->service->deleteOrder($id)) {
+            if ($this->isAjax()) {
+                $this->respondJson(['success' => false, 'error' => 'Could not delete order'], 500);
+            }
             $this->flash('Could not delete order ' . $order->orderId() . '.', 'danger');
-            $this->redirect($target);
+            $this->redirect('/admin/orders');
+        }
+
+        if ($this->isAjax()) {
+            $this->respondJson([
+                'success' => true,
+                'orderId' => $order->id(),
+                'message' => 'Order deleted successfully'
+            ]);
         }
 
         $this->flash('Order ' . htmlspecialchars($order->orderId()) . ' deleted.', 'success');
-        $this->redirect($target);
+        $this->redirect($back);
     }
 
     /**
@@ -238,8 +273,9 @@ final class AdminOrdersController extends AdminController
                 . '<div class="d-inline-flex gap-2 align-items-center">'
                 . $this->quickStatusForm($order, $csrf)
                 . '<a href="/admin/orders/detail?id=' . $order->id() . '" class="btn btn-sm btn-outline-primary">View</a>'
-                . ($order->status() === 'cancelled'
-                    ? '<form action="/admin/orders/delete?id=' . $order->id() . '" method="post" class="d-inline" onsubmit="return confirm(\'Are you sure you want to delete this order? This cannot be undone.\');">'
+                .($order->status() === 'cancelled'
+                    ? '<form action="/admin/orders/delete?id=' . $order->id() . '" method="post" class="d-inline" data-delete-order="1" onsubmit="return confirm(\'Are you sure you want to delete this order? This cannot be undone.\');">'
+                      . '<input type="hidden" name="id" value="' . $order->id() . '">'
                       . '<input type="hidden" name="csrf_token" value="' . $csrf . '">'
                       . '<button type="submit" class="btn btn-sm btn-danger">Delete</button>'
                       . '</form>'

@@ -14,7 +14,7 @@ abstract class AdminController
         }
 
         $html = preg_replace_callback(
-            '/<!--IF:([A-Z0-9_]+)-->(.*?)<!--ENDIF:\1-->/s',
+            '/<!--IF:([A-Z0-9_]+)-->(.*?)<!--ENDIF:\\1-->/s',
             function (array $m) use ($placeholders): string {
                 $key = $m[1];
                 $val = $placeholders[$key] ?? '';
@@ -68,6 +68,19 @@ abstract class AdminController
             http_response_code(403);
             exit('CSRF token validation failed');
         }
+    }
+
+    protected function isAjax(): bool
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+    }
+
+    protected function respondJson(array $payload, int $status = 200): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+        http_response_code($status);
+        echo json_encode($payload);
+        exit;
     }
 
     protected function requireAuth(): void
